@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lista de Usuários</title>
+
+  <!--Navbar-->
+ <link rel="stylesheet" href="/css/navbar.css" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #333;
+      margin-top: 20px;
+      color: #fff;
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #555;
+      text-align: left;
+    }
+
+    th {
+      background-color: #444;
+    }
+
+    button {
+      padding: 6px 12px;
+      background-color: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #c0392b;
+    }
+
+    .navbar-nav .nav-link {
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      font-size: 20px;
+      color: #000 !important;
+    }
+
+        /* Navbar personalizada */
+    .custom-navbar {
+      background-color: #727277 !important;
+    }
+
+    .custom-navbar .nav-link {
+      color: #fff !important;
+      font-weight: bold;
+    }
+
+    .custom-navbar .nav-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div id="navbar-placeholder"></div>
+
+  <h1>Usuários Cadastrados</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Telefone</th>
+        <th>Email</th>
+        <th>Cidade</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="ListaUsu">
+    </tbody>
+  </table>
+
+  <script>
+    // Corrigido: id do tbody correto e funcional
+    async function carregarUsuarios() {
+      try {
+        const resposta = await fetch('/api/usuarios/lista');
+        const usuarios = await resposta.json();
+
+        const tabela = document.getElementById('ListaUsu'); // Corrigido para o ID certo
+        tabela.innerHTML = '';
+
+        usuarios.forEach(usuario => {
+          const linha = document.createElement('tr');
+
+          linha.innerHTML = `
+            <td>${usuario.nome} ${usuario.sobrenome || ''}</td>
+            <td>${usuario.telefone || '-'}</td>
+            <td>${usuario.email || '-'}</td>
+            <td>${usuario.cidade || '-'}</td>
+            <td><button onclick="deletarUsuario('${usuario._id}')">Excluir</button></td>
+          `;
+
+          tabela.appendChild(linha);
+        });
+      } catch (erro) {
+        console.error('Erro ao carregar usuários:', erro);
+      }
+    }
+
+    async function deletarUsuario(id) {
+      if (confirm('Tem certeza que deseja excluir este usuário?')) {
+        const resposta = await fetch(`/api/usuarios/${id}`, { method: 'DELETE' });
+
+        if (resposta.ok) {
+          alert('Usuário excluído com sucesso!');
+          carregarUsuarios();
+        } else {
+          alert('Erro ao excluir o usuário.');
+        }
+      }
+    }
+
+    carregarUsuarios();
+
+    // Navbar carregada com tratamento de erro
+  fetch('/components/navbar.html')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('navbar-placeholder').innerHTML = data;
+    });
+  </script>
+</body>
+</html>

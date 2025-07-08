@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lista de Eventos</title>
+
+    <!--Navbar-->
+  <link rel="stylesheet" href="/css/navbar.css" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #fff;
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #333;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #555;
+      text-align: left;
+    }
+
+    th {
+      background-color: #444;
+    }
+
+    button {
+      padding: 6px 10px;
+      background-color: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #c0392b;
+    }
+
+    .btn-ver-mais {
+      background-color: #3498db;
+    }
+
+    .btn-ver-mais:hover {
+      background-color: #2980b9;
+    }
+
+    .btn-editar {
+      background-color: #f39c12;
+      margin-left: 5px;
+    }
+
+    .btn-editar:hover {
+      background-color: #e67e22;
+    } 
+
+        /* Navbar personalizada */
+    .custom-navbar {
+      background-color: #727277 !important;
+    }
+
+    .custom-navbar .nav-link {
+      color: #fff !important;
+      font-weight: bold;
+    }
+
+    .custom-navbar .nav-link:hover {
+      text-decoration: underline;
+    }
+
+  </style>
+</head>
+<body>
+  <!--Navbar-->
+  <div id="navbar-placeholder"></div>
+  
+  <h1>Eventos Cadastrados</h1>
+
+<!-- Barra de pesquisa -->
+<div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+  <input
+    type="date"
+    id="filtro-data"
+    style="padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;"
+  />
+  <input
+    type="text"
+    id="filtro-tipo"
+    placeholder="Filtrar por tipo de evento..."
+    style="flex: 1; padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;"
+  />
+</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Hora</th>
+        <th>Tipo Evento</th>
+        <th>Acesso</th>
+        <th>Comida</th>
+        <th>Bebida</th>
+        <th>Nº Convidados</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="lista-eventos">
+      <!-- Linhas geradas via JS -->
+    </tbody>
+  </table>
+
+  <script>
+ let todosEventos = [];
+
+  async function carregarEventos() {
+    const resposta = await fetch('/api/eventos/lista-evento');
+    todosEventos = await resposta.json();
+    exibirEventos(todosEventos);
+  }
+
+  function exibirEventos(lista) {
+    const tabela = document.getElementById('lista-eventos');
+    tabela.innerHTML = '';
+
+    lista.forEach(evento => {
+      const linha = document.createElement('tr');
+      linha.innerHTML = `
+        <td>${new Date(evento.data_evento).toLocaleDateString()}</td>
+        <td>${evento.hora_evento}</td>
+        <td>${evento.tipo_evento}</td>
+        <td>${evento.acesso}</td>
+        <td>${evento.tipo_comida}</td>
+        <td>${evento.tipo_bebida}</td>
+        <td>${evento.num_convidados}</td>
+        <td>
+          <button onclick="deletarEvento('${evento._id}')">Excluir</button>
+          <button class="btn-ver-mais" onclick="verDetalhes('${evento._id}')">Ver Mais</button>
+          <button class="btn-editar" onclick="editarEvento('${evento._id}')">Editar</button>
+        </td>
+      `;
+      tabela.appendChild(linha);
+    });
+  }
+
+  function filtrarEventos() {
+    const tipo = document.getElementById('filtro-tipo').value.toLowerCase();
+    const data = document.getElementById('filtro-data').value; // yyyy-mm-dd
+
+    const filtrados = todosEventos.filter(evento => {
+      const dataEvento = evento.data_evento?.split('T')[0];
+      const tipoMatch = evento.tipo_evento?.toLowerCase().includes(tipo);
+      const dataMatch = !data || dataEvento === data;
+      return tipoMatch && dataMatch;
+    });
+
+    exibirEventos(filtrados);
+  }
+
+  // Eventos dos filtros
+  document.getElementById('filtro-tipo').addEventListener('input', filtrarEventos);
+  document.getElementById('filtro-data').addEventListener('input', filtrarEventos);
+
+  async function deletarEvento(id) {
+    if (confirm('Tem certeza que deseja excluir este evento?')) {
+      const resposta = await fetch(`/api/eventos/${id}`, { method: 'DELETE' });
+      if (resposta.ok) {
+        alert('Evento excluído com sucesso!');
+        carregarEventos();
+      } else {
+        alert('Erro ao excluir o evento.');
+      }
+    }
+  }
+
+  function verDetalhes(id) {
+    window.location.href = `/api/eventos/detalhes?id=${id}`;
+  }
+
+  function editarEvento(id) {
+    window.location.href = `/api/eventos/editar?id=${id}`;
+  }
+
+  carregarEventos();
+
+  // Carregar navbar
+  fetch('/components/navbar.html')
+    .then(response => {
+      if (!response.ok) throw new Error('Erro ao carregar a navbar');
+      return response.text();
+    })
+    .then(data => {
+      document.getElementById('navbar-placeholder').innerHTML = data;
+    })
+    .catch(error => {
+      console.error('Erro ao carregar navbar:', error);
+    });
+  </script>
+
+</body>
+</html>

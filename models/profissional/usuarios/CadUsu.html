@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Formulário de Cadastro de Usuário</title>
+
+  <!--Navbar-->
+  <link rel="stylesheet" href="/css/navbar.css" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #000000;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  margin-top: 50px;
+  flex-direction: column;
+}
+
+    form {
+      background-color: #727277;
+      width: 100%;
+      max-width: 800px;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgb(0, 0, 0);
+      padding-top: 5px; /* distância da navbar */
+    }
+
+    h2,
+    h3 {
+      text-align: center;
+      color: #000000;
+      margin-top: 0;
+    }
+
+    .section {
+      margin-bottom: 25px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #111;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    input::placeholder {
+      color: #000000;
+    }
+
+    button {
+      background-color: rgb(43, 47, 47);
+      color: white;
+      padding: 12px;
+      border: none;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: rgb(0, 0, 0);
+    }
+
+        /* Navbar personalizada */
+    .custom-navbar {
+      background-color: #727277 !important;
+    }
+
+    .custom-navbar .nav-link {
+      color: #fff !important;
+      font-weight: bold;
+    }
+
+    .custom-navbar .nav-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!--Navbar-->
+  <div id="navbar-placeholder"></div>
+
+  <!-- Formulário -->
+    <div class="container-form">
+    <div id="erros" class="alert alert-danger d-none" role="alert"></div>
+
+    <form action="/api/usuarios/cadastro" method="POST">
+      <div class="section">
+        <img
+          src="/imagens/logo.png"
+          alt="Logo"
+          style="width: 110px; height: auto; display: block; margin: 0 auto 10px; border-radius: 10px"
+        />
+      </div>
+
+      <div class="section">
+        <h2>Crie seu cadastro</h2>
+
+        <div class="form-group">
+          <label for="nome">Nome</label>
+          <input type="text" id="nome" name="nome" placeholder="Digite seu nome" required />
+        </div>
+
+        <div class="form-group">
+          <label for="sobrenome">Sobrenome</label>
+          <input type="text" id="sobrenome" name="sobrenome" placeholder="Digite seu sobrenome" required />
+        </div>
+
+        <div class="form-group">
+          <label for="cpf">CPF</label>
+          <input
+              type="text"
+              id="cpf"
+              name="cpf"
+              placeholder="000.000.000-00"
+              required
+             />
+        </div>
+
+        <div class="form-group">
+          <label for="datanasc">Data de Nascimento</label>
+          <input type="date" id="datanasc" name="datanasc" required />
+        </div>
+
+        <div class="form-group">
+          <label for="telefone">Telefone</label>
+          <input
+            type="text"
+            id="telefone"
+            name="telefone"
+            placeholder="(99) 99999-9999"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="genero">Gênero</label>
+          <select id="genero" name="genero" required>
+            <option value="">Selecione...</option>
+            <option value="feminino">Feminino</option>
+            <option value="masculino">Masculino</option>
+            <option value="nao_binario">Não-binário</option>
+            <option value="outro">Outro</option>
+            <option value="prefiro_nao_dizer">Prefiro não dizer</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="email">E-mail</label>
+         <input type="text" id="email" name="email" placeholder="exemplo@dominio.com" required />
+        </div>
+
+        <!-- Depois do campo de email -->
+
+        <div class="form-group">
+           <label for="senha">Senha</label>
+           <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required minlength="6" />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmaSenha">Confirme a Senha</label>
+          <input type="password" id="confirmaSenha" name="confirmaSenha" placeholder="Confirme sua senha" required minlength="6" />
+        </div>
+
+      </div>
+
+      <div class="section">
+        <h3>Endereço do Usuário</h3>
+
+        <div class="form-group">
+          <label for="rua">Rua</label>
+          <input type="text" id="rua" name="rua" placeholder="Digite o nome da rua" required />
+        </div>
+
+        <div class="form-group">
+          <label for="numero">Número</label>
+          <input type="text" id="numero" name="numero" placeholder="Número da casa/prédio" required />
+        </div>
+
+        <div class="form-group">
+          <label for="complemento">Complemento</label>
+          <input type="text" id="complemento" name="complemento" placeholder="Ex: Apto 101" />
+        </div>
+
+        <div class="form-group">
+          <label for="bairro">Bairro</label>
+          <input type="text" id="bairro" name="bairro" placeholder="Digite o bairro" required />
+        </div>
+
+        <div class="form-group">
+          <label for="cidade">Cidade</label>
+          <input type="text" id="cidade" name="cidade" placeholder="Digite a cidade" required />
+        </div>
+
+        <div class="form-group">
+          <label for="estado">Estado</label>
+          <select id="estado" name="estado" required>
+            <option value="">Selecione o estado</option>
+            <option value="AC">Acre (AC)</option>
+            <option value="AL">Alagoas (AL)</option>
+            <option value="AP">Amapá (AP)</option>
+            <option value="AM">Amazonas (AM)</option>
+            <option value="BA">Bahia (BA)</option>
+            <option value="CE">Ceará (CE)</option>
+            <option value="DF">Distrito Federal (DF)</option>
+            <option value="ES">Espírito Santo (ES)</option>
+            <option value="GO">Goiás (GO)</option>
+            <option value="MA">Maranhão (MA)</option>
+            <option value="MT">Mato Grosso (MT)</option>
+            <option value="MS">Mato Grosso do Sul (MS)</option>
+            <option value="MG">Minas Gerais (MG)</option>
+            <option value="PA">Pará (PA)</option>
+            <option value="PB">Paraíba (PB)</option>
+            <option value="PR">Paraná (PR)</option>
+            <option value="PE">Pernambuco (PE)</option>
+            <option value="PI">Piauí (PI)</option>
+            <option value="RJ">Rio de Janeiro (RJ)</option>
+            <option value="RN">Rio Grande do Norte (RN)</option>
+            <option value="RS">Rio Grande do Sul (RS)</option>
+            <option value="RO">Rondônia (RO)</option>
+            <option value="RR">Roraima (RR)</option>
+            <option value="SC">Santa Catarina (SC)</option>
+            <option value="SP">São Paulo (SP)</option>
+            <option value="SE">Sergipe (SE)</option>
+            <option value="TO">Tocantins (TO)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="cep">CEP</label>
+          <input type="text" id="cep" name="cep" placeholder="00000-000" required />
+        </div>
+      </div>
+
+      <button type="submit">Cadastrar</button>
+    </form>
+  </div>
+  
+  <script>
+  const form = document.querySelector('form');
+  const errosDiv = document.getElementById('erros');
+
+  form.addEventListener('submit', async function (event) {
+    errosDiv.classList.add('d-none');
+    errosDiv.innerHTML = '';
+
+    const erros = [];
+
+    const nome = document.getElementById('nome').value.trim();
+    const sobrenome = document.getElementById('sobrenome').value.trim();
+    const cpf = document.getElementById('cpf').value.trim();
+    const datanasc = document.getElementById('datanasc').value;
+    const telefone = document.getElementById('telefone').value.trim();
+    const genero = document.getElementById('genero').value;
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value;
+    const confirmaSenha = document.getElementById('confirmaSenha').value;
+    const rua = document.getElementById('rua').value.trim();
+    const numero = document.getElementById('numero').value.trim();
+    const complemento = document.getElementById('complemento').value.trim();
+    const bairro = document.getElementById('bairro').value.trim();
+    const cidade = document.getElementById('cidade').value.trim();
+    const estado = document.getElementById('estado').value;
+    const cep = document.getElementById('cep').value.trim();
+
+    // Validações
+    if (nome === '') erros.push('O campo Nome é obrigatório.');
+    if (sobrenome === '') erros.push('O campo Sobrenome é obrigatório.');
+    if (!datanasc) erros.push('A Data de Nascimento é obrigatória.');
+    if (!genero) erros.push('Selecione um gênero.');
+    if (email === '') erros.push('O campo E-mail é obrigatório.');
+    if (telefone === '') erros.push('O campo Telefone é obrigatório.');
+    if (!senha) erros.push('O campo Senha é obrigatório.');
+    if (!confirmaSenha) erros.push('O campo Confirmação de Senha é obrigatório.');
+    if (senha && senha.length < 6) erros.push('A senha deve ter pelo menos 6 caracteres.');
+    if (senha && confirmaSenha && senha !== confirmaSenha) erros.push('As senhas não coincidem.');
+    if (rua === '') erros.push('O campo Rua é obrigatório.');
+    if (numero === '') erros.push('O campo Número é obrigatório.');
+    if (bairro === '') erros.push('O campo Bairro é obrigatório.');
+    if (cidade === '') erros.push('O campo Cidade é obrigatório.');
+    if (!estado) erros.push('Selecione um estado.');
+    if (cep === '') erros.push('O campo CEP é obrigatório.');
+
+    if (erros.length > 0) {
+      event.preventDefault();
+      errosDiv.innerHTML = erros.map(erro => `<div>${erro}</div>`).join('');
+      errosDiv.classList.remove('d-none');
+      window.scrollTo(0, 0);
+      return;
+    }
+
+    // Envio com fetch (AJAX)
+    event.preventDefault(); // Impede envio padrão
+    const formData = {
+      nome, sobrenome, cpf, datanasc, telefone, genero, email, senha, confirmaSenha,
+      rua, numero, complemento, bairro, cidade, estado, cep
+    };
+
+    try {
+      const resposta = await fetch('/api/usuarios/cadastro', {  // corrigido
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    });
+
+      if (resposta.ok) {
+        window.location.href = '/usuarios/CadastroSucesso.html';
+      } else {
+        const msg = await resposta.text();
+        alert('Erro ao cadastrar usuário:\n' + msg);
+      }
+    } catch (err) {
+      console.error('Erro:', err);
+      alert('Erro ao tentar enviar o formulário.');
+    }
+  });
+
+  // Carrega a navbar.html automaticamente
+  fetch('/components/navbar.html')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('navbar-placeholder').innerHTML = data;
+    });
+</script>
+
+</body>
+</html>

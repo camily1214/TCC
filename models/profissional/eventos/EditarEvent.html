@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Editar Evento</title>
+
+  <!-- Navbar -->
+  <link rel="stylesheet" href="/css/navbar.css" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #000000;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background-color: #727277;
+      padding: 30px;
+      border-radius: 10px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #000000;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #000000;
+      color: #fff;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #232424;
+    }
+    
+        .bebida-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .bebida-opcao {
+      font-family: Arial, sans-serif;
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: #f0f0f0;
+      font-size: 14px;
+      transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    }
+
+    .bebida-opcao.selecionado {
+      background-color: #000000;
+      color: white;
+      border-color: #000000;
+    }
+
+    /* Navbar personalizada */
+    .custom-navbar {
+      background-color: #727277 !important;
+    }
+
+    .custom-navbar .nav-link {
+      color: #fff !important;
+      font-weight: bold;
+    }
+
+    .custom-navbar .nav-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div id="navbar-placeholder"></div>
+
+  <div class="container">
+    <h2>Editar Evento</h2>
+    <form id="form-editar-evento">
+      <div class="form-group">
+        <label for="data_evento">Data do Evento</label>
+        <input type="date" id="data_evento" name="data_evento" required>
+      </div>
+
+      <div class="form-group">
+        <label for="hora_evento">Horário</label>
+        <input type="time" id="hora_evento" name="hora_evento" required>
+      </div>
+
+      <div class="form-group">
+        <label for="tipo_evento">Tipo de Evento</label>
+        <select id="tipo_evento" name="tipo_evento" required>
+          <option value="">Selecione...</option>
+          <option value="aniversario">Aniversário</option>
+          <option value="casamento">Casamento</option>
+          <option value="empresarial">Empresarial</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="acesso">Acesso</label>
+        <select id="acesso" name="acesso" required>
+          <option value="">Selecione...</option>
+          <option value="pulseira">Pulseira</option>
+          <option value="lista">Lista</option>
+          <option value="livre">Livre</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="tipo_comida">Tipo de Comida</label>
+        <select id="tipo_comida" name="tipo_comida" required>
+          <option value="">Selecione...</option>
+          <option value="buffet">Buffet</option>
+          <option value="coquetel">Coquetel</option>
+        </select>
+      </div>
+
+     <div class="form-group">
+  <label for="tipo_bebida">Tipo de Bebida</label>
+  <div id="bebida-opcoes" class="bebida-container">
+    <div class="bebida-opcao" data-value="refrigerante">Refrigerante</div>
+    <div class="bebida-opcao" data-value="agua">Água</div>
+    <div class="bebida-opcao" data-value="suco">Suco</div>
+    <div class="bebida-opcao" data-value="cerveja">Cerveja</div>
+    <div class="bebida-opcao" data-value="vinho">Vinho</div>
+  </div>
+  <input type="hidden" id="tipo_bebida" name="tipo_bebida" required>
+</div>
+
+      <div class="form-group">
+        <label for="num_convidados">Número de Convidados</label>
+        <select id="num_convidados" name="num_convidados" required>
+          <option value="">Selecione...</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+          <option value="200">200</option>
+          <option value="300">300</option>
+          <option value="500">500</option>
+        </select>
+      </div>
+
+      <button type="submit">Salvar Alterações</button>
+
+      <br></br>
+
+      <button
+         type="button"
+         class="btn btn-secondary"
+         onclick="window.location.href='/api/eventos/editar/cancelar'">
+         Cancelar alterações
+      </button>
+
+    </form>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventoId = urlParams.get('id');
+
+    async function carregarDados() {
+      if (!eventoId) return alert('ID do evento não informado');
+
+      try {
+        const resposta = await fetch(`/api/eventos/${eventoId}`);
+        const evento = await resposta.json();
+
+        document.getElementById('data_evento').value = evento.data_evento.split('T')[0];
+        document.getElementById('hora_evento').value = evento.hora_evento;
+        document.getElementById('tipo_evento').value = evento.tipo_evento;
+        document.getElementById('acesso').value = evento.acesso;
+        document.getElementById('tipo_comida').value = evento.tipo_comida;
+        document.getElementById('tipo_bebida').value = evento.tipo_bebida;
+        document.getElementById('num_convidados').value = evento.num_convidados;
+      } catch (err) {
+        alert('Erro ao carregar dados do evento');
+      }
+    }
+
+    document.getElementById('form-editar-evento').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const dados = {
+        data_evento: document.getElementById('data_evento').value,
+        hora_evento: document.getElementById('hora_evento').value,
+        tipo_evento: document.getElementById('tipo_evento').value,
+        acesso: document.getElementById('acesso').value,
+        tipo_comida: document.getElementById('tipo_comida').value,
+        num_convidados: document.getElementById('num_convidados').value
+      };
+
+      try {
+        const resposta = await fetch(`/api/eventos/${eventoId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dados)
+        });
+
+        if (resposta.ok) {
+          alert('Evento atualizado com sucesso!');
+          window.location.href = '/api/eventos/lista';
+        } else {
+          alert('Erro ao atualizar evento.');
+        }
+      } catch (err) {
+        alert('Erro ao enviar os dados.');
+      }
+    });
+
+    // Carregar dados ao abrir a página
+    carregarDados();
+
+      const opcoes = document.querySelectorAll('.bebida-opcao');
+  const campoHidden = document.getElementById('tipo_bebida');
+  let selecionados = [];
+
+  document.querySelector('form').addEventListener('submit', function (e) {
+  if (!campoHidden.value) {
+    alert("Selecione pelo menos uma opção de bebida.");
+    e.preventDefault();
+  }
+});
+
+  opcoes.forEach(opcao => {
+    opcao.addEventListener('click', () => {
+      const valor = opcao.getAttribute('data-value');
+      if (selecionados.includes(valor)) {
+        selecionados = selecionados.filter(v => v !== valor);
+        opcao.classList.remove('selecionado');
+      } else {
+        selecionados.push(valor);
+        opcao.classList.add('selecionado');
+      }
+      campoHidden.value = selecionados.join(',');
+    });
+  });
+
+    // Carregar navbar
+    fetch('/components/navbar.html')
+      .then(res => res.ok ? res.text() : Promise.reject('Erro ao carregar navbar'))
+      .then(html => document.getElementById('navbar-placeholder').innerHTML = html)
+      .catch(err => console.error(err));
+  </script>
+
+</body>
+</html>

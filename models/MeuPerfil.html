@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meu Perfil</title>
+
+  <!--Navbar-->
+  <link rel="stylesheet" href="/css/navbar.css" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container-form {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: calc(100vh - 100px);
+      padding: 20px;
+    }
+
+    form {
+      background-color: #727277;
+      width: 100%;
+      max-width: 800px;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgb(0, 0, 0);
+    }
+
+    h2 {
+      text-align: center;
+      color: #000000;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      font-weight: bold;
+      color: #111;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      background-color: rgb(43, 47, 47);
+      color: white;
+      padding: 12px;
+      border: none;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: rgb(0, 0, 0);
+    }
+
+    .custom-navbar {
+      background-color: #727277 !important;
+    }
+
+    .custom-navbar .nav-link {
+      color: #fff !important;
+      font-weight: bold;
+    }
+
+    .custom-navbar .nav-link:hover {
+      text-decoration: underline;
+    }
+
+        /* Navbar personalizada */
+    .custom-navbar {
+      background-color: #727277 !important;
+    }
+
+    .custom-navbar .nav-link {
+      color: #fff !important;
+      font-weight: bold;
+    }
+
+    .custom-navbar .nav-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!--Navbar-->
+  <div id="navbar-placeholder"></div>
+
+  <!-- Formulário de Edição -->
+  <div class="container-form">
+    <form id="formPerfil">
+      <h2>Meu Perfil</h2>
+
+      <div class="form-group">
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" name="nome" required />
+      </div>
+
+      <div class="form-group">
+        <label for="sobrenome">Sobrenome</label>
+        <input type="text" id="sobrenome" name="sobrenome" required />
+      </div>
+
+      <div class="form-group">
+        <label for="cpf">CPF</label>
+        <input type="text" id="cpf" name="cpf" disabled />
+      </div>
+
+      <div class="form-group">
+        <label for="datanasc">Data de Nascimento</label>
+        <input type="date" id="datanasc" name="datanasc" required />
+      </div>
+
+      <div class="form-group">
+        <label for="telefone">Telefone</label>
+        <input type="tel" id="telefone" name="telefone" required />
+      </div>
+
+      <div class="form-group">
+        <label for="genero">Gênero</label>
+        <select id="genero" name="genero" required>
+          <option value="">Selecione...</option>
+          <option value="feminino">Feminino</option>
+          <option value="masculino">Masculino</option>
+          <option value="nao_binario">Não-binário</option>
+          <option value="outro">Outro</option>
+          <option value="prefiro_nao_dizer">Prefiro não dizer</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" required />
+      </div>
+
+      <hr />
+
+      <div class="form-group">
+        <label for="rua">Rua</label>
+        <input type="text" id="rua" name="rua" required />
+      </div>
+
+      <div class="form-group">
+        <label for="numero">Número</label>
+        <input type="text" id="numero" name="numero" required />
+      </div>
+
+      <div class="form-group">
+        <label for="complemento">Complemento</label>
+        <input type="text" id="complemento" name="complemento" />
+      </div>
+
+      <div class="form-group">
+        <label for="bairro">Bairro</label>
+        <input type="text" id="bairro" name="bairro" required />
+      </div>
+
+      <div class="form-group">
+        <label for="cidade">Cidade</label>
+        <input type="text" id="cidade" name="cidade" required />
+      </div>
+
+      <div class="form-group">
+        <label for="estado">Estado</label>
+        <select id="estado" name="estado" required>
+          <option value="">Selecione o estado</option>
+          <option value="SP">São Paulo (SP)</option>
+          <option value="RJ">Rio de Janeiro (RJ)</option>
+          <!-- ... outros estados ... -->
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="cep">CEP</label>
+        <input type="text" id="cep" name="cep" required />
+      </div>
+
+      <button type="submit">Salvar Alterações</button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('formPerfil');
+
+    // Carrega dados fictícios (depois você busca com fetch)
+    window.onload = () => {
+      fetch('/api/usuarios/me')
+        .then(res => res.json())
+        .then(dados => {
+          for (const key in dados) {
+            if (form[key]) form[key].value = dados[key];
+          }
+        });
+    };
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const dadosAtualizados = {};
+      new FormData(form).forEach((valor, chave) => dadosAtualizados[chave] = valor);
+
+      fetch('/api/usuarios/me', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dadosAtualizados)
+      })
+      .then(res => res.json())
+      .then(response => {
+        alert('Perfil atualizado com sucesso!');
+      })
+      .catch(err => {
+        alert('Erro ao atualizar perfil.');
+        console.error(err);
+      });
+    });
+
+    fetch('/components/navbar.html')
+      .then(response => {
+        if (!response.ok) throw new Error('Erro ao carregar a navbar');
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('navbar-placeholder').innerHTML = data;
+      })
+      .catch(error => {
+        console.error('Erro ao carregar navbar:', error);
+      });
+</script>
+</body>
+</html>
