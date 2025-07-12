@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Escolher Data</title>
+
+    <!--Navbar-->
+  <link rel="stylesheet" href="/css/navbar.css" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #555;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 28px;
+      margin: 0;
+    }
+
+    header nav a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .calendario {
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .mes-navegacao {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+      gap: 20px;
+    }
+
+    .mes-navegacao span,
+    .mes-navegacao button {
+      cursor: pointer;
+      font-weight: bold;
+      background: none;
+      border: none;
+      color: inherit;
+      font-size: 24px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      transition: background-color 0.3s ease;
+    }
+    .mes-navegacao span:hover,
+    .mes-navegacao button:hover {
+      background-color: #333;
+    }
+
+    table.tabela-calendario {
+      border-collapse: separate;
+      border-spacing: 10px;
+    }
+
+    .tabela-calendario th,
+    .tabela-calendario td {
+      width: 60px;
+      height: 60px;
+      text-align: center;
+      vertical-align: middle;
+      border-radius: 15px;
+      font-size: 18px;
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+      color: white;
+    }
+
+    .tabela-calendario td:hover {
+      opacity: 0.8;
+    }
+
+    .disponivel {
+      background-color: #999;
+    }
+
+    .feriado {
+      background-color: #f1c40f;
+      color: #000;
+    }
+
+    .agendado {
+      background-color: #e74c3c;
+    }
+
+    .vazio {
+      background-color: transparent;
+      cursor: default;
+    }
+
+    .legenda {
+      display: flex;
+      gap: 30px;
+      margin-top: 25px;
+      font-size: 16px;
+    }
+
+    .legenda span {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .legenda .cor {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+    }
+
+        /* Botões da navbar e logo com a mesma cor */
+    .custom-navbar, .logo-area {
+      background-color: #727277 !important;
+    }
+
+    .custom-navbar .nav-link {
+      background-color: #727277;
+      color: #fff !important;
+      font-weight: bold;
+      border-radius: 5px;
+      margin: 0 5px;
+      padding: 6px 12px;
+      display: inline-block;
+    }
+
+    .custom-navbar .nav-link:hover {
+      text-decoration: underline;
+      background-color: #666;
+    }
+  </style>
+</head>
+<body>
+  <!--Navbar-->
+  <div id="navbar-placeholder" class="logo-area"></div>
+
+  <div class="calendario">
+    <div class="mes-navegacao">
+      <span onclick="mudarMes(-1)" aria-label="Mês anterior" role="button">&lt;</span>
+      <button id="mesAno" aria-label="Selecionar mês e ano"></button>
+      <span onclick="mudarMes(1)" aria-label="Próximo mês" role="button">&gt;</span>
+    </div>
+
+    <table class="tabela-calendario">
+      <thead>
+        <tr>
+          <th>D</th><th>S</th><th>T</th><th>Q</th><th>Q</th><th>S</th><th>S</th>
+        </tr>
+      </thead>
+      <tbody id="corpo-calendario">
+        <!-- Dias serão gerados dinamicamente aqui -->
+      </tbody>
+    </table>
+
+    <div class="legenda">
+      <span><div class="cor agendado"></div> Evento já agendado</span>
+      <span><div class="cor disponivel"></div> Data disponível</span>
+      <span><div class="cor feriado"></div> Alerta de feriado</span>
+    </div>
+  </div>
+
+  <script>
+  const corpoCalendario = document.getElementById("corpo-calendario");
+  const mesAno          = document.getElementById("mesAno");
+
+  let dataAtual         = new Date();
+  let eventosAgendados  = [];                // será preenchido via fetch
+  const feriados        = [];                // mantenha aqui se precisar
+
+  /* ------------------------------------------------------------------ */
+  /* 1. Busca no backend as datas de eventos já confirmados ------------ */
+  async function carregarDatasAgendadas() {
+    try {
+      const resp = await fetch('/api/eventos/datas-agendadas');
+      if (!resp.ok) throw new Error('Erro ao buscar datas');
+      eventosAgendados = await resp.json();  // ["2025-07-01", "2025-07-14", …]
+    } catch (err) {
+      console.error('Falha ao carregar datas agendadas:', err);
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 2. Funções auxiliares e geração do calendário --------------------- */
+  function formatarDataLocal(date) {
+    const ano = date.getFullYear();
+    const mes = String(date.getMonth() + 1).padStart(2, '0');
+    const dia = String(date.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  function gerarCalendario(ano, mes) {
+    corpoCalendario.innerHTML = "";
+    const primeiroDia = new Date(ano, mes, 1);
+    const ultimoDia   = new Date(ano, mes + 1, 0);
+    const nomeMes     = primeiroDia.toLocaleString("pt-BR", { month: "long" });
+
+    mesAno.textContent = `${nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)} ${ano}`;
+    mesAno.onclick     = habilitarEdicaoMesAno;
+
+    let linha = document.createElement("tr");
+
+    // células vazias antes do 1º dia do mês
+    for (let i = 0; i < primeiroDia.getDay(); i++) {
+      const vazio = document.createElement("td");
+      vazio.className = "vazio";
+      linha.appendChild(vazio);
+    }
+
+    for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
+      const dataCompleta = new Date(ano, mes, dia);
+      const dataStr      = formatarDataLocal(dataCompleta);
+
+      const celula = document.createElement("td");
+      celula.textContent = dia;
+
+      if (eventosAgendados.includes(dataStr)) {
+        celula.className = "agendado";           // vermelho
+      } else if (feriados.includes(dataStr)) {
+        celula.className = "feriado";
+      } else {
+        celula.className = "disponivel";
+        celula.onclick   = () => selecionarData(dataStr);
+      }
+
+      linha.appendChild(celula);
+
+      if (dataCompleta.getDay() === 6) {         // sábado → quebra de linha
+        corpoCalendario.appendChild(linha);
+        linha = document.createElement("tr");
+      }
+    }
+
+    if (linha.children.length > 0) corpoCalendario.appendChild(linha);
+  }
+
+  function mudarMes(delta) {
+    dataAtual.setMonth(dataAtual.getMonth() + delta);
+    gerarCalendario(dataAtual.getFullYear(), dataAtual.getMonth());
+  }
+
+  function selecionarData(data) {
+    window.location.href = `/api/eventos/criar?data=${data}`;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 3. Permite editar mês/ano clicando no cabeçalho ------------------- */
+  function habilitarEdicaoMesAno() {
+    mesAno.onclick = null;
+
+    const anoAtual = dataAtual.getFullYear();
+    const mesAtual = dataAtual.getMonth();
+
+    const selectMes = document.createElement("select");
+    const meses = [
+      "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+      "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+    ];
+    meses.forEach((nome, idx) => {
+      const opt = document.createElement("option");
+      opt.value = idx;
+      opt.textContent = nome;
+      if (idx === mesAtual) opt.selected = true;
+      selectMes.appendChild(opt);
+    });
+
+    selectMes.style.fontSize = "18px";
+    selectMes.style.padding  = "6px 12px";
+    selectMes.style.borderRadius = "12px";
+    selectMes.style.border   = "1px solid #ccc";
+    selectMes.style.outline  = "none";
+
+    const inputAno = document.createElement("input");
+    inputAno.type  = "number";
+    inputAno.value = anoAtual;
+    inputAno.style.width = "90px";
+    inputAno.style.fontSize = "18px";
+    inputAno.style.padding  = "6px 12px";
+    inputAno.style.borderRadius = "12px";
+    inputAno.style.border  = "1px solid #ccc";
+    inputAno.style.outline = "none";
+    inputAno.min = 1970;
+    inputAno.max = 2100;
+
+    mesAno.textContent = "";
+    mesAno.appendChild(selectMes);
+    mesAno.appendChild(document.createTextNode(" "));
+    mesAno.appendChild(inputAno);
+
+    function atualizar() {
+      const novoMes = parseInt(selectMes.value, 10);
+      let   novoAno = parseInt(inputAno.value, 10);
+
+      if (isNaN(novoAno) || novoAno < 1970) novoAno = 1970;
+      if (novoAno > 2100) novoAno = 2100;
+
+      dataAtual = new Date(novoAno, novoMes, 1);
+      gerarCalendario(novoAno, novoMes);
+    }
+
+    selectMes.onchange = atualizar;
+    inputAno.onchange  = atualizar;
+
+    inputAno.onblur = () => {
+      if (inputAno.value === "") inputAno.value = dataAtual.getFullYear();
+      atualizar();
+    };
+
+    inputAno.onkeydown = (e) => {
+      if (e.key === "Enter") inputAno.blur();
+    };
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 4. Inicializa: busca datas confirmadas, depois gera o calendário -- */
+  (async function initCalendario() {
+    await carregarDatasAgendadas();                        // ← carrega backend
+    gerarCalendario(dataAtual.getFullYear(), dataAtual.getMonth());
+  })();
+
+  /* ------------------------------------------------------------------ */
+  /* 5. Carrega a navbar externa -------------------------------------- */
+  fetch('/components/navbar.html')
+    .then(r => { if (!r.ok) throw new Error('Erro ao carregar navbar'); return r.text(); })
+    .then(html => { document.getElementById('navbar-placeholder').innerHTML = html; })
+    .catch(err => console.error('Erro ao carregar navbar:', err));
+</script>
+</body>
+</html>
