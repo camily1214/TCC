@@ -46,12 +46,12 @@ router.get('/logout', (req, res) => {
 
 // Página de cadastro
 router.get('/cadastro', (req, res) => {
-  res.sendFile(path.join(__dirname, '../models/usuarios/CadUsu.html'));
+  res.sendFile(path.join(__dirname, '../models/profissional/usuarios/CadUsu.html'));
 });
 
 // Página de sucesso
 router.get('/cadastro-sucesso', (req, res) => {
-  res.sendFile(path.join(__dirname, '../models/usuarios/CadastroSucesso.html'));
+  res.sendFile(path.join(__dirname, '../models/profissional/usuarios/CadastroSucesso.html'));
 });
 
 // Criar usuário (POST)
@@ -111,7 +111,7 @@ router.post('/cadastro', async (req, res) => {
 
     await novoUsuario.save();
 
-    res.redirect('/usuarios/cadastro-sucesso');
+    res.redirect('/cadastro-sucesso');
 
   } catch (erro) {
     console.error(erro);

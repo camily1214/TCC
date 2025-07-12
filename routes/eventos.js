@@ -40,7 +40,8 @@ router.post('/novo-evento', async (req, res) => {
     const novoEvento = new Evento({
       acesso, tipo_evento, tipo_comida, tipo_bebida,
       num_convidados, data_evento, hora_evento,
-      rua, numero, complemento, bairro, cidade, estado, cep
+      rua, numero, complemento, bairro, cidade, estado, cep,
+      usuarioId: req.session.usuarioId
     });
 
     await novoEvento.save();
@@ -73,6 +74,21 @@ router.get('/lista-evento', async (req, res) => {
     res.json(eventos);
   } catch (err) {
     res.status(500).json({ error: 'Erro ao buscar eventos.' });
+  }
+});
+
+// ✅ NOVA ROTA: Listar apenas os eventos do usuário logado
+router.get('/meus-eventos', async (req, res) => {
+  try {
+    if (!req.session.usuarioId) {
+      return res.status(401).send('Usuário não autenticado.');
+    }
+
+    const eventos = await Evento.find({ usuarioId: req.session.usuarioId });
+    res.json(eventos);
+  } catch (err) {
+    console.error('Erro ao buscar eventos do usuário:', err);
+    res.status(500).send('Erro ao buscar eventos do usuário.');
   }
 });
 

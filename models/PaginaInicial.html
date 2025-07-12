@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Página Inicial</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+
+    .hero {
+      background:  #727277;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 36px;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: #ddd;
+      margin-bottom: 30px;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .btn {
+      background-color: #444;
+      color: #fff;
+      padding: 15px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #555;
+    }
+
+    .logo {
+      width: 120px;
+      margin-bottom: 20px;
+    }
+
+    .footer {
+      background-color: #111;
+      color: #888;
+      text-align: center;
+      padding: 20px;
+      margin-top: 60px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Conteúdo principal -->
+  <div class="hero">
+    <img src="/imagens/logo.png" alt="Logo" class="logo" />
+    <h1>Bem-vindo ao AHS Eventos</h1>
+    <p>Aqui o sistema é voltado para que o cliente contrate e acompanhe os detalhes do seu serviço com eficiencia e facilidade.</p>
+
+    <div class="buttons">
+      <a href="/login" class="btn">Ja tenho cadastro</a>
+      <a href="/api/usuarios/cadastro" class="btn">Quero me cadastrar</a>
+      <a href="/api/eventos/escolher-data" class="btn">Agendar meu evento</a>
+    </div>
+  </div>
+
+  <div class="footer">
+    &copy; 2025 Sistema de Gerenciamento de Serviços para Eventos — Camily de Sant'ana Lummertz e Isadora Sofia Pereira Marcelino
+  </div>
+
+  <script>
+
+  </script>
+</body>
+</html>

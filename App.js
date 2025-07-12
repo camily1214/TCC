@@ -50,6 +50,11 @@ app.use('/api/eventos', eventosRoutes);
 
 //  ROTAS DE PÁGINAS HTML //
 
+// Página inicial
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'models/PaginaInicial.html'));
+});
+
 // Página inicial (cadastro de usuário)
 app.get('/usuarios/CadUsus.html', (req, res) =>
   res.sendFile(path.join(__dirname, 'models/profissional/usuarios/CadUsu.html'))
@@ -67,7 +72,7 @@ app.get('/usuarios/ListaUsu.html', (req, res) => {
 
 // Página de login
 app.get('/login', (req, res) =>
-  res.sendFile(path.join(__dirname, 'models/Login.html')) // ← corrigido!
+  res.sendFile(path.join(__dirname, 'models/Login.html')) 
 );
 
 // 404 - ROTA NÃO ENCONTRADA //

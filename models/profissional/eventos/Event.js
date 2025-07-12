@@ -15,8 +15,11 @@ const EventSchema = new mongoose.Schema({
   cidade: String,
   estado: String,
   cep: String,
-
-  // novo campo para controle de confirmação
+  usuarioId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Usuario',
+    required: true
+  },
   confirmado: {
     type: Boolean,
     default: false
