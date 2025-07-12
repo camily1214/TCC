@@ -30,7 +30,7 @@ router.post('/login', async (req, res) => {
     // Autenticar sessão
     req.session.usuarioId = usuario._id;
 
-    res.status(200).json({ mensagem: 'Login bem‑sucedido.' });
+    res.redirect('/');
   } catch (erro) {
     console.error('Erro no login:', erro);
     res.status(500).json({ mensagem: 'Erro ao tentar login.' });
