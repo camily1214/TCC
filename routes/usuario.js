@@ -29,6 +29,9 @@ router.post('/login', async (req, res) => {
 
     // Autenticar sessão
     req.session.usuarioId = usuario._id;
+        
+    // Redireciona para a página inicial após login
+      return res.redirect('/clientes/usuarios/MeuInicial.html');
 
     res.redirect('/');
   } catch (erro) {

@@ -154,7 +154,7 @@
         });
 
         if (resposta.ok) {
-          window.location.href = 'models/PaginaInicial.html'; // ajuste conforme sua rota
+          window.location.href = '/clientes/usuarios/MeuInicial.html';
         } else {
           const msg = await resposta.text();
           errosDiv.innerHTML = msg;

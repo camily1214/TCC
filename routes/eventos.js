@@ -13,7 +13,7 @@ router.get('/criar', (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissinal/eventos/CriarEvent.html'));
 });
 
-// ✅ NOVO: Página de sucesso após cadastrar evento
+// NOVO: Página de sucesso após cadastrar evento
 router.get('/sucesso', (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/EventSucesso.html'));
 });
@@ -23,9 +23,9 @@ router.get('/editar', (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/EditarEvent.html'));
 });
 
-// ✅ CANCELAR ALTERAÇÕES (voltar sem salvar) — deve vir ANTES do /:id
+// CANCELAR ALTERAÇÕES (voltar sem salvar) — deve vir ANTES do /:id
 router.get('/editar/cancelar', (req, res) => {
-  res.redirect('/api/eventos/lista-evento');
+  res.redirect('/api/eventos-profissional/lista-evento');
 });
 
 // Salvar evento via POST
@@ -45,7 +45,7 @@ router.post('/novo-evento', async (req, res) => {
     });
 
     await novoEvento.save();
-    res.redirect('/api/eventos/sucesso');
+    res.redirect('/api/eventos-profissional/sucesso');
   } catch (err) {
     console.error('Erro ao cadastrar evento:', err);
     res.status(500).send('Erro ao cadastrar evento.');
@@ -67,7 +67,7 @@ router.get('/detalhes', (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/DetalhesEvento.html'));
 });
 
-// API: Listar eventos (usado por JS)
+// API: Listar eventos 
 router.get('/lista-evento', async (req, res) => {
   try {
     const eventos = await Evento.find();
@@ -77,7 +77,7 @@ router.get('/lista-evento', async (req, res) => {
   }
 });
 
-// ✅ NOVA ROTA: Listar apenas os eventos do usuário logado
+// NOVA ROTA: Listar apenas os eventos do usuário logado
 router.get('/meus-eventos', async (req, res) => {
   try {
     if (!req.session.usuarioId) {
