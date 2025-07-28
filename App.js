@@ -52,7 +52,7 @@ app.use('/api/eventos', eventosRoutes);
 
 // Página inicial
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'models/PaginaInicial.html'));
+  res.sendFile(path.join(__dirname, 'public/PaginaInicial.html'));
 });
 
 // Página inicial (cadastro de usuário)

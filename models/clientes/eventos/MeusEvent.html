@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meus Eventos</title>
+    <!--Navbar-->
+  <link rel="stylesheet" href="/css/navbar.css" />
+
+ <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #fff;
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #333;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #555;
+      text-align: left;
+    }
+
+    th {
+      background-color: #444;
+    }
+
+    button {
+      padding: 6px 10px;
+      background-color: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #c0392b;
+    }
+
+    .btn-ver-mais {
+      background-color: #3498db;
+    }
+
+    .btn-ver-mais:hover {
+      background-color: #2980b9;
+    }
+
+    .btn-editar {
+      background-color: #f39c12;
+      margin-left: 5px;
+    }
+
+    .btn-editar:hover {
+      background-color: #e67e22;
+    } 
+
+        /* Navbar personalizada */
+    .custom-navbar {
+      background-color: #727277 !important;
+    }
+
+    .custom-navbar .nav-link {
+      color: #fff !important;
+      font-weight: bold;
+    }
+
+    .custom-navbar .nav-link:hover {
+      text-decoration: underline;
+    }
+
+    .btn-confirmar {
+  background-color: #2ecc71;
+  margin-right: 5px;
+}
+
+.btn-confirmar:hover {
+  background-color: #27ae60;
+}
+
+.btn-cancelar {
+  background-color: #e74c3c;
+  margin-right: 5px;
+}
+
+.btn-cancelar:hover {
+  background-color: #c0392b;
+}
+
+
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Meus Eventos</a>
+      <div class="d-flex">
+        <button class="btn btn-outline-light" onclick="logout()">Sair</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2 class="mb-4">Lista dos Meus Eventos</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Hora</th>
+          <th>Tipo</th>
+          <th>Acesso</th>
+          <th>Convidados</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="corpo-tabela"></tbody>
+    </table>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const usuarioId = localStorage.getItem("usuarioId");
+      if (!usuarioId) {
+        alert("Você precisa estar logado.");
+        window.location.href = "/login";
+        return;
+      }
+
+      try {
+        const resposta = await fetch("/api/eventos/meus-eventos");
+        const eventos = await resposta.json();
+
+        const tabela = document.getElementById("corpo-tabela");
+        tabela.innerHTML = "";
+
+        if (eventos.length === 0) {
+          tabela.innerHTML = "<tr><td colspan='6'>Nenhum evento encontrado.</td></tr>";
+        } else {
+          eventos.forEach(evento => {
+            const linha = document.createElement("tr");
+
+            linha.innerHTML = `
+              <td>${new Date(evento.data_evento).toLocaleDateString()}</td>
+              <td>${evento.hora_evento}</td>
+              <td>${evento.tipo_evento || 'N/A'}</td>
+              <td>${evento.acesso}</td>
+              <td>${evento.num_convidados}</td>
+              <td>${evento.confirmado ? "Confirmado" : "Pendente"}</td>
+            `;
+
+            tabela.appendChild(linha);
+          });
+        }
+
+      } catch (erro) {
+        console.error("Erro ao buscar eventos:", erro);
+        alert("Erro ao carregar seus eventos.");
+      }
+    });
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "/login";
+    }
+  </script>
+
+</body>
+</html>

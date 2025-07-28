@@ -77,6 +77,25 @@
       text-decoration: underline;
     }
 
+    .btn-confirmar {
+  background-color: #2ecc71;
+  margin-right: 5px;
+}
+
+.btn-confirmar:hover {
+  background-color: #27ae60;
+}
+
+.btn-cancelar {
+  background-color: #e74c3c;
+  margin-right: 5px;
+}
+
+.btn-cancelar:hover {
+  background-color: #c0392b;
+}
+
+
   </style>
 </head>
 <body>
@@ -103,14 +122,13 @@
   <table>
     <thead>
       <tr>
-        <th>Data</th>
-        <th>Hora</th>
-        <th>Tipo Evento</th>
-        <th>Acesso</th>
-        <th>Comida</th>
-        <th>Bebida</th>
-        <th>Nº Convidados</th>
-        <th>Ações</th>
+    <th>Data</th>
+    <th>Hora</th>
+    <th>Nome do Cliente</th>
+    <th>Telefone</th>
+    <th>Tipo Evento</th>
+    <th>Nº Convidados</th>
+    <th>Ações</th>
       </tr>
     </thead>
     <tbody id="lista-eventos">
@@ -132,24 +150,28 @@
     tabela.innerHTML = '';
 
     lista.forEach(evento => {
-      const linha = document.createElement('tr');
-      linha.innerHTML = `
-        <td>${new Date(evento.data_evento).toLocaleDateString()}</td>
-        <td>${evento.hora_evento}</td>
-        <td>${evento.tipo_evento}</td>
-        <td>${evento.acesso}</td>
-        <td>${evento.tipo_comida}</td>
-        <td>${evento.tipo_bebida}</td>
-        <td>${evento.num_convidados}</td>
-        <td>
-          <button onclick="deletarEvento('${evento._id}')">Excluir</button>
-          <button class="btn-ver-mais" onclick="verDetalhes('${evento._id}')">Ver Mais</button>
-          <button class="btn-editar" onclick="editarEvento('${evento._id}')">Editar</button>
-        </td>
-      `;
-      tabela.appendChild(linha);
-    });
-  }
+    const usuario = evento.usuarioId || {};
+    const nomeUsuario = usuario.nome || 'N/A';
+    const telefoneUsuario = usuario.telefone || 'N/A';
+
+    const linha = document.createElement('tr');
+    linha.innerHTML = `
+      <td>${new Date(evento.data_evento).toLocaleDateString()}</td>
+      <td>${evento.hora_evento || 'N/A'}</td>
+      <td>${nomeUsuario}</td>
+      <td>${telefoneUsuario}</td>
+      <td>${evento.acesso || 'N/A'}</td>
+      <td>${evento.num_convidados || 0}</td>
+      <td>
+        <button class="btn-confirmar" onclick="confirmarEvento('${evento._id}')">Confirmar</button>
+        <button class="btn-cancelar" onclick="cancelarEvento('${evento._id}')">Cancelar</button>
+        <button class="btn-ver-mais" onclick="verDetalhes('${evento._id}')">Ver Mais</button>
+        <button class="btn-editar" onclick="editarEvento('${evento._id}')">Editar</button>
+      </td>
+    `;
+    tabela.appendChild(linha);
+  });
+}
 
   function filtrarEventos() {
     const tipo = document.getElementById('filtro-tipo').value.toLowerCase();
@@ -164,6 +186,29 @@
 
     exibirEventos(filtrados);
   }
+
+  async function confirmarEvento(id) {
+  const resposta = await fetch(`/api/eventos/confirmar/${id}`, { method: 'PUT' });
+  if (resposta.ok) {
+    alert('Evento confirmado com sucesso!');
+    carregarEventos();
+  } else {
+    alert('Erro ao confirmar o evento.');
+  }
+}
+
+async function cancelarEvento(id) {
+  if (confirm('Tem certeza que deseja cancelar este evento?')) {
+    const resposta = await fetch(`/api/eventos/${id}`, { method: 'DELETE' });
+    if (resposta.ok) {
+      alert('Evento cancelado com sucesso!');
+      carregarEventos();
+    } else {
+      alert('Erro ao cancelar o evento.');
+    }
+  }
+}
+
 
   // Eventos dos filtros
   document.getElementById('filtro-tipo').addEventListener('input', filtrarEventos);

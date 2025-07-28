@@ -132,6 +132,16 @@ router.get('/lista', async (req, res) => {
   }
 });
 
+// Listar eventos do cliente
+router.get('/meus-eventos/:clienteId', async (req, res) => {
+  try {
+    const eventos = await Evento.find({ cliente: req.params.clienteId });
+    res.json(eventos);
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao buscar eventos do cliente.' });
+  }
+});
+
 // Rota para deletar usuário
 router.delete('/:id', async (req, res) => {
   try {
