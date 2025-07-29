@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Meus Eventos</title>
-    <!--Navbar-->
+
+  <!--Navbar-->
   <link rel="stylesheet" href="/css/navbar.css" />
 
- <style>
+  <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #000;
@@ -53,16 +54,7 @@
       background-color: #2980b9;
     }
 
-    .btn-editar {
-      background-color: #f39c12;
-      margin-left: 5px;
-    }
-
-    .btn-editar:hover {
-      background-color: #e67e22;
-    } 
-
-        /* Navbar personalizada */
+    /* Navbar personalizada */
     .custom-navbar {
       background-color: #727277 !important;
     }
@@ -98,79 +90,114 @@
   </style>
 </head>
 <body>
+  <!-- Navbar -->
+  <div id="navbar-placeholder"></div>
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Meus Eventos</a>
-      <div class="d-flex">
-        <button class="btn btn-outline-light" onclick="logout()">Sair</button>
-      </div>
-    </div>
-  </nav>
+  <h1>Meus Eventos</h1>
+    <h2>Meus Eventos</h2>
+    <ul id="lista-eventos"></ul>
 
-  <div class="container">
-    <h2 class="mb-4">Lista dos Meus Eventos</h2>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Data</th>
-          <th>Hora</th>
-          <th>Tipo</th>
-          <th>Acesso</th>
-          <th>Convidados</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="corpo-tabela"></tbody>
-    </table>
-  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Hora</th>
+        <th>Tipo Evento</th>
+        <th>Nº Convidados</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="lista-eventos">
+      <!-- Linhas geradas via JS -->
+    </tbody>
+  </table>
 
   <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      const usuarioId = localStorage.getItem("usuarioId");
+  const resposta = await fetch(`/api/eventos/meus-eventos?clienteId=${usuarioId}`);
+    async function carregarMeusEventos() {
+      const usuarioId = localStorage.getItem('usuarioId');
       if (!usuarioId) {
-        alert("Você precisa estar logado.");
-        window.location.href = "/login";
+        alert('Você precisa estar logado para ver seus eventos.');
+        window.location.href = '/login';
         return;
       }
 
       try {
-        const resposta = await fetch("/api/eventos/meus-eventos");
+        // Passa o usuarioId na query para o backend filtrar os eventos do usuário
+        const resposta = await fetch(`/api/eventos/meus-eventos?clienteId=${usuarioId}`);
+        if (!resposta.ok) throw new Error('Erro ao buscar eventos');
         const eventos = await resposta.json();
 
-        const tabela = document.getElementById("corpo-tabela");
-        tabela.innerHTML = "";
+        const tabela = document.getElementById('lista-eventos');
+        tabela.innerHTML = '';
 
         if (eventos.length === 0) {
-          tabela.innerHTML = "<tr><td colspan='6'>Nenhum evento encontrado.</td></tr>";
-        } else {
-          eventos.forEach(evento => {
-            const linha = document.createElement("tr");
-
-            linha.innerHTML = `
-              <td>${new Date(evento.data_evento).toLocaleDateString()}</td>
-              <td>${evento.hora_evento}</td>
-              <td>${evento.tipo_evento || 'N/A'}</td>
-              <td>${evento.acesso}</td>
-              <td>${evento.num_convidados}</td>
-              <td>${evento.confirmado ? "Confirmado" : "Pendente"}</td>
-            `;
-
-            tabela.appendChild(linha);
-          });
+          tabela.innerHTML = '<tr><td colspan="6">Nenhum evento encontrado.</td></tr>';
+          return;
         }
 
-      } catch (erro) {
-        console.error("Erro ao buscar eventos:", erro);
-        alert("Erro ao carregar seus eventos.");
+        eventos.forEach(evento => {
+          const linha = document.createElement('tr');
+
+          linha.innerHTML = `
+            <td>${new Date(evento.data_evento).toLocaleDateString()}</td>
+            <td>${evento.hora_evento || 'N/A'}</td>
+            <td>${evento.tipo_evento || 'N/A'}</td>
+            <td>${evento.num_convidados || 0}</td>
+            <td>${evento.confirmado ? 'Confirmado' : 'Pendente'}</td>
+            <td>
+              <button class="btn-ver-mais" onclick="verDetalhes('${evento._id}')">Ver Mais</button>
+            </td>
+          `;
+
+          tabela.appendChild(linha);
+        });
+
+      } catch (error) {
+        console.error('Erro ao carregar eventos:', error);
+        alert('Erro ao carregar seus eventos.');
       }
-    });
-
-    function logout() {
-      localStorage.clear();
-      window.location.href = "/login";
     }
-  </script>
 
+    function verDetalhes(id) {
+      // Pode abrir uma página com detalhes do evento, adapte conforme seu sistema
+      window.location.href = `/clientes/eventos/detalhes?id=${id}`;
+    }
+
+    // Carrega navbar (ajuste o caminho se necessário)
+    fetch('/components/navbarClientes.html')
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById('navbar-placeholder').innerHTML = html;
+        const tipoUsuario = localStorage.getItem('tipoUsuario');
+        if (tipoUsuario === 'cliente') {
+          document.querySelector('.navbar-clientes').style.display = 'flex';
+        }
+      })
+      .catch(err => console.error('Erro ao carregar navbar:', err));
+
+    carregarMeusEventos();
+
+  fetch('/api/eventos/meus-eventos')
+    .then(res => res.json())
+    .then(eventos => {
+      const ul = document.getElementById('lista-eventos');
+      if (eventos.length === 0) {
+        ul.innerHTML = '<li>Nenhum evento encontrado.</li>';
+      } else {
+        eventos.forEach(evento => {
+          const li = document.createElement('li');
+          li.textContent = `${evento.tipo_evento} em ${new Date(evento.data_evento).toLocaleDateString()}`;
+          ul.appendChild(li);
+        });
+      }
+    })
+    .catch(err => {
+      console.error('Erro ao carregar eventos:', err);
+      document.getElementById('lista-eventos').innerHTML = '<li>Erro ao carregar eventos</li>';
+    });
+</script>
 </body>
 </html>

@@ -3,6 +3,27 @@ const router = express.Router();
 const path = require('path');
 const Evento = require('../models/profissional/eventos/Event');
 const Usuario = require('../models/profissional/usuarios/usuarios'); 
+const { autenticar, apenasClientes, apenasProfissionais } = require('../middlewares/auth');
+
+// CLIENTE → Ver seus próprios eventos
+router.get('/meus-eventos', autenticar, apenasClientes, async (req, res) => {
+  try {
+    const eventos = await Evento.find({ clienteId: req.session.usuarioId });
+    res.json(eventos);
+  } catch (erro) {
+    res.status(500).json({ mensagem: 'Erro ao buscar eventos do cliente.' });
+  }
+});
+
+// PROFISSIONAL → Ver eventos com nome e telefone do cliente
+router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) => {
+  try {
+    const eventos = await Evento.find().populate('clienteId', 'nome telefone');
+    res.json(eventos);
+  } catch (erro) {
+    res.status(500).json({ mensagem: 'Erro ao buscar eventos para profissional.' });
+  }
+});
 
 // Página para escolher data
 router.get('/escolher-data', (req, res) => {
@@ -99,6 +120,10 @@ router.get('/todos', async (req, res) => {
 // Página de detalhes do evento
 router.get('/detalhes', (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/DetalhesEvento.html'));
+});
+
+router.get('/clientes/eventos/meuseventos', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../models/clientes/eventos/meusevents/MeusEvent.html'));
 });
 
 // API: Listar eventos (com nome e telefone do usuário que criou o evento)

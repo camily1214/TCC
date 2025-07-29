@@ -27,11 +27,18 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ mensagem: 'Senha incorreta.' });
     }
 
-    // Autenticar sessão
-    req.session.usuarioId = usuario._id;
-        
-    // Redireciona para a página inicial após login
-      return res.redirect('/clientes/usuarios/MeuInicial.html');
+// Autenticar sessão
+req.session.usuarioId = usuario._id;
+req.session.tipoUsuario = usuario.tipo; // salvando o tipo na sessão
+
+// Redirecionamento baseado no tipo do usuário
+if (usuario.tipo === 'cliente') {
+  return res.redirect('/clientes/usuarios/MeuInicial.html');
+} else if (usuario.tipo === 'profissional') {
+  return res.redirect('/profissionais/usuarios/MeuInicial.html');
+} else {
+  return res.redirect('/'); // fallback
+}
 
     res.redirect('/');
   } catch (erro) {
@@ -61,14 +68,14 @@ router.get('/cadastro-sucesso', (req, res) => {
 router.post('/cadastro', async (req, res) => {
   try {
     const {
-      nome, sobrenome, datanasc, email, genero, telefone, cpf,
+      tipo, nome, sobrenome, datanasc, email, genero, telefone, cpf,
       senha, confirmaSenha,
       rua, numero, complemento, bairro, cidade, estado, cep
     } = req.body;
 
     // Validação de campos obrigatórios
     if (
-      !nome || !sobrenome || !cpf || !datanasc || !telefone || !genero || !email || !senha || !confirmaSenha ||
+      !tipo || !nome || !sobrenome || !cpf || !datanasc || !telefone || !genero || !email || !senha || !confirmaSenha ||
       !rua || !numero || !bairro || !cidade || !estado || !cep
     ) {
       return res.status(400).json({ mensagem: 'Preencha todos os campos obrigatórios.' });
@@ -95,6 +102,7 @@ router.post('/cadastro', async (req, res) => {
 
     // Criar novo usuário
     const novoUsuario = new Usuario({
+      tipo,
       nome,
       sobrenome,
       datanasc,
@@ -132,13 +140,22 @@ router.get('/lista', async (req, res) => {
   }
 });
 
-// Listar eventos do cliente
-router.get('/meus-eventos/:clienteId', async (req, res) => {
+router.get('/meus-eventos', autenticar, apenasClientes, async (req, res) => {
   try {
-    const eventos = await Evento.find({ cliente: req.params.clienteId });
+    const eventos = await Evento.find({ cliente: req.session.usuarioId });
     res.json(eventos);
   } catch (err) {
-    res.status(500).json({ erro: 'Erro ao buscar eventos do cliente.' });
+    res.status(500).json({ mensagem: 'Erro ao buscar eventos do cliente.' });
+  }
+});
+
+
+router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) => {
+  try {
+    const eventos = await Evento.find().populate('cliente', 'nome telefone');
+    res.json(eventos);
+  } catch (err) {
+    res.status(500).json({ mensagem: 'Erro ao buscar eventos para profissional.' });
   }
 });
 
@@ -151,6 +168,24 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ erro: err.message });
   }
 });
+
+// middlewares/auth.js
+function autenticar(req, res, next) {
+  if (req.session.usuarioId) return next();
+  return res.redirect('/login');
+}
+
+function apenasClientes(req, res, next) {
+  if (req.session.tipoUsuario === 'cliente') return next();
+  return res.status(403).send('Acesso permitido apenas para clientes.');
+}
+
+function apenasProfissionais(req, res, next) {
+  if (req.session.tipoUsuario === 'profissional') return next();
+  return res.status(403).send('Acesso permitido apenas para profissionais.');
+}
+
+module.exports = { autenticar, apenasClientes, apenasProfissionais };
 
 // Rota GET para listar todos os usuários (interface HTML) COM LOG PARA DEBUG
 router.get('/ListaUsu', async (req, res) => {

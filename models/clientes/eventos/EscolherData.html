@@ -330,19 +330,24 @@
     };
   }
 
-  /* ------------------------------------------------------------------ */
   /* 4. Inicializa: busca datas confirmadas, depois gera o calendário -- */
   (async function initCalendario() {
     await carregarDatasAgendadas();                        // ← carrega backend
     gerarCalendario(dataAtual.getFullYear(), dataAtual.getMonth());
   })();
 
-  /* ------------------------------------------------------------------ */
-  /* 5. Carrega a navbar externa -------------------------------------- */
-  fetch('/components/navbar.html')
-    .then(r => { if (!r.ok) throw new Error('Erro ao carregar navbar'); return r.text(); })
-    .then(html => { document.getElementById('navbar-placeholder').innerHTML = html; })
-    .catch(err => console.error('Erro ao carregar navbar:', err));
+
+  /* 5. Carrega a navbar externa */
+fetch('/components/navbarClientes.html')
+  .then(res => res.text())
+  .then(html => {
+    document.getElementById('navbar-placeholder').innerHTML = html;
+
+    const tipoUsuario = localStorage.getItem('tipoUsuario');
+    if (tipoUsuario === 'cliente') {
+      document.querySelector('.navbar-clientes').style.display = 'flex';
+    }
+  });
 </script>
 </body>
 </html>

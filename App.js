@@ -70,6 +70,12 @@ app.get('/usuarios/ListaUsu.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'models/profissional/usuarios/ListaUsu.html'));
 });
 
+app.get('/clientes/eventos/meuseventos', (req, res) => {
+  const caminhoArquivo = path.join(__dirname, 'models', 'clientes', 'eventos', 'MeusEvent.html');
+  res.sendFile(caminhoArquivo);
+});
+
+
 // Página de login
 app.get('/login', (req, res) =>
   res.sendFile(path.join(__dirname, 'models/Login.html')) 

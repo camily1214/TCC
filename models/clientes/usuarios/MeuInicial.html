@@ -81,6 +81,10 @@
     <div class="buttons">
       <a href="/api/eventos/escolher-data" class="btn">Agendar meu evento</a>
     </div>
+    <br>
+        <div class="buttons">
+      <a href="/clientes/eventos/meuseventos" class="btn">Acessar meus eventos</a>
+    </div>
   </div>
 
   <div class="footer">
@@ -88,7 +92,16 @@
   </div>
 
   <script>
+fetch('/components/navbarClientes.html')
+  .then(res => res.text())
+  .then(html => {
+    document.getElementById('navbar-placeholder').innerHTML = html;
 
+    const tipoUsuario = localStorage.getItem('tipoUsuario');
+    if (tipoUsuario === 'cliente') {
+      document.querySelector('.navbar-clientes').style.display = 'flex';
+    }
+  });
   </script>
 </body>
 </html>

@@ -268,10 +268,16 @@
   });
 
     // Carregar navbar
-    fetch('/components/navbar.html')
-      .then(res => res.ok ? res.text() : Promise.reject('Erro ao carregar navbar'))
-      .then(html => document.getElementById('navbar-placeholder').innerHTML = html)
-      .catch(err => console.error(err));
+fetch('/components/navbarClientes.html')
+  .then(res => res.text())
+  .then(html => {
+    document.getElementById('navbar-placeholder').innerHTML = html;
+
+    const tipoUsuario = localStorage.getItem('tipoUsuario');
+    if (tipoUsuario === 'cliente') {
+      document.querySelector('.navbar-clientes').style.display = 'flex';
+    }
+  });
   </script>
 
 </body>

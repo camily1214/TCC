@@ -318,11 +318,16 @@
   });
 
     // Carrega a navbar.html automaticamente
-  fetch('/components/navbar.html')
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById('navbar-placeholder').innerHTML = data;
-    });
+fetch('/components/navbarClientes.html')
+  .then(res => res.text())
+  .then(html => {
+    document.getElementById('navbar-placeholder').innerHTML = html;
+
+    const tipoUsuario = localStorage.getItem('tipoUsuario');
+    if (tipoUsuario === 'cliente') {
+      document.querySelector('.navbar-clientes').style.display = 'flex';
+    }
+  });
 </script>
 
 </body>
