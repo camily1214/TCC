@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const Evento = require('../models/profissional/eventos/Event');
-const Usuario = require('../models/profissional/usuarios/usuarios'); 
+const Usuario = require('../models/profissional/usuarios/usuarios');
 const { autenticar, apenasClientes, apenasProfissionais } = require('../middlewares/auth');
+
 
 // CLIENTE → Ver seus próprios eventos
 router.get('/meus-eventos', autenticar, apenasClientes, async (req, res) => {
@@ -18,6 +19,7 @@ router.get('/meus-eventos', autenticar, apenasClientes, async (req, res) => {
 // PROFISSIONAL → Ver eventos com nome e telefone do cliente
 router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) => {
   try {
+    // O campo correto é clienteId? Aqui usa clienteId para popular
     const eventos = await Evento.find().populate('clienteId', 'nome telefone');
     res.json(eventos);
   } catch (erro) {
@@ -35,7 +37,17 @@ router.get('/criar', (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/CriarEvent.html'));
 });
 
-// NOVO: Página de sucesso após cadastrar evento
+// CLIENTE: Página de criação de evento (nova rota)
+router.get('/criar-cliente', autenticar, apenasClientes, (req, res) => {
+  res.sendFile(path.join(__dirname, '../models/clientes/eventos/CriarEventCliente.html'));
+});
+
+// PROFISSIONAL: Página de criação de evento (nova rota)
+router.get('/criar-profissional', autenticar, apenasProfissionais, (req, res) => {
+  res.sendFile(path.join(__dirname, '../models/profissional/eventos/CriarEvent.html'));
+});
+
+// Página de sucesso após cadastrar evento
 router.get('/sucesso', (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/EventSucesso.html'));
 });
@@ -50,54 +62,113 @@ router.get('/editar/cancelar', (req, res) => {
   res.redirect('/api/eventos-profissional/lista-evento');
 });
 
-// Salvar evento via POST (rota já existente)
-router.post('/novo-evento', async (req, res) => {
+
+// Salvar evento via POST com cliente autenticado
+router.post('/novo-evento', autenticar, apenasClientes, async (req, res) => {
+    console.log('Sessão:', req.session);
   try {
+    const clienteId = req.session.usuarioId;
+
+    if (!clienteId) {
+      return res.status(401).json({ erro: 'Usuário não autenticado.' });
+    }
+
     const {
       acesso, tipo_evento, tipo_comida, tipo_bebida,
-      num_convidados, data_evento, hora_evento,
+      numero_convidados, data_evento, horario_evento,
       rua, numero, complemento, bairro, cidade, estado, cep
     } = req.body;
 
+    // Validação simples (use bibliotecas como Joi para validações robustas)
+    if (!acesso || !tipo_evento || !tipo_comida || !tipo_bebida ||
+        !numero_convidados || !data_evento || !horario_evento ||
+        !rua || !numero || !bairro || !cidade || !estado || !cep) {
+      return res.status(400).json({ mensagem: 'Preencha todos os campos obrigatórios.' });
+    }
+
     const novoEvento = new Evento({
-      acesso, tipo_evento, tipo_comida, tipo_bebida,
-      num_convidados, data_evento, hora_evento,
-      rua, numero, complemento, bairro, cidade, estado, cep,
-      usuarioId: req.session.usuarioId
+      clienteId,
+      acesso,
+      tipo_evento,
+      tipo_comida,
+      tipo_bebida,
+      numero_convidados,
+      data_evento,
+      horario_evento,
+      rua,
+      numero,
+      complemento,
+      bairro,
+      cidade,
+      estado,
+      cep,
+      usuarioId: clienteId  // Evitar duplicidade: se clienteId e usuarioId são a mesma coisa, pode eliminar um
     });
 
     await novoEvento.save();
-    res.redirect('/api/eventos-profissional/sucesso');
-  } catch (err) {
-    console.error('Erro ao cadastrar evento:', err);
-    res.status(500).send('Erro ao cadastrar evento.');
+    res.status(201).json({ mensagem: 'Evento cadastrado com sucesso!' });
+
+  } catch (erro) {
+    console.error('Erro ao cadastrar evento:', erro);
+    res.status(500).json({ erro: 'Erro ao cadastrar evento. Verifique os dados.' });
   }
 });
 
-// NOVA ROTA: Criar novo evento vinculando ao cliente informado no corpo da requisição
+
+// Criar novo evento vinculando ao cliente informado no corpo da requisição
 router.post('/criar-com-cliente', async (req, res) => {
   try {
-    const { clienteId, ...dadosEvento } = req.body;
+    const {
+      clienteId, acesso, tipo_evento, tipo_comida, tipo_bebida,
+      numero_convidados, data_evento, horario_evento,
+      rua, numero, complemento, bairro, cidade, estado, cep
+    } = req.body;
+
+    if (!clienteId) {
+      return res.status(400).json({ erro: 'clienteId é obrigatório.' });
+    }
 
     const cliente = await Usuario.findById(clienteId);
     if (!cliente) {
       return res.status(404).json({ erro: 'Cliente não encontrado.' });
     }
 
+    // Validação dos demais campos
+    if (!acesso || !tipo_evento || !tipo_comida || !tipo_bebida ||
+        !numero_convidados || !data_evento || !horario_evento ||
+        !rua || !numero || !bairro || !cidade || !estado || !cep) {
+      return res.status(400).json({ mensagem: 'Preencha todos os campos obrigatórios.' });
+    }
+
     const novoEvento = new Evento({
-      ...dadosEvento,
-      cliente: clienteId
+      acesso,
+      tipo_evento,
+      tipo_comida,
+      tipo_bebida,
+      numero_convidados,
+      data_evento,
+      horario_evento,
+      rua,
+      numero,
+      complemento,
+      bairro,
+      cidade,
+      estado,
+      cep,
+      clienteId,
+      usuarioId: clienteId  // Mesmo comentário do duplicado
     });
 
     await novoEvento.save();
     res.status(201).json({ mensagem: 'Evento cadastrado com sucesso!' });
   } catch (erro) {
-    console.error(erro);
+    console.error('Erro ao cadastrar evento:', erro);
     res.status(400).json({ erro: 'Erro ao cadastrar evento.' });
   }
 });
 
-// Rota para listar usuários
+
+// Rota para listar todos os eventos (sem filtros)
 router.get('/listar', async (req, res) => {
   try {
     const eventos = await Evento.find();
@@ -107,10 +178,10 @@ router.get('/listar', async (req, res) => {
   }
 });
 
-// Listar todos os eventos com dados do cliente
+// Listar todos os eventos com dados do cliente (nome e telefone)
 router.get('/todos', async (req, res) => {
   try {
-    const eventos = await Evento.find().populate('cliente', 'nome telefone');
+    const eventos = await Evento.find().populate('clienteId', 'nome telefone');
     res.json(eventos);
   } catch (err) {
     res.status(500).json({ erro: 'Erro ao buscar eventos.' });
@@ -122,34 +193,7 @@ router.get('/detalhes', (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/DetalhesEvento.html'));
 });
 
-router.get('/clientes/eventos/meuseventos', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../models/clientes/eventos/meusevents/MeusEvent.html'));
-});
 
-// API: Listar eventos (com nome e telefone do usuário que criou o evento)
-router.get('/lista-evento', async (req, res) => {
-  try {
-    const eventos = await Evento.find().populate('usuarioId', 'nome telefone');
-    res.json(eventos);
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao buscar eventos.' });
-  }
-});
-
-// NOVA ROTA: Listar apenas os eventos do usuário logado
-router.get('/meus-eventos', async (req, res) => {
-  try {
-    if (!req.session.usuarioId) {
-      return res.status(401).send('Usuário não autenticado.');
-    }
-
-    const eventos = await Evento.find({ usuarioId: req.session.usuarioId });
-    res.json(eventos);
-  } catch (err) {
-    console.error('Erro ao buscar eventos do usuário:', err);
-    res.status(500).send('Erro ao buscar eventos do usuário.');
-  }
-});
 
 // Rota para retornar somente as datas dos eventos agendados
 router.get('/datas-agendadas', async (req, res) => {
@@ -170,11 +214,11 @@ router.get('/datas-agendadas', async (req, res) => {
   }
 });
 
-// Rota: Ver todos os eventos com dados do cliente
+// Rota: Ver todos os eventos com dados do cliente (nome e telefone)
 router.get('/todos-com-clientes', async (req, res) => {
   try {
     const eventos = await Evento.find()
-      .populate('usuarioId', 'nome telefone'); // busca nome e telefone do cliente
+      .populate('clienteId', 'nome telefone'); // corrigido para clienteId
 
     res.json(eventos);
   } catch (err) {
@@ -183,18 +227,7 @@ router.get('/todos-com-clientes', async (req, res) => {
   }
 });
 
-// Rota: Ver eventos do cliente logado
-router.get('/meus-eventos', async (req, res) => {
-  try {
-    const eventos = await Evento.find({ usuarioId: req.session.usuarioId });
-    res.json(eventos);
-  } catch (err) {
-    console.error('Erro ao buscar eventos do cliente:', err);
-    res.status(500).json({ erro: 'Erro interno do servidor' });
-  }
-});
-
-// API: Buscar evento por ID — essa deve vir por último
+// API: Buscar evento por ID — deve vir por último para evitar conflito com outras rotas
 router.get('/:id', async (req, res) => {
   try {
     const evento = await Evento.findById(req.params.id);

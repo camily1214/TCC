@@ -1,14 +1,14 @@
 // middlewares/auth.js
 
 function autenticar(req, res, next) {
-  if (!req.session || !req.session.usuarioId) {
+  if (!req.session && !req.session.usuarioId) {
     return res.status(401).json({ mensagem: 'Usuário não autenticado' });
   }
   next();
 }
 
 function apenasClientes(req, res, next) {
-  if (req.session.tipoUsuario !== 'cliente') {
+  if (req.session && req.session.tipo === 'cliente') {
     return res.status(403).json({ mensagem: 'Apenas clientes têm acesso' });
   }
   next();

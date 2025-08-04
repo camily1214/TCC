@@ -139,51 +139,64 @@
   </div>
 
   <script>
-    const form = document.getElementById('formLogin');
-    const errosDiv = document.getElementById('erros');
+  const form = document.getElementById('formLogin');
+  const errosDiv = document.getElementById('erros');
 
-    form.addEventListener('submit', async function (event) {
-      event.preventDefault();
-      errosDiv.style.display = 'none';
-      errosDiv.innerHTML = '';
+  form.addEventListener('submit', async function (event) {
+    event.preventDefault();
+    errosDiv.style.display = 'none';
+    errosDiv.innerHTML = '';
 
-      const email = document.getElementById('email').value.trim();
-      const senha = document.getElementById('senha').value;
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value;
+    const tipo = document.getElementById('tipo').value;
 
-      if (!email || !senha) {
-        errosDiv.innerHTML = 'Por favor, preencha todos os campos.';
-        errosDiv.style.display = 'block';
-        return;
-      }
+    if (!email || !senha || !tipo) {
+      errosDiv.innerHTML = 'Por favor, preencha todos os campos.';
+      errosDiv.style.display = 'block';
+      return;
+    }
 
-      try {
-        const resposta = await fetch('/api/usuarios/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, senha })
-        });
-
-        if (resposta.ok) {
-          window.location.href = '/clientes/usuarios/MeuInicial.html';
-        } else {
-          const msg = await resposta.text();
-          errosDiv.innerHTML = msg;
-          errosDiv.style.display = 'block';
-        }
-      } catch (err) {
-        console.error('Erro ao tentar login:', err);
-        errosDiv.innerHTML = 'Erro ao conectar ao servidor.';
-        errosDiv.style.display = 'block';
-      }
-    });
-
-    // Carrega a navbar
-    fetch('/components/navbar.html')
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById('navbar-placeholder').innerHTML = data;
+    try {
+      const resposta = await fetch('/api/usuarios/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // importante para enviar cookies de sessão
+        body: JSON.stringify({ email, senha, tipo })
       });
-  </script>
 
+      const data = await resposta.json();
+
+      if (resposta.ok) {
+        // Salva os dados no localStorage
+        localStorage.setItem('tipo', data.tipo);
+        localStorage.setItem('usuarioId', data._id);
+
+        // Redireciona para a página correta
+        if (data.tipo === 'cliente') {
+          window.location.href = '/clientes/eventos/meuseventos';
+        } else if (data.tipo === 'profissional') {
+          window.location.href = '/usuarios/ListaUsu.html';
+        } else {
+          window.location.href = '/'; // fallback
+        }
+      } else {
+        errosDiv.innerHTML = data.mensagem || 'Falha no login.';
+        errosDiv.style.display = 'block';
+      }
+    } catch (err) {
+      console.error('Erro ao tentar login:', err);
+      errosDiv.innerHTML = 'Erro ao conectar ao servidor.';
+      errosDiv.style.display = 'block';
+    }
+  });
+
+  // Carrega a navbar
+  fetch('/components/navbar.html')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('navbar-placeholder').innerHTML = data;
+    });
+</script>
 </body>
 </html>

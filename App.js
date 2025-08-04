@@ -6,9 +6,9 @@ const mongoose   = require('mongoose');
 const cors       = require('cors');
 const session    = require('express-session');
 
-// Rotas
-const usuarioRoutes = require('./routes/usuario');  // ← API de usuários
-const eventosRoutes = require('./routes/eventos');  // ← API de eventos
+// Rotas //
+const usuarioRoutes = require('./routes/usuario');
+const eventosRoutes = require('./routes/eventos');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -21,16 +21,19 @@ mongoose.connect(mongoURI)
   .catch(err  => console.error('Erro ao conectar no MongoDB:', err));
 
 // MIDDLEWARES //
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', // ou a origem do seu frontend
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Sessão para login
+// Sessão temporária em memória (desaparece ao reiniciar o servidor)
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'segredo‑super‑seguro',
+  secret: 'chave-secreta',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false } // use true somente em produção com HTTPS
+  cookie: { secure: false }
 }));
 
 // VIEWS (caso use EJS em alguma parte) //
@@ -48,24 +51,33 @@ app.use(express.static(path.join(__dirname, 'models'))); // serve HTML diretamen
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/eventos', eventosRoutes);
 
-//  ROTAS DE PÁGINAS HTML //
-
-// Página inicial
+// ROTAS DE PÁGINAS HTML //
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/PaginaInicial.html'));
 });
 
-// Página inicial (cadastro de usuário)
+// Página para o cliente criar evento //
+app.get('/clientes/eventos/criar', (req, res) => {
+  const caminho = path.join(__dirname, 'models', 'clientes', 'eventos', 'CriarEventCliente.html');
+  res.sendFile(caminho);
+});
+
+// Página para o profissional criar evento //
+app.get('/profissionais/eventos/criar', (req, res) => {
+  const caminho = path.join(__dirname, 'models', 'profissional', 'eventos', 'CriarEvent.html');
+  res.sendFile(caminho);
+});
+
 app.get('/usuarios/CadUsus.html', (req, res) =>
   res.sendFile(path.join(__dirname, 'models/profissional/usuarios/CadUsu.html'))
 );
 
-// Cadastro com sucesso
+// Cadastro com sucesso //
 app.get('/cadastro-sucesso', (req, res) =>
   res.sendFile(path.join(__dirname, 'models/profissional/usuarios/CadastroSucesso.html'))
 );
 
-// Lista de usuários
+// Lista de usuários //
 app.get('/usuarios/ListaUsu.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'models/profissional/usuarios/ListaUsu.html'));
 });
@@ -75,8 +87,7 @@ app.get('/clientes/eventos/meuseventos', (req, res) => {
   res.sendFile(caminhoArquivo);
 });
 
-
-// Página de login
+// Página de login //
 app.get('/login', (req, res) =>
   res.sendFile(path.join(__dirname, 'models/Login.html')) 
 );

@@ -27,20 +27,27 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ mensagem: 'Senha incorreta.' });
     }
 
+        // ✅ Autenticar sessão (completo agora)
+    req.session.usuario = {
+      id: usuario._id,
+      nome: usuario.nome,
+      tipo: usuario.tipo
+    };
+
+        // ✅ Responder com dados
+    return res.json({
+      sucesso: true,
+      usuario: {
+        _id: usuario._id,
+        tipo: usuario.tipo
+      }
+    });
+
 // Autenticar sessão
 req.session.usuarioId = usuario._id;
 req.session.tipoUsuario = usuario.tipo; // salvando o tipo na sessão
 
-// Redirecionamento baseado no tipo do usuário
-if (usuario.tipo === 'cliente') {
-  return res.redirect('/clientes/usuarios/MeuInicial.html');
-} else if (usuario.tipo === 'profissional') {
-  return res.redirect('/profissionais/usuarios/MeuInicial.html');
-} else {
-  return res.redirect('/'); // fallback
-}
 
-    res.redirect('/');
   } catch (erro) {
     console.error('Erro no login:', erro);
     res.status(500).json({ mensagem: 'Erro ao tentar login.' });
@@ -184,8 +191,6 @@ function apenasProfissionais(req, res, next) {
   if (req.session.tipoUsuario === 'profissional') return next();
   return res.status(403).send('Acesso permitido apenas para profissionais.');
 }
-
-module.exports = { autenticar, apenasClientes, apenasProfissionais };
 
 // Rota GET para listar todos os usuários (interface HTML) COM LOG PARA DEBUG
 router.get('/ListaUsu', async (req, res) => {

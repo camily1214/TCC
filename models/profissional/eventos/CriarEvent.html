@@ -132,7 +132,7 @@
   <div id="navbar-placeholder"></div>
   <div class="form-wrapper">
 
-  <form action="/api/eventos/novo-evento" method="POST">
+  <form method="POST" action="/api/eventos/novo-evento">
     <div class="section">
       <img src="/imagens/logo.png" 
       alt="Logo"
@@ -198,7 +198,7 @@
 
     <div class="form-group">
       <label for="data_evento">Data do Evento</label>
-      <input type="date" id="data_evento" name="data_evento" value="" readonly>
+      <input type="date" id="data_evento" name="data_evento" required>
     </div>
 
     <div class="form-group">
@@ -296,12 +296,60 @@
   const campoHidden = document.getElementById('tipo_bebida');
   let selecionados = [];
 
-  document.querySelector('form').addEventListener('submit', function (e) {
+document.querySelector('form').addEventListener('submit', async function (e) {
+  e.preventDefault(); // Impede redirecionamento padrão
+
   if (!campoHidden.value) {
     alert("Selecione pelo menos uma opção de bebida.");
-    e.preventDefault();
+    return;
+  }
+
+  const dados = {
+    acesso: document.getElementById("acesso").value,
+    tipo_evento: document.getElementById("tipo_evento").value,
+    tipo_comida: document.getElementById("tipo_comida").value,
+    tipo_bebida: campoHidden.value,
+    numero_convidados: document.getElementById("numero_convidados").value,
+    data_evento: document.getElementById("data_evento").value,
+    horario_evento: document.getElementById("horario_evento").value,
+    rua: document.getElementById("rua").value,
+    numero: document.getElementById("numero").value,
+    complemento: document.getElementById("complemento").value,
+    bairro: document.getElementById("bairro").value,
+    cidade: document.getElementById("cidade").value,
+    estado: document.getElementById("estado").value,
+    cep: document.getElementById("cep").value
+  };
+
+  try {
+    const resposta = await fetch('/api/eventos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+       credentials: 'include',
+      body: JSON.stringify(dados)
+    })
+.then(res => res.json())
+.then(data => {
+  console.log(data);
+})
+.catch(err => console.error('Erro:', err));
+
+    const resultado = await resposta.json();
+
+    if (resposta.ok) {
+      alert('Evento criado com sucesso!');
+      window.location.href = '/clientes/eventos/meuseventos'; // ajuste se quiser ir para outra página
+    } else {
+      alert('Erro ao cadastrar: ' + resultado.erro);
+    }
+  } catch (erro) {
+    console.error('Erro na requisição:', erro);
+    alert('Erro ao enviar dados.');
   }
 });
+
 
   opcoes.forEach(opcao => {
     opcao.addEventListener('click', () => {
@@ -318,11 +366,16 @@
   });
 
     // Carrega a navbar.html automaticamente
-  fetch('/components/navbar.html')
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById('navbar-placeholder').innerHTML = data;
-    });
+fetch('/components/navbarClientes.html')
+  .then(res => res.text())
+  .then(html => {
+    document.getElementById('navbar-placeholder').innerHTML = html;
+
+    const tipoUsuario = localStorage.getItem('tipoUsuario');
+    if (tipoUsuario === 'cliente') {
+      document.querySelector('.navbar-clientes').style.display = 'flex';
+    }
+  });
 </script>
 
 </body>

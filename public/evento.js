@@ -5,6 +5,7 @@ const router = express.Router();
 
 // Esquema do Evento
 const eventoSchema = new mongoose.Schema({
+  clienteId: { type: mongoose.Schema.Types.ObjectId, ref: 'Cliente', required: true },
   acesso: { type: String, required: true },
   tipo_evento: { type: String, required: true },
   tipo_bebida: { type: String, required: true },
