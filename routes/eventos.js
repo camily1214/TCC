@@ -28,6 +28,11 @@ router.get('/editar/cancelar', (req, res) => {
   res.redirect('/api/eventos/lista-evento');
 });
 
+// Página para listar usuarios
+router.get('/ListaUsu', (req, res) => {
+  res.sendFile(path.join(__dirname, '../models/profissional/usuarios/ListaUsu.html'));
+});
+
 // Salvar evento via POST
 router.post('/novo-evento', async (req, res) => {
   try {
@@ -52,30 +57,12 @@ router.post('/novo-evento', async (req, res) => {
   }
 });
 
-// Rota para listar usuários
-router.get('/listar', async (req, res) => {
-  try {
-    const eventos = await Evento.find();
-    res.json(eventos);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar eventos' });
-  }
-});
 
 // Página de detalhes do evento
 router.get('/detalhes', (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/DetalhesEvento.html'));
 });
 
-// API: Listar eventos (usado por JS)
-router.get('/lista-evento', async (req, res) => {
-  try {
-    const eventos = await Evento.find();
-    res.json(eventos);
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao buscar eventos.' });
-  }
-});
 
 // ✅ NOVA ROTA: Listar apenas os eventos do usuário logado
 router.get('/meus-eventos', async (req, res) => {

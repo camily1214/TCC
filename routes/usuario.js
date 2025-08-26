@@ -9,6 +9,10 @@ router.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, '../models/Login.html'));
 });
 
+router.get('/usuarios/lista', (req, res) => {
+  res.sendFile(path.join(__dirname, '../models/profissional/usuarios/ListaUsu.html'));
+});
+
 router.post('/login', async (req, res) => {
   try {
     const { email, senha } = req.body;
@@ -58,14 +62,14 @@ router.get('/cadastro-sucesso', (req, res) => {
 router.post('/cadastro', async (req, res) => {
   try {
     const {
-      nome, sobrenome, datanasc, email, genero, telefone, cpf,
+      tipo, nome, sobrenome, datanasc, email, genero, telefone, cpf,
       senha, confirmaSenha,
       rua, numero, complemento, bairro, cidade, estado, cep
     } = req.body;
 
     // Validação de campos obrigatórios
     if (
-      !nome || !sobrenome || !cpf || !datanasc || !telefone || !genero || !email || !senha || !confirmaSenha ||
+      !tipo || !nome || !sobrenome || !cpf || !datanasc || !telefone || !genero || !email || !senha || !confirmaSenha ||
       !rua || !numero || !bairro || !cidade || !estado || !cep
     ) {
       return res.status(400).json({ mensagem: 'Preencha todos os campos obrigatórios.' });
@@ -92,6 +96,7 @@ router.post('/cadastro', async (req, res) => {
 
     // Criar novo usuário
     const novoUsuario = new Usuario({
+      tipo,
       nome,
       sobrenome,
       datanasc,
@@ -143,7 +148,7 @@ router.delete('/:id', async (req, res) => {
 router.get('/ListaUsu', async (req, res) => {
   try {
     const usuarios = await Usuario.find();
-    console.log("Usuários encontrados:", usuarios); // log para debug
+    console.log("Usuários encontrados:", usuarios);
     res.json(usuarios);
   } catch (erro) {
     console.error("Erro ao buscar usuários:", erro);

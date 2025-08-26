@@ -122,6 +122,17 @@
       <div class="section">
         <h2>Crie seu cadastro</h2>
 
+              <div class="section">
+        <div class="form-group">
+          <label for="tipo">Selecione o tipo de usuário</label>
+          <select id="tipo" name="tipo" required>
+            <option value="">Selecione...</option>
+            <option value="cliente">Cliente</option>
+            <option value="profissional">Profissional</option>
+          </select>
+        </div>
+      </div>
+
         <div class="form-group">
           <label for="nome">Nome</label>
           <input type="text" id="nome" name="nome" placeholder="Digite seu nome" required />
@@ -272,6 +283,7 @@
 
     const erros = [];
 
+    const tipo = document.getElementById('tipo').value.trim();
     const nome = document.getElementById('nome').value.trim();
     const sobrenome = document.getElementById('sobrenome').value.trim();
     const cpf = document.getElementById('cpf').value.trim();
@@ -290,6 +302,7 @@
     const cep = document.getElementById('cep').value.trim();
 
     // Validações
+    if (tipo === '') erros.push('O campo Tipo é obrigatório.');
     if (nome === '') erros.push('O campo Nome é obrigatório.');
     if (sobrenome === '') erros.push('O campo Sobrenome é obrigatório.');
     if (!datanasc) erros.push('A Data de Nascimento é obrigatória.');
@@ -318,7 +331,7 @@
     // Envio com fetch (AJAX)
     event.preventDefault(); // Impede envio padrão
     const formData = {
-      nome, sobrenome, cpf, datanasc, telefone, genero, email, senha, confirmaSenha,
+      tipo, nome, sobrenome, cpf, datanasc, telefone, genero, email, senha, confirmaSenha,
       rua, numero, complemento, bairro, cidade, estado, cep
     };
 
@@ -330,7 +343,7 @@
     });
 
       if (resposta.ok) {
-        window.location.href = '/Cadastro-Sucesso';
+        window.location.href = '/ListaUsu';
       } else {
         const msg = await resposta.text();
         alert('Erro ao cadastrar usuário:\n' + msg);
