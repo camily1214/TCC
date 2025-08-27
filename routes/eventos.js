@@ -6,6 +6,12 @@ const Evento = require('../models/profissional/eventos/Event');
 // ✅ Importar middleware de autenticação
 const autenticar = require('../middlewares/autenticar');
 
+// Rota para abrir a página HTML de lista de eventos
+router.get('/lista-eventos-html', autenticar, (req, res) => {
+  res.sendFile(path.join(__dirname, '../models/profissional/eventos/ListaEvent.html'));
+});
+
+
 // Página para escolher data (não precisa login)
 router.get('/escolher-data', (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/EscolherData.html'));
@@ -29,6 +35,11 @@ router.get('/editar', autenticar, (req, res) => {
 // ✅ CANCELAR ALTERAÇÕES (voltar sem salvar) — deve vir ANTES do /:id
 router.get('/editar/cancelar', autenticar, (req, res) => {
   res.redirect('/api/eventos/lista-evento');
+});
+
+// Página de pós-login (cliente)
+router.get('/pos-login', autenticar, (req, res) => {
+  res.sendFile(path.join(__dirname, '../models/profissional/eventos/PosLogin.html'));
 });
 
 // Página para listar usuarios (provavelmente só profissionais)
@@ -105,6 +116,18 @@ router.get('/:id', autenticar, async (req, res) => {
     res.status(500).send('Erro ao buscar evento');
   }
 });
+
+// API: Listar todos os eventos (para página de listagem completa)
+router.get('/lista-evento', autenticar, async (req, res) => {
+  try {
+    const eventos = await Evento.find(); // pega todos
+    res.json(eventos);
+  } catch (err) {
+    console.error('Erro ao buscar eventos:', err);
+    res.status(500).json({ error: 'Erro ao buscar eventos.' });
+  }
+});
+
 
 // API: Deletar evento
 router.delete('/:id', autenticar, async (req, res) => {

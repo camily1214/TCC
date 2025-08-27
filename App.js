@@ -75,6 +75,9 @@ app.get('/login', (req, res) =>
   res.sendFile(path.join(__dirname, 'models/Login.html'))
 );
 
+app.use('/profissional/eventos', express.static(path.join(__dirname, 'models/profissional/eventos')));
+
+
 // 404
 app.use((_req, res) => res.status(404).send('Página não encontrada.'));
 

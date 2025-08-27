@@ -157,21 +157,17 @@
 
       const data = await resposta.json();
 
-      if (resposta.ok) {
-        // login ok
-        alert(data.mensagem || 'Login realizado com sucesso!');
-        // 🔹 Melhor apontar para rota Express que entrega o HTML
-        window.location.href = '/api/eventos/lista-evento'; 
-      } else {
-        errosDiv.innerHTML = data.mensagem || 'Erro ao fazer login.';
-        errosDiv.style.display = 'block';
-      }
-    } catch (err) {
-      console.error('Erro ao tentar login:', err);
-      errosDiv.innerHTML = 'Erro ao conectar ao servidor.';
-      errosDiv.style.display = 'block';
-    }
-  });
+  if (resposta.ok) {
+     window.location.href = '/api/eventos/pos-login';
+  } else {
+    errosDiv.innerHTML = data.mensagem || 'Erro ao fazer login.';
+    errosDiv.style.display = 'block';
+  }
+} catch (err) {
+  console.error('Erro ao tentar login:', err);
+  errosDiv.innerHTML = 'Erro ao conectar ao servidor.';
+  errosDiv.style.display = 'block';
+}});
 
   // Carrega a navbar
   fetch('/components/navbar.html')

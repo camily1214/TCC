@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Evento Agendado</title>
+  <title>Página Inicial - Cliente</title>
 
-  <!--Navbar-->
+  <!-- Navbar -->
   <link rel="stylesheet" href="/css/navbar.css" />
 
   <style>
@@ -19,7 +19,7 @@
       min-height: 100vh;
     }
 
-    .container-sucesso {
+    .container-opcoes {
       display: flex;
       justify-content: center;
       align-items: flex-start;
@@ -28,7 +28,7 @@
       flex: 1;
     }
 
-    .card-sucesso {
+    .card-opcoes {
       background-color: #727277;
       padding: 30px;
       border-radius: 10px;
@@ -38,28 +38,26 @@
       max-width: 600px;
     }
 
-    .card-sucesso h2 {
+    .card-opcoes h2 {
       color: #000;
+      margin-bottom: 20px;
     }
 
-    #navbar-placeholder {
-      flex-shrink: 0;
-    }
-
-    .btn-voltar {
+    .btn-opcao {
       background-color: rgb(43, 47, 47);
       border: none;
       color: #fff;
-      padding: 12px 24px;
+      padding: 14px 28px;
       border-radius: 5px;
       font-size: 16px;
-      margin-top: 20px;
+      margin: 10px;
       text-decoration: none;
       display: inline-block;
       cursor: pointer;
+      transition: background 0.3s ease;
     }
 
-    .btn-voltar:hover {
+    .btn-opcao:hover {
       background-color: #000;
     }
 
@@ -80,18 +78,23 @@
 </head>
 <body>
 
-  <!--Navbar-->
+  <!-- Navbar -->
   <div id="navbar-placeholder"></div>
 
-  <!-- Mensagem de Sucesso -->
-  <div class="container-sucesso">
-    <div class="card-sucesso">
+  <!-- Opções Pós Login -->
+  <div class="container-opcoes">
+    <div class="card-opcoes">
       <img src="/imagens/logo.png" alt="Logo" style="width: 110px; border-radius: 10px; margin-bottom: 15px;" />
-      <h2>Evento cadastrado com sucesso!</h2>
-      <p>Seus dados foram salvos corretamente no sistema.</p>
+      <h2>Bem-vindo!</h2>
+      <p>Escolha uma das opções abaixo:</p>
       
-      <!-- Botão agora redireciona para a lista de eventos -->
-      <button class="btn-voltar" onclick="window.location.href='/api/eventos/lista-eventos-html'">
+      <!-- Botão Criar Evento -->
+      <button class="btn-opcao" onclick="window.location.href = '/api/eventos/escolher-data'">
+        Criar Novo Evento
+      </button>
+
+      <!-- Botão Ver Meus Eventos -->
+      <button class="btn-opcao" onclick="window.location.href='/api/eventos/meus-eventos'">
         Ver Meus Eventos
       </button>
     </div>
