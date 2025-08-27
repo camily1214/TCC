@@ -128,52 +128,61 @@
     </form>
   </div>
 
-  <script>
-    const form = document.getElementById('formLogin');
-    const errosDiv = document.getElementById('erros');
+<script>
+  const form = document.getElementById('formLogin');
+  const errosDiv = document.getElementById('erros');
 
-    form.addEventListener('submit', async function (event) {
-      event.preventDefault();
-      errosDiv.style.display = 'none';
-      errosDiv.innerHTML = '';
+  form.addEventListener('submit', async function (event) {
+    event.preventDefault();
+    errosDiv.style.display = 'none';
+    errosDiv.innerHTML = '';
 
-      const email = document.getElementById('email').value.trim();
-      const senha = document.getElementById('senha').value;
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value;
 
-      if (!email || !senha) {
-        errosDiv.innerHTML = 'Por favor, preencha todos os campos.';
-        errosDiv.style.display = 'block';
-        return;
-      }
+    if (!email || !senha) {
+      errosDiv.innerHTML = 'Por favor, preencha todos os campos.';
+      errosDiv.style.display = 'block';
+      return;
+    }
 
-      try {
-        const resposta = await fetch('/api/usuarios/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, senha })
-        });
+    try {
+      // 🔹 Se no app.js você usou app.use('/api/usuarios', usuariosRouter)
+      // use a linha abaixo:
+      // const resposta = await fetch('/api/usuarios/login', {
 
-        if (resposta.ok) {
-          window.location.href = 'models/PaginaInicial.html'; // ajuste conforme sua rota
-        } else {
-          const msg = await resposta.text();
-          errosDiv.innerHTML = msg;
-          errosDiv.style.display = 'block';
-        }
-      } catch (err) {
-        console.error('Erro ao tentar login:', err);
-        errosDiv.innerHTML = 'Erro ao conectar ao servidor.';
-        errosDiv.style.display = 'block';
-      }
-    });
-
-    // Carrega a navbar
-    fetch('/components/navbar.html')
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById('navbar-placeholder').innerHTML = data;
+      // 🔹 Se no app.js você usou app.use('/', usuariosRouter)
+      // troque pela linha:
+      const resposta = await fetch('/login', {
+        
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
       });
-  </script>
 
+      const data = await resposta.json();
+
+      if (resposta.ok) {
+        // login ok
+        alert(data.mensagem || 'Login realizado com sucesso!');
+        window.location.href = '/models/PaginaInicial.html'; 
+      } else {
+        errosDiv.innerHTML = data.mensagem || 'Erro ao fazer login.';
+        errosDiv.style.display = 'block';
+      }
+    } catch (err) {
+      console.error('Erro ao tentar login:', err);
+      errosDiv.innerHTML = 'Erro ao conectar ao servidor.';
+      errosDiv.style.display = 'block';
+    }
+  });
+
+  // Carrega a navbar
+  fetch('/components/navbar.html')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('navbar-placeholder').innerHTML = data;
+    });
+</script>
 </body>
 </html>

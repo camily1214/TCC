@@ -7,8 +7,8 @@ const cors       = require('cors');
 const session    = require('express-session');
 
 // Rotas
-const usuarioRoutes = require('./routes/usuario');  // ← API de usuários
-const eventosRoutes = require('./routes/eventos');  // ← API de eventos
+const usuarioRoutes = require('./routes/usuario');   // ← Nome correto (singular)
+const eventosRoutes = require('./routes/eventos');   // ← Eventos
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -26,37 +26,35 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Sessão para login
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'segredo‑super‑seguro',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false } // use true somente em produção com HTTPS
-}));
+// app.use(session({
+//  secret: process.env.SESSION_SECRET || 'segredo_super_seguro',
+//  resave: false,
+//  saveUninitialized: false,
+//  cookie: { secure: false }
+// }));
 
-// VIEWS (caso use EJS em alguma parte) //
+// VIEWS (se usar EJS)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// ARQUIVOS ESTÁTICOS //
+// ARQUIVOS ESTÁTICOS
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/imagens',    express.static(path.join(__dirname, 'imagens')));
 app.use('/components', express.static(path.join(__dirname, 'public/components')));
 app.use('/css',        express.static(path.join(__dirname, 'public/css')));
-app.use(express.static(path.join(__dirname, 'models'))); // serve HTML diretamente
+app.use(express.static(path.join(__dirname, 'models')));
 
-// ROTAS DE API //
-app.use('/api/usuarios', usuarioRoutes);
+// ROTAS DE API
+app.use('/api/usuarios', usuarioRoutes);   // ✅ apenas essa
 app.use('/api/eventos', eventosRoutes);
 
-//  ROTAS DE PÁGINAS HTML //
-
-// Página inicial
+// ROTAS DE PÁGINAS HTML
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'models/PaginaInicial.html'));
+  res.sendFile(path.join(__dirname, 'models/Login.html'));
 });
 
-// Página inicial (cadastro de usuário)
-app.get('/usuarios/CadUsus.html', (req, res) =>
+// Cadastro de usuário
+app.get('/usuarios/CadUsu.html', (req, res) =>
   res.sendFile(path.join(__dirname, 'models/profissional/usuarios/CadUsu.html'))
 );
 
@@ -72,13 +70,13 @@ app.get('/usuarios/ListaUsu.html', (req, res) => {
 
 // Página de login
 app.get('/login', (req, res) =>
-  res.sendFile(path.join(__dirname, 'models/Login.html')) 
+  res.sendFile(path.join(__dirname, 'models/Login.html'))
 );
 
-// 404 - ROTA NÃO ENCONTRADA //
+// 404
 app.use((_req, res) => res.status(404).send('Página não encontrada.'));
 
-// INICIAR SERVIDOR //
+// INICIAR SERVIDOR
 app.listen(PORT, () =>
   console.log(`Servidor rodando em: http://localhost:${PORT}`)
 );

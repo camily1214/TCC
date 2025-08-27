@@ -10,7 +10,7 @@ router.get('/escolher-data', (req, res) => {
 
 // Página de criação de evento
 router.get('/criar', (req, res) => {
-  res.sendFile(path.join(__dirname, '../models/profissinal/eventos/CriarEvent.html'));
+  res.sendFile(path.join(__dirname, '../models/profissional/eventos/CriarEvent.html'));
 });
 
 // ✅ NOVO: Página de sucesso após cadastrar evento
@@ -39,7 +39,7 @@ router.post('/novo-evento', async (req, res) => {
     const {
       acesso, tipo_evento, tipo_comida, tipo_bebida,
       num_convidados, data_evento, hora_evento,
-      rua, numero, complemento, bairro, cidade, estado, cep
+      rua, numero, complemento, bairro, cidade, estado, cep,
     } = req.body;
 
     const novoEvento = new Evento({

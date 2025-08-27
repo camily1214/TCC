@@ -13,40 +13,34 @@ router.get('/usuarios/lista', (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/usuarios/ListaUsu.html'));
 });
 
-router.post('/login', async (req, res) => {
-  try {
-    const { email, senha } = req.body;
+//Exemplo de rota de login//
+// router.post('/login', async (req, res) => {//
+//  const { email, senha } = req.body;//
 
-    if (!email || !senha) {
-      return res.status(400).json({ mensagem: 'Preencha e‑mail e senha.' });
-    }
+  // try {//
+  //  const usuario = await Usuario.findOne({ email });/
 
-    const usuario = await Usuario.findOne({ email });
-    if (!usuario) {
-      return res.status(400).json({ mensagem: 'Usuário não encontrado.' });
-    }
+  ///  if (!usuario) {//
+  //    return res.status(401).send('Usuário não encontrado');//
+   // }//
+  ///  if (usuario.senha !== senha) {  // (melhor usar bcrypt depois)
+  //    return res.status(401).send('Senha inválida');///
+   /// 
+    // salva o ID do usuário logado na sessão
+  //  req.session.usuarioId = usuario._id;//
+  //  res.redirect('/'); // ou outra página
+  //} catch (err) {
+  //  console.error('Erro no login:', err);
+  //  res.status(500).send('Erro no login');
+  //}
+// });
 
-    const senhaValida = await bcrypt.compare(senha, usuario.senha);
-    if (!senhaValida) {
-      return res.status(400).json({ mensagem: 'Senha incorreta.' });
-    }
-
-    // Autenticar sessão
-    req.session.usuarioId = usuario._id;
-
-    res.status(200).json({ mensagem: 'Login bem‑sucedido.' });
-  } catch (erro) {
-    console.error('Erro no login:', erro);
-    res.status(500).json({ mensagem: 'Erro ao tentar login.' });
-  }
-});
-
-router.get('/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) return res.status(500).send('Erro ao sair.');
-    res.redirect('/login');
-  });
-});
+//router.get('/logout', (req, res) => {
+//  req.session.destroy(err => {
+//    if (err) return res.status(500).send('Erro ao sair.');
+//    res.redirect('/login');
+//  });
+//});
 
 // Página de cadastro
 router.get('/cadastro', (req, res) => {
