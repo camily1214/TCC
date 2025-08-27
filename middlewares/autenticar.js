@@ -1,7 +1,13 @@
 // middlewares/autenticar.js
-
 module.exports = (req, res, next) => {
-  // Middleware falso (só para não travar o app por enquanto)
-  console.log('Middleware de autenticação chamado.');
-  next();
+  if (req.session && req.session.usuarioId) {
+    // Usuário está logado
+    console.log('Usuário autenticado:', req.session.usuarioId);
+    return next();
+  } else {
+    console.log('Tentativa de acesso sem login.');
+    return res.status(401).json({
+      mensagem: 'Você precisa estar logado para acessar esta rota.'
+    });
+  }
 };

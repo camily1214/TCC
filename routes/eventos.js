@@ -3,38 +3,41 @@ const router = express.Router();
 const path = require('path');
 const Evento = require('../models/profissional/eventos/Event');
 
-// Página para escolher data
+// ✅ Importar middleware de autenticação
+const autenticar = require('../middlewares/autenticar');
+
+// Página para escolher data (não precisa login)
 router.get('/escolher-data', (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/EscolherData.html'));
 });
 
-// Página de criação de evento
-router.get('/criar', (req, res) => {
+// Página de criação de evento (precisa estar logado)
+router.get('/criar', autenticar, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/CriarEvent.html'));
 });
 
 // ✅ NOVO: Página de sucesso após cadastrar evento
-router.get('/sucesso', (req, res) => {
+router.get('/sucesso', autenticar, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/EventSucesso.html'));
 });
 
 // Página de edição de evento
-router.get('/editar', (req, res) => {
+router.get('/editar', autenticar, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/EditarEvent.html'));
 });
 
 // ✅ CANCELAR ALTERAÇÕES (voltar sem salvar) — deve vir ANTES do /:id
-router.get('/editar/cancelar', (req, res) => {
+router.get('/editar/cancelar', autenticar, (req, res) => {
   res.redirect('/api/eventos/lista-evento');
 });
 
-// Página para listar usuarios
-router.get('/ListaUsu', (req, res) => {
+// Página para listar usuarios (provavelmente só profissionais)
+router.get('/ListaUsu', autenticar, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/usuarios/ListaUsu.html'));
 });
 
 // Salvar evento via POST
-router.post('/novo-evento', async (req, res) => {
+router.post('/novo-evento', autenticar, async (req, res) => {
   try {
     const {
       acesso, tipo_evento, tipo_comida, tipo_bebida,
@@ -57,20 +60,14 @@ router.post('/novo-evento', async (req, res) => {
   }
 });
 
-
 // Página de detalhes do evento
-router.get('/detalhes', (req, res) => {
+router.get('/detalhes', autenticar, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/DetalhesEvento.html'));
 });
 
-
 // ✅ NOVA ROTA: Listar apenas os eventos do usuário logado
-router.get('/meus-eventos', async (req, res) => {
+router.get('/meus-eventos', autenticar, async (req, res) => {
   try {
-    if (!req.session.usuarioId) {
-      return res.status(401).send('Usuário não autenticado.');
-    }
-
     const eventos = await Evento.find({ usuarioId: req.session.usuarioId });
     res.json(eventos);
   } catch (err) {
@@ -80,7 +77,7 @@ router.get('/meus-eventos', async (req, res) => {
 });
 
 // Rota para retornar somente as datas dos eventos agendados
-router.get('/datas-agendadas', async (req, res) => {
+router.get('/datas-agendadas', autenticar, async (req, res) => {
   try {
     const eventos = await Evento.find({}, 'data_evento').lean();
     const datas = eventos.map(e => {
@@ -99,7 +96,7 @@ router.get('/datas-agendadas', async (req, res) => {
 });
 
 // API: Buscar evento por ID — essa deve vir por último
-router.get('/:id', async (req, res) => {
+router.get('/:id', autenticar, async (req, res) => {
   try {
     const evento = await Evento.findById(req.params.id);
     if (!evento) return res.status(404).send('Evento não encontrado');
@@ -110,7 +107,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // API: Deletar evento
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', autenticar, async (req, res) => {
   try {
     await Evento.findByIdAndDelete(req.params.id);
     res.status(200).send('Evento excluído');
@@ -120,7 +117,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Atualizar evento
-router.put('/:id', async (req, res) => {
+router.put('/:id', autenticar, async (req, res) => {
   try {
     const eventoAtualizado = await Evento.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(eventoAtualizado);
@@ -130,7 +127,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Confirmar evento
-router.put('/:id/confirmar', async (req, res) => {
+router.put('/:id/confirmar', autenticar, async (req, res) => {
   try {
     const evento = await Evento.findByIdAndUpdate(
       req.params.id,

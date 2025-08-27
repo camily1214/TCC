@@ -13,34 +13,33 @@ router.get('/usuarios/lista', (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/usuarios/ListaUsu.html'));
 });
 
-//Exemplo de rota de login//
-// router.post('/login', async (req, res) => {//
-//  const { email, senha } = req.body;//
+// Rota de login
+router.post('/login', async (req, res) => {
+  const { email, senha } = req.body;
 
-  // try {//
-  //  const usuario = await Usuario.findOne({ email });/
+  try {
+    const usuario = await Usuario.findOne({ email });
 
-  ///  if (!usuario) {//
-  //    return res.status(401).send('Usuário não encontrado');//
-   // }//
-  ///  if (usuario.senha !== senha) {  // (melhor usar bcrypt depois)
-  //    return res.status(401).send('Senha inválida');///
-   /// 
-    // salva o ID do usuário logado na sessão
-  //  req.session.usuarioId = usuario._id;//
-  //  res.redirect('/'); // ou outra página
-  //} catch (err) {
-  //  console.error('Erro no login:', err);
-  //  res.status(500).send('Erro no login');
-  //}
-// });
+    if (!usuario) {
+      return res.status(401).json({ mensagem: 'Usuário não encontrado' });
+    }
 
-//router.get('/logout', (req, res) => {
-//  req.session.destroy(err => {
-//    if (err) return res.status(500).send('Erro ao sair.');
-//    res.redirect('/login');
-//  });
-//});
+    // compara senha com bcrypt
+    const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
+    if (!senhaCorreta) {
+      return res.status(401).json({ mensagem: 'Senha inválida' });
+    }
+
+    // salva o ID do usuário na sessão
+    req.session.usuarioId = usuario._id;
+    req.session.tipo = usuario.tipo; // opcional: guarda tipo do usuário
+
+    return res.json({ mensagem: 'Login realizado com sucesso!' });
+  } catch (erro) {
+    console.error('Erro no login:', erro);
+    return res.status(500).json({ mensagem: 'Erro no login.' });
+  }
+});
 
 // Página de cadastro
 router.get('/cadastro', (req, res) => {

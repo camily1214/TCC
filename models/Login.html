@@ -112,7 +112,7 @@
       <img src="/imagens/logo.png" alt="Logo" style="width: 100px; display: block; margin: 0 auto 15px; border-radius: 10px" />
       <h2>Login do Usuário</h2>
 
-      <div id="erros" class="alert"></div>
+      <div id="erros" class="alert" aria-live="polite"></div>
 
       <div class="form-group">
         <label for="email">E-mail</label>
@@ -147,16 +147,11 @@
     }
 
     try {
-      // 🔹 Se no app.js você usou app.use('/api/usuarios', usuariosRouter)
-      // use a linha abaixo:
-      // const resposta = await fetch('/api/usuarios/login', {
-
-      // 🔹 Se no app.js você usou app.use('/', usuariosRouter)
-      // troque pela linha:
-      const resposta = await fetch('/login', {
-        
+      // 🔹 Corrigido para a rota usada no backend
+      const resposta = await fetch('/api/usuarios/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // 🔑 Mantém a sessão/cookie ativa
         body: JSON.stringify({ email, senha })
       });
 
@@ -165,7 +160,8 @@
       if (resposta.ok) {
         // login ok
         alert(data.mensagem || 'Login realizado com sucesso!');
-        window.location.href = '/models/PaginaInicial.html'; 
+        // 🔹 Melhor apontar para rota Express que entrega o HTML
+        window.location.href = '/api/eventos/lista-evento'; 
       } else {
         errosDiv.innerHTML = data.mensagem || 'Erro ao fazer login.';
         errosDiv.style.display = 'block';
