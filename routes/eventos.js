@@ -76,15 +76,24 @@ router.get('/detalhes', autenticar, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/DetalhesEvento.html'));
 });
 
-// ✅ NOVA ROTA: Listar apenas os eventos do usuário logado
+// NOVA ROTA: Listar apenas os eventos do usuário logado
 router.get('/meus-eventos', autenticar, async (req, res) => {
   try {
     const eventos = await Evento.find({ usuarioId: req.session.usuarioId });
-    res.json(eventos);
+    res.render('meus-eventos', { eventos });
   } catch (err) {
     console.error('Erro ao buscar eventos do usuário:', err);
     res.status(500).send('Erro ao buscar eventos do usuário.');
   }
+});
+
+router.get('/eventos/lista', (req, res) => {
+  res.sendFile(path.join(__dirname, '../models/profissional/eventos/ListaEvent.html'));
+});
+
+router.get('/meus-eventos', async (req, res) => {
+    const eventos = await Evento.find({ usuarioId: req.session.usuarioId });
+    res.render('meus-eventos', { eventos }); // Renderiza o EJS
 });
 
 // Rota para retornar somente as datas dos eventos agendados

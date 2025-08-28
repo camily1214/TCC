@@ -5,6 +5,7 @@ const path       = require('path');
 const mongoose   = require('mongoose');
 const cors       = require('cors');
 const session    = require('express-session');
+const Evento = require('./models/profissional/eventos/Event');
 
 const usuarioRoutes = require('./routes/usuario');
 const eventosRoutes = require('./routes/eventos');
@@ -27,7 +28,7 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Sessão para login (✅ DESCOMENTADO)
+// Sessão para login (DESCOMENTADO)
 app.use(session({
   secret: process.env.SESSION_SECRET || 'segredo_super_seguro',
   resave: false,
@@ -75,7 +76,21 @@ app.get('/login', (req, res) =>
   res.sendFile(path.join(__dirname, 'models/Login.html'))
 );
 
-app.use('/profissional/eventos', express.static(path.join(__dirname, 'models/profissional/eventos')));
+
+app.get('/profissional/eventos/MeusEventos.html', async (req, res) => {
+  try {
+    if (!req.session.usuarioId) return res.redirect('/login');
+
+    // Busca os eventos do usuário logado
+    const eventos = await Evento.find({ usuarioId: req.session.usuarioId });
+
+    // Renderiza usando EJS
+    res.render('MeusEventos', { eventos }); 
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Erro ao carregar eventos');
+  }
+});
 
 
 // 404
