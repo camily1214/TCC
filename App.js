@@ -77,7 +77,7 @@ app.get('/login', (req, res) =>
 );
 
 
-app.get('/profissional/eventos/MeusEventos.html', async (req, res) => {
+app.get('/eventos/meus-eventos.html', async (req, res) => {
   try {
     if (!req.session.usuarioId) return res.redirect('/login');
 

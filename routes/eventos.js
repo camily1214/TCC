@@ -47,6 +47,11 @@ router.get('/ListaUsu', autenticar, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/usuarios/ListaUsu.html'));
 });
 
+router.get('/meus-eventos', autenticar, (req, res) => {
+  res.sendFile(path.join(__dirname, '../models/profissional/eventos/meus-eventos.html'));
+});
+
+
 // Salvar evento via POST
 router.post('/novo-evento', autenticar, async (req, res) => {
   try {
@@ -76,24 +81,22 @@ router.get('/detalhes', autenticar, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/DetalhesEvento.html'));
 });
 
-// NOVA ROTA: Listar apenas os eventos do usuário logado
-router.get('/meus-eventos', autenticar, async (req, res) => {
+// Rota que devolve só os eventos em JSON
+router.get('/api/meus-eventos/dados', autenticar, async (req, res) => {
   try {
+    if (!req.session.usuarioId) {
+      return res.status(401).json({ erro: 'Usuário não autenticado' });
+    }
     const eventos = await Evento.find({ usuarioId: req.session.usuarioId });
-    res.render('meus-eventos', { eventos });
+    res.json(eventos);
   } catch (err) {
     console.error('Erro ao buscar eventos do usuário:', err);
-    res.status(500).send('Erro ao buscar eventos do usuário.');
+    res.status(500).json({ erro: 'Erro ao buscar eventos' });
   }
 });
 
 router.get('/eventos/lista', (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/ListaEvent.html'));
-});
-
-router.get('/meus-eventos', async (req, res) => {
-    const eventos = await Evento.find({ usuarioId: req.session.usuarioId });
-    res.render('meus-eventos', { eventos }); // Renderiza o EJS
 });
 
 // Rota para retornar somente as datas dos eventos agendados
