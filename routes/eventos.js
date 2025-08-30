@@ -61,9 +61,14 @@ router.post('/novo-evento', autenticar, async (req, res) => {
       rua, numero, complemento, bairro, cidade, estado, cep,
     } = req.body;
 
+    // separa ano, mês, dia
+    const [ano, mes, dia] = data_evento.split('-').map(Number);
+    // cria objeto Date no fuso local (sem UTC)
+    const dataFinal = new Date(ano, mes - 1, dia);
+
     const novoEvento = new Evento({
       acesso, tipo_evento, tipo_comida, tipo_bebida,
-      num_convidados, data_evento, hora_evento,
+      num_convidados, data_evento:dataFinal, hora_evento,
       rua, numero, complemento, bairro, cidade, estado, cep,
       usuarioId: req.session.usuarioId
     });
