@@ -11,7 +11,6 @@
     body {
       font-family: Arial, sans-serif;
       background-color: #000;
-      color: #000000;
       margin: 0;
       padding: 0;
     }
@@ -51,7 +50,7 @@
       color: #111;
     }
 
-    input {
+    input, select {
       width: 100%;
       padding: 8px;
       border: 1px solid #ccc;
@@ -115,6 +114,15 @@
       <div id="erros" class="alert" aria-live="polite"></div>
 
       <div class="form-group">
+        <label for="tipo">Você é:</label>
+        <select id="tipo" name="tipo" required>
+          <option value="">Selecione...</option>
+          <option value="cliente">cliente</option>
+          <option value="profissional">profissional</option>
+        </select>
+      </div>
+
+      <div class="form-group">
         <label for="email">E-mail</label>
         <input type="email" id="email" name="email" placeholder="Digite seu e-mail" required />
       </div>
@@ -129,45 +137,52 @@
   </div>
 
 <script>
-  const form = document.getElementById('formLogin');
-  const errosDiv = document.getElementById('erros');
+const form = document.getElementById('formLogin');
+const errosDiv = document.getElementById('erros');
 
-  form.addEventListener('submit', async function (event) {
-    event.preventDefault();
-    errosDiv.style.display = 'none';
-    errosDiv.innerHTML = '';
+form.addEventListener('submit', async function (event) {
+  event.preventDefault();
+  errosDiv.style.display = 'none';
+  errosDiv.innerHTML = '';
 
-    const email = document.getElementById('email').value.trim();
-    const senha = document.getElementById('senha').value;
+  const email = document.getElementById('email').value.trim();
+  const senha = document.getElementById('senha').value;
+  const tipo  = document.getElementById('tipo').value;
 
-    if (!email || !senha) {
-      errosDiv.innerHTML = 'Por favor, preencha todos os campos.';
+  if (!email || !senha || !tipo) {
+    errosDiv.innerHTML = 'Por favor, preencha todos os campos.';
+    errosDiv.style.display = 'block';
+    return;
+  }
+
+  try {
+    const resposta = await fetch('/api/usuarios/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, senha, tipo }) // envia tipo junto
+    });
+
+    const data = await resposta.json();
+
+    if (resposta.ok) {
+      if (data.tipo === 'cliente') {
+        window.location.href = '/api/eventos/pos-login';
+      } else if (data.tipo === 'profissional') {
+        window.location.href = '/api/eventos/prof-pos-login'; 
+      } else {
+        window.location.href = '/api/eventos/pos-login';
+      }
+    } else {
+      errosDiv.innerHTML = data.mensagem || 'Erro ao fazer login.';
       errosDiv.style.display = 'block';
-      return;
     }
-
-    try {
-      // 🔹 Corrigido para a rota usada no backend
-      const resposta = await fetch('/api/usuarios/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // 🔑 Mantém a sessão/cookie ativa
-        body: JSON.stringify({ email, senha })
-      });
-
-      const data = await resposta.json();
-
-  if (resposta.ok) {
-     window.location.href = '/api/eventos/pos-login';
-  } else {
-    errosDiv.innerHTML = data.mensagem || 'Erro ao fazer login.';
+  } catch (err) {
+    console.error('Erro ao tentar login:', err);
+    errosDiv.innerHTML = 'Erro ao conectar ao servidor.';
     errosDiv.style.display = 'block';
   }
-} catch (err) {
-  console.error('Erro ao tentar login:', err);
-  errosDiv.innerHTML = 'Erro ao conectar ao servidor.';
-  errosDiv.style.display = 'block';
-}});
+});
 
   // Carrega a navbar
   fetch('/components/navbar.html')

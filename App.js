@@ -71,6 +71,11 @@ app.get('/usuarios/ListaUsu.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'models/profissional/usuarios/ListaUsu.html'));
 });
 
+// Lista de usuários
+app.get('/eventos/ProfPosLogin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'models/profissional/eventos/ProfPosLogin.html'));
+});
+
 // Página de login
 app.get('/login', (req, res) =>
   res.sendFile(path.join(__dirname, 'models/Login.html'))
@@ -79,10 +84,10 @@ app.get('/login', (req, res) =>
 
 app.get('/eventos/meus-eventos.html', async (req, res) => {
   try {
-    if (!req.session.usuarioId) return res.redirect('/login');
+    if (!req.session.usuario.id) return res.redirect('/login');
 
     // Busca os eventos do usuário logado
-    const eventos = await Evento.find({ usuarioId: req.session.usuarioId });
+    const eventos = await Evento.find({ usuarioId: req.session.usuario.id });
 
     // Renderiza usando EJS
     res.render('MeusEventos', { eventos }); 

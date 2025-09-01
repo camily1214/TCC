@@ -4,51 +4,75 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const Usuario = require('../models/profissional/usuarios/usuarios');
 
-// página de login //
+// Importar middleware de autenticação
+const { autenticar, apenasClientes, apenasProfissionais } = require('../middlewares/autenticar');
+
+/* --ROTAS DE PÁGINAS--*/
+
+// Página de login
 router.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, '../models/Login.html'));
-});
-
-router.get('/usuarios/lista', (req, res) => {
-  res.sendFile(path.join(__dirname, '../models/profissional/usuarios/ListaUsu.html'));
-});
-
-// Rota de login
-router.post('/login', async (req, res) => {
-  const { email, senha } = req.body;
-
-  try {
-    const usuario = await Usuario.findOne({ email });
-
-    if (!usuario) {
-      return res.status(401).json({ mensagem: 'Usuário não encontrado' });
-    }
-
-    // compara senha com bcrypt
-    const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
-    if (!senhaCorreta) {
-      return res.status(401).json({ mensagem: 'Senha inválida' });
-    }
-
-    // salva o ID do usuário na sessão
-    req.session.usuarioId = usuario._id;
-    req.session.tipo = usuario.tipo; // opcional: guarda tipo do usuário
-
-    return res.json({ mensagem: 'Login realizado com sucesso!' });
-  } catch (erro) {
-    console.error('Erro no login:', erro);
-    return res.status(500).json({ mensagem: 'Erro no login.' });
-  }
+  res.sendFile(path.resolve(__dirname, '../models/Login.html'));
 });
 
 // Página de cadastro
 router.get('/cadastro', (req, res) => {
-  res.sendFile(path.join(__dirname, '../models/profissional/usuarios/CadUsu.html'));
+  res.sendFile(path.resolve(__dirname, '../models/profissional/usuarios/CadUsu.html'));
 });
 
 // Página de sucesso
 router.get('/cadastro-sucesso', (req, res) => {
-  res.sendFile(path.join(__dirname, '../models/profissional/usuarios/CadastroSucesso.html'));
+  res.sendFile(path.resolve(__dirname, '../models/profissional/usuarios/CadastroSucesso.html'));
+});
+
+// Página HTML de listagem de usuários (apenas profissionais)
+router.get('/usuarios/lista-html', autenticar, apenasProfissionais, (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../models/profissional/usuarios/ListaUsu.html'));
+});
+
+router.get('/pos-login', autenticar, apenasClientes, (req, res) => {
+  res.redirect('/api/eventos/pos-login');
+});
+
+/* ---ROTAS DE AUTENTICAÇÃO---*/
+
+// Rota de login
+router.post('/login', async (req, res) => {
+  console.log('req.body:', req.body); // <--- debug
+  try {
+    const { email, senha, tipo } = req.body;
+
+    // 1. Busca usuário pelo email
+    const usuario = await Usuario.findOne({ email });
+
+    if (!usuario) {
+      return res.status(400).json({ mensagem: 'Usuário não encontrado.' });
+    }
+
+    // 2. Confere se o tipo bate
+    if (!usuario.tipo || usuario.tipo.toLowerCase() !== tipo.toLowerCase()) {
+      return res.status(403).json({
+        mensagem: 'Tipo de usuário incorreto. Selecione corretamente Cliente ou Profissional.'
+      });
+    }
+
+    // 3. Verifica senha
+    const senhaOk = await bcrypt.compare(senha, usuario.senha);
+    if (!senhaOk) {
+      return res.status(401).json({ mensagem: 'Senha incorreta.' });
+    }
+
+    // 4. Cria sessão
+    req.session.usuario = {
+      id: usuario._id.toString(),
+      email: usuario.email,
+      tipo: usuario.tipo
+    };
+
+    res.json({ mensagem: 'Login realizado com sucesso', tipo: usuario.tipo });
+  } catch (err) {
+    console.error('Erro no login:', err);
+    res.status(500).json({ mensagem: 'Erro no servidor.' });
+  }
 });
 
 // Criar usuário (POST)
@@ -62,8 +86,8 @@ router.post('/cadastro', async (req, res) => {
 
     // Validação de campos obrigatórios
     if (
-      !tipo || !nome || !sobrenome || !cpf || !datanasc || !telefone || !genero || !email || !senha || !confirmaSenha ||
-      !rua || !numero || !bairro || !cidade || !estado || !cep
+      !tipo || !nome || !sobrenome || !cpf || !datanasc || !telefone || !genero ||
+      !email || !senha || !confirmaSenha || !rua || !numero || !bairro || !cidade || !estado || !cep
     ) {
       return res.status(400).json({ mensagem: 'Preencha todos os campos obrigatórios.' });
     }
@@ -73,15 +97,15 @@ router.post('/cadastro', async (req, res) => {
     }
 
     // Verifica se o CPF já está cadastrado
-    const cpfExistente = await Usuario.findOne({ cpf: req.body.cpf });
+    const cpfExistente = await Usuario.findOne({ cpf });
     if (cpfExistente) {
-      return res.status(400).send('CPF já cadastrado.');
+      return res.status(400).json({ mensagem: 'CPF já cadastrado.' });
     }
 
     // Verifica se o E-MAIL já está cadastrado
-    const emailExistente = await Usuario.findOne({ email: req.body.email });
+    const emailExistente = await Usuario.findOne({ email });
     if (emailExistente) {
-      return res.status(400).send('E-mail já cadastrado.');
+      return res.status(400).json({ mensagem: 'E-mail já cadastrado.' });
     }
 
     // Criptografar senha
@@ -89,10 +113,10 @@ router.post('/cadastro', async (req, res) => {
 
     // Criar novo usuário
     const novoUsuario = new Usuario({
-      tipo,
+      tipo: tipo.toLowerCase(), // garante "cliente" ou "profissional"
       nome,
       sobrenome,
-      datanasc,
+      datanasc: new Date(datanasc),
       email,
       genero,
       telefone,
@@ -112,13 +136,15 @@ router.post('/cadastro', async (req, res) => {
     res.redirect('/cadastro-sucesso');
 
   } catch (erro) {
-    console.error(erro);
+    console.error('Erro ao cadastrar usuário:', erro);
     res.status(500).json({ mensagem: 'Erro ao cadastrar usuário.' });
   }
 });
 
-// Rota para retornar todos os usuários
-router.get('/lista', async (req, res) => {
+/* -- ROTAS DE ADMINISTRAÇÃO --*/
+
+// Rota para retornar todos os usuários (apenas profissionais)
+router.get('/api/usuarios/lista', autenticar, apenasProfissionais, async (req, res) => {
   try {
     const usuarios = await Usuario.find();
     res.json(usuarios);
@@ -127,8 +153,8 @@ router.get('/lista', async (req, res) => {
   }
 });
 
-// Rota para deletar usuário
-router.delete('/:id', async (req, res) => {
+// Rota para deletar usuário (apenas profissionais)
+router.delete('/api/usuarios/:id', autenticar, apenasProfissionais, async (req, res) => {
   try {
     await Usuario.findByIdAndDelete(req.params.id);
     res.status(200).json({ mensagem: 'Usuário excluído com sucesso' });
@@ -137,8 +163,8 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Rota GET para listar todos os usuários (interface HTML) COM LOG PARA DEBUG
-router.get('/ListaUsu', async (req, res) => {
+// Rota GET para listar todos os usuários com log de debug (somente profissionais)
+router.get('/api/usuarios/debug', autenticar, apenasProfissionais, async (req, res) => {
   try {
     const usuarios = await Usuario.find();
     console.log("Usuários encontrados:", usuarios);
