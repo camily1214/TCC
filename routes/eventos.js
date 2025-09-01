@@ -3,7 +3,7 @@ const router = express.Router();
 const path = require('path');
 const Evento = require('../models/profissional/eventos/Event');
 
-// ✅ Importar middleware de autenticação
+// Importar middleware de autenticação
 const { autenticar, apenasClientes, apenasProfissionais } = require('../middlewares/autenticar');
 
 // Rota para abrir a página HTML de lista de eventos
@@ -22,7 +22,7 @@ router.get('/criar', autenticar, apenasClientes, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/CriarEvent.html'));
 });
 
-// ✅ NOVO: Página de sucesso após cadastrar evento
+// NOVO: Página de sucesso após cadastrar evento
 router.get('/sucesso', autenticar, apenasClientes, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/EventSucesso.html'));
 });
@@ -32,7 +32,7 @@ router.get('/editar', autenticar, apenasClientes, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/EditarEvent.html'));
 });
 
-// ✅ CANCELAR ALTERAÇÕES (voltar sem salvar) — deve vir ANTES do /:id
+// CANCELAR ALTERAÇÕES (voltar sem salvar) — deve vir ANTES do /:id
 router.get('/editar/cancelar', autenticar, apenasClientes, (req, res) => {
   res.redirect('/api/eventos/lista-evento');
 });
@@ -128,21 +128,40 @@ router.get('/datas-agendadas', autenticar, async (req, res) => {
   }
 });
 
-// API: Listar todos os eventos (profissionais veem todos, clientes só os deles)
-router.get('/lista-evento', autenticar, async (req, res) => {
+// API: Listar todos os eventos (somente profissionais) com dados formatados
+router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) => {
   try {
-    let eventos;
-    if (req.session.usuario.tipo === 'profissional') {
-      eventos = await Evento.find(); // todos
-    } else {
-      eventos = await Evento.find({ usuarioId: req.session.usuarioId }); // só do cliente
-    }
-    res.json(eventos);
+    const eventos = await Evento.find().lean();
+
+    const eventosFormatados = eventos.map(e => {
+      // garantir que a data_evento seja Date
+      const d = new Date(e.data_evento);
+      const dataFormatada = d.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+      const horaFormatada = e.hora_evento ? e.hora_evento : '--:--';
+
+      return {
+  _id: e._id, // mantém _id para compatibilidade com frontend
+  confirmado: e.confirmado ? '✅ Confirmado' : '❌ Pendente',
+  tipo_evento: e.tipo_evento || '-',
+  acesso: e.acesso || '-',
+  num_convidados: e.num_convidados || '-',
+  tipo_bebida: e.tipo_bebida || '-',
+  tipo_comida: e.tipo_comida || '-',
+  data_evento: dataFormatada || '-',
+  hora_evento: horaFormatada || '--:--',
+  endereco: `${e.rua || '-'}${e.numero ? ', ' + e.numero : ''} - ${e.bairro || '-'}, ${e.cidade || '-'} - ${e.estado || '-'}, CEP: ${e.cep || '-'}`,
+  complemento: e.complemento || '---',
+  usuarioId: e.usuarioId || 'N/A'
+      };
+    });
+
+    res.json(eventosFormatados);
   } catch (err) {
     console.error('Erro ao buscar eventos:', err);
     res.status(500).json({ error: 'Erro ao buscar eventos.' });
   }
 });
+
 
 // API: Buscar evento por ID — (vem depois da lista)
 router.get('/:id', autenticar, async (req, res) => {

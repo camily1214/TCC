@@ -127,43 +127,47 @@
     exibirEventos(todosEventos);
   }
 
-  function exibirEventos(lista) {
-    const tabela = document.getElementById('lista-evento');
-    tabela.innerHTML = '';
+function exibirEventos(lista) {
+  const tabela = document.getElementById('lista-eventos');
+  tabela.innerHTML = '';
 
-    lista.forEach(evento => {
-      const linha = document.createElement('tr');
-      linha.innerHTML = `
-        <td>${new Date(evento.data_evento).toLocaleDateString()}</td>
-        <td>${evento.hora_evento}</td>
-        <td>${evento.tipo_evento}</td>
-        <td>${evento.acesso}</td>
-        <td>${evento.tipo_comida}</td>
-        <td>${evento.tipo_bebida}</td>
-        <td>${evento.num_convidados}</td>
-        <td>
-          <button onclick="deletarEvento('${evento._id}')">Excluir</button>
-          <button class="btn-ver-mais" onclick="verDetalhes('${evento._id}')">Ver Mais</button>
-          <button class="btn-editar" onclick="editarEvento('${evento._id}')">Editar</button>
-        </td>
-      `;
-      tabela.appendChild(linha);
-    });
-  }
+  lista.forEach(evento => {
+    const dataFormatada = evento.data_evento
+      ? new Date(evento.data_evento).toLocaleDateString('pt-BR')
+      : '-';
 
-  function filtrarEventos() {
-    const tipo = document.getElementById('filtro-tipo').value.toLowerCase();
-    const data = document.getElementById('filtro-data').value; // yyyy-mm-dd
+    const linha = document.createElement('tr');
+    linha.innerHTML = `
+      <td>${dataFormatada}</td>
+      <td>${evento.hora_evento}</td>
+      <td>${evento.tipo_evento}</td>
+      <td>${evento.acesso}</td>
+      <td>${evento.tipo_comida}</td>
+      <td>${evento.tipo_bebida}</td>
+      <td>${evento.num_convidados}</td>
+      <td>
+        <button onclick="deletarEvento('${evento._id}')">Excluir</button>
+        <button class="btn-ver-mais" onclick="verDetalhes('${evento._id}')">Ver Mais</button>
+        <button class="btn-editar" onclick="editarEvento('${evento._id}')">Editar</button>
+      </td>
+    `;
+    tabela.appendChild(linha);
+  });
+}
 
-    const filtrados = todosEventos.filter(evento => {
-      const dataEvento = evento.data_evento?.split('T')[0];
-      const tipoMatch = evento.tipo_evento?.toLowerCase().includes(tipo);
-      const dataMatch = !data || dataEvento === data;
-      return tipoMatch && dataMatch;
-    });
+function filtrarEventos() {
+  const tipo = document.getElementById('filtro-tipo').value.toLowerCase();
+  const data = document.getElementById('filtro-data').value; // yyyy-mm-dd
 
-    exibirEventos(filtrados);
-  }
+  const filtrados = todosEventos.filter(evento => {
+    const dataEvento = new Date(evento.data_evento).toISOString().split('T')[0]; // yyyy-mm-dd
+    const tipoMatch = evento.tipo_evento?.toLowerCase().includes(tipo);
+    const dataMatch = !data || dataEvento === data;
+    return tipoMatch && dataMatch;
+  });
+
+  exibirEventos(filtrados);
+}
 
   // Eventos dos filtros
   document.getElementById('filtro-tipo').addEventListener('input', filtrarEventos);
