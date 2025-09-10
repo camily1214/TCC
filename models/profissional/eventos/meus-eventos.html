@@ -96,7 +96,7 @@ let meusEventos = [];
 // Carregar eventos do usuário logado
 async function carregarEventos() {
   try {
-    const resposta = await fetch('/api/eventos/api/meus-eventos/dados', { credentials: 'include' });
+    const resposta = await fetch('/api/eventos/meus-eventos/dados', { credentials: 'include' });
     if (!resposta.ok) throw new Error("Falha ao buscar eventos");
 
     meusEventos = await resposta.json();

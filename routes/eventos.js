@@ -87,7 +87,7 @@ router.get('/detalhes', autenticar, (req, res) => {
 });
 
 // Rota que devolve só os eventos em JSON (clientes veem só os deles)
-router.get('/api/meus-eventos/dados', autenticar, apenasClientes, async (req, res) => {
+router.get('/meus-eventos/dados', autenticar, apenasClientes, async (req, res) => {
   try {
     if (!req.session.usuario.id) {
       return res.status(401).json({ erro: 'Usuário não autenticado' });
