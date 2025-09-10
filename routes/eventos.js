@@ -11,7 +11,6 @@ router.get('/lista-eventos-html', autenticar, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/ListaEvent.html'));
 });
 
-
 // Página para escolher data (não precisa login)
 router.get('/escolher-data', (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/EscolherData.html'));
@@ -134,9 +133,15 @@ router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) =>
       const dataFormatada = d.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
       const horaFormatada = e.hora_evento ? e.hora_evento : '--:--';
 
+      // Formata status corretamente usando o campo 'status'
+      let statusFormatado = '⏳ Aguardando confirmação';
+      if (e.status === 'confirmado') statusFormatado = '✅ Confirmado';
+      if (e.status === 'cancelado') statusFormatado = '❌ Cancelado';
+
+
       return {
-  _id: e._id, // mantém _id para compatibilidade com frontend
-  confirmado: e.confirmado ? '✅ Confirmado' : '❌ Pendente',
+        _id: e._id, // mantém _id para frontend
+  status: statusFormatado,
   tipo_evento: e.tipo_evento || '-',
   acesso: e.acesso || '-',
   num_convidados: e.num_convidados || '-',
@@ -175,6 +180,29 @@ router.get('/:id', autenticar, async (req, res) => {
   }
 });
 
+// Atualizar status do evento (confirmado/cancelado) - apenas profissionais
+router.put('/:id/status', autenticar, apenasProfissionais, async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['confirmado', 'cancelado'].includes(status)) {
+      return res.status(400).send('Status inválido');
+    }
+
+    const eventoAtualizado = await Evento.findByIdAndUpdate(
+      req.params.id,
+      { status }, // atualiza o campo "status"
+      { new: true }
+    );
+
+    if (!eventoAtualizado) return res.status(404).send('Evento não encontrado');
+
+    res.json(eventoAtualizado);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Erro ao atualizar status do evento');
+  }
+});
+
 // API: Deletar evento (clientes só podem deletar os próprios, profissional pode deletar qualquer)
 router.delete('/:id', autenticar, async (req, res) => {
   try {
@@ -189,6 +217,29 @@ router.delete('/:id', autenticar, async (req, res) => {
     res.status(200).send('Evento excluído');
   } catch (err) {
     res.status(500).send('Erro ao excluir evento');
+  }
+});
+
+// Atualizar status do evento (confirmado/cancelado) - apenas profissionais
+router.put('/:id/status', autenticar, apenasProfissionais, async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['confirmado', 'cancelado'].includes(status)) {
+      return res.status(400).send('Status inválido');
+    }
+
+    const eventoAtualizado = await Evento.findByIdAndUpdate(
+      req.params.id,
+      { status }, // atualiza o campo "status"
+      { new: true }
+    );
+
+    if (!eventoAtualizado) return res.status(404).send('Evento não encontrado');
+
+    res.json(eventoAtualizado);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Erro ao atualizar status do evento');
   }
 });
 

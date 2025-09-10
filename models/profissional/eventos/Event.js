@@ -20,9 +20,10 @@ const EventSchema = new mongoose.Schema({
     ref: 'Usuario',
     required: true
   },
-  confirmado: {
-    type: Boolean,
-    default: false
+  status: {
+    type: String,
+    enum: ['aguardando', 'confirmado', 'cancelado'],
+    default: 'aguardando'
   }
 });
 

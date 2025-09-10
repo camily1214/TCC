@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Lista de Eventos</title>
 
-    <!--Navbar-->
+  <!-- Navbar -->
   <link rel="stylesheet" href="/css/navbar.css" />
 
   <style>
@@ -35,35 +35,22 @@
 
     button {
       padding: 6px 10px;
-      background-color: #e74c3c;
+      background-color: #484545;
       color: #fff;
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      color: #fff;
     }
 
-    button:hover {
-      background-color: #c0392b;
-    }
+    .btn-confirmar:hover { background-color: #27ae60; }
 
-    .btn-ver-mais {
-      background-color: #3498db;
-    }
+    .btn-cancelar:hover { background-color: #c0392b; }
 
-    .btn-ver-mais:hover {
-      background-color: #2980b9;
-    }
+    .btn-ver-mais:hover { background-color: #2980b9; }
 
-    .btn-editar {
-      background-color: #f39c12;
-      margin-left: 5px;
-    }
+    .btn-editar:hover { background-color: #e67e22; }
 
-    .btn-editar:hover {
-      background-color: #e67e22;
-    } 
-
-        /* Navbar personalizada */
     .custom-navbar {
       background-color: #727277 !important;
     }
@@ -77,28 +64,33 @@
       text-decoration: underline;
     }
 
+    .filtros {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filtros input {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      flex: 1;
+    }
   </style>
 </head>
 <body>
-  <!--Navbar-->
+  <!-- Navbar -->
   <div id="navbar-placeholder"></div>
-  
+
   <h1>Eventos Cadastrados</h1>
 
-<!-- Barra de pesquisa -->
-<div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-  <input
-    type="date"
-    id="filtro-data"
-    style="padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;"
-  />
-  <input
-    type="text"
-    id="filtro-tipo"
-    placeholder="Filtrar por tipo de evento..."
-    style="flex: 1; padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc;"
-  />
-</div>
+  <!-- Filtros -->
+  <div class="filtros">
+    <input type="date" id="filtro-data" placeholder="Filtrar por data" />
+    <input type="text" id="filtro-tipo" placeholder="Filtrar por tipo de evento..." />
+  </div>
 
   <table>
     <thead>
@@ -110,23 +102,30 @@
         <th>Comida</th>
         <th>Bebida</th>
         <th>Nº Convidados</th>
+        <th>Status</th>
         <th>Ações</th>
       </tr>
     </thead>
-    <tbody id="lista-eventos">
-      <!-- Linhas geradas via JS -->
-    </tbody>
+    <tbody id="lista-eventos"></tbody>
   </table>
 
-  <script>
- let todosEventos = [];
+<script>
+let todosEventos = [];
 
-  async function carregarEventos() {
-    const resposta = await fetch('/api/eventos/lista-evento');
+// Carregar todos os eventos (profissionais)
+async function carregarEventos() {
+  try {
+    const resposta = await fetch('/api/eventos/lista-evento', { credentials: 'include' });
+    if (!resposta.ok) throw new Error('Erro ao buscar eventos');
     todosEventos = await resposta.json();
     exibirEventos(todosEventos);
+  } catch (err) {
+    console.error(err);
+    alert('Erro ao carregar eventos.');
   }
+}
 
+// Exibir eventos na tabela
 function exibirEventos(lista) {
   const tabela = document.getElementById('lista-eventos');
   tabela.innerHTML = '';
@@ -136,17 +135,24 @@ function exibirEventos(lista) {
       ? new Date(evento.data_evento).toLocaleDateString('pt-BR')
       : '-';
 
+    let statusFormatado = '⏳ Aguardando confirmação';
+    if (evento.status === 'confirmado') statusFormatado = '✅ Confirmado';
+    if (evento.status === 'cancelado') statusFormatado = '❌ Cancelado';
+
     const linha = document.createElement('tr');
+    linha.id = `evento-${evento._id}`;
     linha.innerHTML = `
       <td>${dataFormatada}</td>
-      <td>${evento.hora_evento}</td>
-      <td>${evento.tipo_evento}</td>
-      <td>${evento.acesso}</td>
-      <td>${evento.tipo_comida}</td>
-      <td>${evento.tipo_bebida}</td>
-      <td>${evento.num_convidados}</td>
+      <td>${evento.hora_evento || '-'}</td>
+      <td>${evento.tipo_evento || '-'}</td>
+      <td>${evento.acesso || '-'}</td>
+      <td>${evento.tipo_comida || '-'}</td>
+      <td>${evento.tipo_bebida || '-'}</td>
+      <td>${evento.num_convidados || '-'}</td>
+      <td class="status-cell">${statusFormatado}</td>
       <td>
-        <button onclick="deletarEvento('${evento._id}')">Excluir</button>
+        <button class="btn-confirmar" onclick="alterarStatus('${evento._id}', 'confirmado')">✅ Confirmar</button>
+        <button class="btn-cancelar" onclick="alterarStatus('${evento._id}', 'cancelado')">❌ Cancelar</button>
         <button class="btn-ver-mais" onclick="verDetalhes('${evento._id}')">Ver Mais</button>
         <button class="btn-editar" onclick="editarEvento('${evento._id}')">Editar</button>
       </td>
@@ -155,12 +161,13 @@ function exibirEventos(lista) {
   });
 }
 
+// Filtrar eventos por data e tipo
 function filtrarEventos() {
   const tipo = document.getElementById('filtro-tipo').value.toLowerCase();
-  const data = document.getElementById('filtro-data').value; // yyyy-mm-dd
+  const data = document.getElementById('filtro-data').value;
 
   const filtrados = todosEventos.filter(evento => {
-    const dataEvento = new Date(evento.data_evento).toISOString().split('T')[0]; // yyyy-mm-dd
+    const dataEvento = new Date(evento.data_evento).toISOString().split('T')[0];
     const tipoMatch = evento.tipo_evento?.toLowerCase().includes(tipo);
     const dataMatch = !data || dataEvento === data;
     return tipoMatch && dataMatch;
@@ -169,45 +176,56 @@ function filtrarEventos() {
   exibirEventos(filtrados);
 }
 
-  // Eventos dos filtros
-  document.getElementById('filtro-tipo').addEventListener('input', filtrarEventos);
-  document.getElementById('filtro-data').addEventListener('input', filtrarEventos);
+// Funções de ação
+function verDetalhes(id) { window.location.href = `/api/eventos/detalhes?id=${id}`; }
+function editarEvento(id) { window.location.href = `/api/eventos/editar?id=${id}`; }
 
-  async function deletarEvento(id) {
-    if (confirm('Tem certeza que deseja excluir este evento?')) {
-      const resposta = await fetch(`/api/eventos/${id}`, { method: 'DELETE' });
-      if (resposta.ok) {
-        alert('Evento excluído com sucesso!');
-        carregarEventos();
-      } else {
-        alert('Erro ao excluir o evento.');
-      }
-    }
-  }
+// Alterar status do evento (confirmar/cancelar)
+async function alterarStatus(id, status) {
+  if (!confirm(`Deseja realmente marcar o evento como "${status}"?`)) return;
 
-  function verDetalhes(id) {
-    window.location.href = `/api/eventos/detalhes?id=${id}`;
-  }
-
-  function editarEvento(id) {
-    window.location.href = `/api/eventos/editar?id=${id}`;
-  }
-
-  carregarEventos();
-
-  // Carregar navbar
-  fetch('/components/navbar.html')
-    .then(response => {
-      if (!response.ok) throw new Error('Erro ao carregar a navbar');
-      return response.text();
-    })
-    .then(data => {
-      document.getElementById('navbar-placeholder').innerHTML = data;
-    })
-    .catch(error => {
-      console.error('Erro ao carregar navbar:', error);
+  try {
+    const resposta = await fetch(`/api/eventos/${id}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+      credentials: 'include'
     });
-  </script>
 
+    if (!resposta.ok) throw new Error('Erro ao atualizar status');
+
+    // Atualizar status no array local
+    const evento = todosEventos.find(e => e._id === id);
+    if (evento) evento.status = status;
+
+    // Atualizar apenas a célula de status da linha correspondente
+    const linha = document.getElementById(`evento-${id}`);
+    if (linha) {
+      const statusCell = linha.querySelector('.status-cell');
+      if (status === 'confirmado') statusCell.textContent = '✅ Confirmado';
+      else if (status === 'cancelado') statusCell.textContent = '❌ Cancelado';
+      else statusCell.textContent = '⏳ Aguardando confirmação';
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert('Erro ao atualizar status do evento.');
+  }
+}
+
+
+// Eventos dos filtros
+document.getElementById('filtro-tipo').addEventListener('input', filtrarEventos);
+document.getElementById('filtro-data').addEventListener('input', filtrarEventos);
+
+// Inicializar
+document.addEventListener('DOMContentLoaded', carregarEventos);
+
+// Carregar navbar
+fetch('/components/navbar.html')
+  .then(res => res.text())
+  .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; })
+  .catch(err => console.error('Erro ao carregar navbar:', err));
+</script>
 </body>
 </html>

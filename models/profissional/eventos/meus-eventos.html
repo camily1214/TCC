@@ -84,6 +84,7 @@
         <th>Comida</th>
         <th>Bebida</th>
         <th>Nº Convidados</th>
+        <th>Status</th>
         <th>Ações</th>
       </tr>
     </thead>
@@ -133,6 +134,11 @@ function exibirEventos(lista) {
     const bebida = evento.tipo_bebida || '-';
     const numConvidados = evento.num_convidados || '-';
 
+    // 👇 status formatado
+    let statusFormatado = '⏳ Aguardando confirmação';
+    if (evento.status === 'confirmado') statusFormatado = '✅ Confirmado';
+    if (evento.status === 'cancelado') statusFormatado = '❌ Cancelado';
+
     const linha = document.createElement('tr');
     linha.innerHTML = `
       <td>${dataFormatada}</td>
@@ -142,6 +148,7 @@ function exibirEventos(lista) {
       <td>${comida}</td>
       <td>${bebida}</td>
       <td>${numConvidados}</td>
+      <td>${statusFormatado}</td>
       <td>
         <button class="btn-ver-mais" onclick="verDetalhes('${evento._id}')">Ver Mais</button>
         <button class="btn-editar" onclick="editarEvento('${evento._id}')">Editar</button>
