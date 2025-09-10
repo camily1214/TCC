@@ -9,7 +9,7 @@ const usuarioSchema = new mongoose.Schema({
   nome: { type: String, required: true },
   sobrenome: { type: String, required: true },
   cpf: { type: String, required: true, unique: true },
-  datanasc: { type: Date, required: true }, // melhor como Date
+  datanasc: { type: Date, required: true }, 
   telefone: { type: String, required: true },
   genero: { type: String, enum: ['masculino', 'feminino', 'outro'], required: true },
   email: { type: String, required: true, unique: true },
@@ -20,7 +20,7 @@ const usuarioSchema = new mongoose.Schema({
   cidade: { type: String, required: true },
   estado: { type: String, required: true },
   cep: { type: String, required: true },
-  senha: { type: String, required: true } // senha já criptografada
+  senha: { type: String, required: true }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Usuario', usuarioSchema);

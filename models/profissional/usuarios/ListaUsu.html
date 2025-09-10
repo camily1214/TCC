@@ -86,59 +86,75 @@
         <th>Ações</th>
       </tr>
     </thead>
-    <tbody id="ListaUsu">
-    </tbody>
+    <tbody id="ListaUsu"></tbody>
   </table>
 
-  <script>
-    // Corrigido: id do tbody correto e funcional
-    async function carregarUsuarios() {
-      try {
-        const resposta = await fetch('/api/usuarios/lista');
-        const usuarios = await resposta.json();
+ <script>
+async function carregarUsuarios() {
+  try {
+    // se a rota /dados for pública não precisa de credentials, mas não faz mal incluir
+    const resposta = await fetch('/api/usuarios/dados', { credentials: 'include' });
+    const usuarios = await resposta.json().catch(() => []);
+    const tabela = document.getElementById('ListaUsu');
+    tabela.innerHTML = '';
 
-        const tabela = document.getElementById('ListaUsu'); // Corrigido para o ID certo
-        tabela.innerHTML = '';
-
-        usuarios.forEach(usuario => {
-          const linha = document.createElement('tr');
-
-          linha.innerHTML = `
-            <td>${usuario.nome} ${usuario.sobrenome || ''}</td>
-            <td>${usuario.telefone || '-'}</td>
-            <td>${usuario.email || '-'}</td>
-            <td>${usuario.cidade || '-'}</td>
-            <td><button onclick="deletarUsuario('${usuario._id}')">Excluir</button></td>
-          `;
-
-          tabela.appendChild(linha);
-        });
-      } catch (erro) {
-        console.error('Erro ao carregar usuários:', erro);
-      }
-    }
-
-    async function deletarUsuario(id) {
-      if (confirm('Tem certeza que deseja excluir este usuário?')) {
-        const resposta = await fetch(`/api/usuarios/${id}`, { method: 'DELETE' });
-
-        if (resposta.ok) {
-          alert('Usuário excluído com sucesso!');
-          carregarUsuarios();
-        } else {
-          alert('Erro ao excluir o usuário.');
-        }
-      }
-    }
-
-    carregarUsuarios();
-
-    // Navbar carregada com tratamento de erro
-  fetch('/components/navbar.html')
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById('navbar-placeholder').innerHTML = data;
+    usuarios.forEach(usuario => {
+      const linha = document.createElement('tr');
+      linha.innerHTML = `
+        <td>${usuario.nome} ${usuario.sobrenome || '-'}</td>
+        <td>${usuario.telefone || '-'}</td>
+        <td>${usuario.email || '-'}</td>
+        <td>${usuario.cidade || '-'}</td>
+        <td><button onclick="deletarUsuario('${usuario._id}')">Excluir</button></td>
+      `;
+      tabela.appendChild(linha);
     });
-  </script>
+  } catch (erro) {
+    console.error('Erro ao carregar usuários:', erro);
+  }
+}
+
+async function deletarUsuario(id) {
+  if (!id) {
+    alert('ID inválido. Não é possível excluir.');
+    return;
+  }
+
+  if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
+
+  try {
+    // <-- importantíssimo: enviar credentials para que o cookie de sessão seja incluído
+    const resposta = await fetch(`/api/usuarios/${id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    });
+
+    // evitar erro se o corpo vier vazio
+    const data = await resposta.json().catch(() => ({}));
+
+    console.log('DELETE /api/usuarios/: status=', resposta.status, 'body=', data);
+
+    if (resposta.ok) {
+      alert(data.mensagem || 'Usuário excluído com sucesso.');
+      carregarUsuarios();
+    } else {
+      alert('Erro ao excluir o usuário: ' + (data.mensagem || data.erro || `Status ${resposta.status}`));
+    }
+  } catch (erro) {
+    console.error('Erro no fetch (DELETE):', erro);
+    alert('Erro ao excluir o usuário (fetch). Veja o console para detalhes.');
+  }
+}
+
+carregarUsuarios();
+
+// carregar navbar
+fetch('/components/navbar.html')
+  .then(r => r.text())
+  .then(html => document.getElementById('navbar-placeholder').innerHTML = html)
+  .catch(err => console.error('Erro ao carregar navbar:', err));
+</script>
+
 </body>
 </html>

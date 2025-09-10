@@ -47,11 +47,6 @@ router.get('/prof-pos-login', autenticar, apenasProfissionais, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/ProfPosLogin.html'));
 });
 
-// Página para listar usuarios (apenas profissionais podem ver lista de clientes)
-router.get('/ListaUsu', autenticar, apenasProfissionais, (req, res) => {
-  res.sendFile(path.join(__dirname, '../models/profissional/usuarios/ListaUsu.html'));
-});
-
 // Página "Meus eventos" (clientes só veem os deles)
 router.get('/meus-eventos', autenticar, apenasClientes, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/meus-eventos.html'));

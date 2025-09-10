@@ -67,11 +67,6 @@ app.get('/cadastro-sucesso', (req, res) =>
 );
 
 // Lista de usuários
-app.get('/usuarios/ListaUsu.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'models/profissional/usuarios/ListaUsu.html'));
-});
-
-// Lista de usuários
 app.get('/eventos/ProfPosLogin', (req, res) => {
   res.sendFile(path.join(__dirname, 'models/profissional/eventos/ProfPosLogin.html'));
 });

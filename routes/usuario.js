@@ -3,6 +3,8 @@ const router = express.Router();
 const path = require('path');
 const bcrypt = require('bcrypt');
 const Usuario = require('../models/profissional/usuarios/usuarios');
+const Evento = require('../models/profissional/eventos/Event');
+
 
 // Importar middleware de autenticação
 const { autenticar, apenasClientes, apenasProfissionais } = require('../middlewares/autenticar');
@@ -25,7 +27,7 @@ router.get('/cadastro-sucesso', (req, res) => {
 });
 
 // Página HTML de listagem de usuários (apenas profissionais)
-router.get('/usuarios/lista-html', autenticar, apenasProfissionais, (req, res) => {
+router.get('/ListaUsu', autenticar, apenasProfissionais, (req, res) => {
   res.sendFile(path.resolve(__dirname, '../models/profissional/usuarios/ListaUsu.html'));
 });
 
@@ -141,27 +143,50 @@ router.post('/cadastro', async (req, res) => {
   }
 });
 
-/* -- ROTAS DE ADMINISTRAÇÃO --*/
+// Lista todos os usuários (somente profissionais)
+router.get('/usuarios/listaUsu', autenticar, apenasProfissionais, async (req, res) => {
+  try {
+    const usuarios = await Usuario.find().select('-senha'); // não retorna senha
+    res.json(usuarios);
+  } catch (error) {
+    console.error("Erro ao buscar usuários:", error);
+    res.status(500).json({ erro: 'Erro ao buscar usuários' });
+  }
+});
 
-// Rota para retornar todos os usuários (apenas profissionais)
-router.get('/api/usuarios/lista', autenticar, apenasProfissionais, async (req, res) => {
+
+// Rota para buscar todos os usuários em JSON
+router.get('/dados', async (req, res) => {
   try {
     const usuarios = await Usuario.find();
     res.json(usuarios);
-  } catch (error) {
-    res.status(500).json({ erro: error.message });
+  } catch (err) {
+    console.error('Erro ao buscar usuários:', err);
+    res.status(500).json({ erro: 'Erro ao buscar usuários' });
   }
 });
 
-// Rota para deletar usuário (apenas profissionais)
-router.delete('/api/usuarios/:id', autenticar, apenasProfissionais, async (req, res) => {
+// Deletar usuário + eventos vinculados (somente profissionais)
+router.delete('/:id', autenticar, apenasProfissionais, async (req, res) => {
   try {
-    await Usuario.findByIdAndDelete(req.params.id);
-    res.status(200).json({ mensagem: 'Usuário excluído com sucesso' });
+    const { id } = req.params;
+
+    // Apagar usuário
+    const usuario = await Usuario.findByIdAndDelete(id);
+    if (!usuario) {
+      return res.status(404).json({ mensagem: 'Usuário não encontrado.' });
+    }
+
+    // Apagar eventos relacionados a esse usuário
+    await Evento.deleteMany({ usuarioId: id });
+
+    res.status(200).json({ mensagem: 'Usuário e eventos excluídos com sucesso.' });
   } catch (err) {
-    res.status(500).json({ erro: err.message });
+    console.error("Erro ao deletar usuário e eventos:", err);
+    res.status(500).json({ erro: 'Erro ao excluir usuário: ' + err.message });
   }
 });
+
 
 // Rota GET para listar todos os usuários com log de debug (somente profissionais)
 router.get('/api/usuarios/debug', autenticar, apenasProfissionais, async (req, res) => {
