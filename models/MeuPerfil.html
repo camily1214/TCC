@@ -232,17 +232,12 @@
       });
     });
 
-    fetch('/components/navbar.html')
-      .then(response => {
-        if (!response.ok) throw new Error('Erro ao carregar a navbar');
-        return response.text();
-      })
-      .then(data => {
-        document.getElementById('navbar-placeholder').innerHTML = data;
-      })
-      .catch(error => {
-        console.error('Erro ao carregar navbar:', error);
-      });
+// Carregar navbar do cliente
+fetch('/components/navbarClient.html')
+  .then(res => res.text())
+  .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; })
+  .catch(err => console.error('Erro ao carregar navbar do cliente:', err));
+  
 </script>
 </body>
 </html>

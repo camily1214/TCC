@@ -95,6 +95,7 @@
   <table>
     <thead>
       <tr>
+        <th>Usuário</th>
         <th>Data</th>
         <th>Hora</th>
         <th>Tipo Evento</th>
@@ -135,13 +136,17 @@ function exibirEventos(lista) {
       ? new Date(evento.data_evento).toLocaleDateString('pt-BR')
       : '-';
 
-    let statusFormatado = '⏳ Aguardando confirmação';
-    if (evento.status === 'confirmado') statusFormatado = '✅ Confirmado';
-    if (evento.status === 'cancelado') statusFormatado = '❌ Cancelado';
+    let statusFormatado = 'Aguardando confirmação';
+    if (evento.status === 'confirmado') statusFormatado = 'Confirmado';
+    if (evento.status === 'cancelado') statusFormatado = 'Cancelado';
+
+    // Verifica se deve mostrar botões de confirmar/cancelar
+    const mostrarBotoesConfirmarCancelar = !['confirmado', 'cancelado'].includes(evento.status);
 
     const linha = document.createElement('tr');
     linha.id = `evento-${evento._id}`;
     linha.innerHTML = `
+      <td>${evento.usuarioNome || '-'}</td>
       <td>${dataFormatada}</td>
       <td>${evento.hora_evento || '-'}</td>
       <td>${evento.tipo_evento || '-'}</td>
@@ -149,7 +154,7 @@ function exibirEventos(lista) {
       <td>${evento.tipo_comida || '-'}</td>
       <td>${evento.tipo_bebida || '-'}</td>
       <td>${evento.num_convidados || '-'}</td>
-      <td class="status-cell">${statusFormatado}</td>
+      <td class="status-cell">${evento.status || '-'}</td>
       <td>
         <button class="btn-confirmar" onclick="alterarStatus('${evento._id}', 'confirmado')">✅ Confirmar</button>
         <button class="btn-cancelar" onclick="alterarStatus('${evento._id}', 'cancelado')">❌ Cancelar</button>
@@ -202,9 +207,9 @@ async function alterarStatus(id, status) {
     const linha = document.getElementById(`evento-${id}`);
     if (linha) {
       const statusCell = linha.querySelector('.status-cell');
-      if (status === 'confirmado') statusCell.textContent = '✅ Confirmado';
-      else if (status === 'cancelado') statusCell.textContent = '❌ Cancelado';
-      else statusCell.textContent = '⏳ Aguardando confirmação';
+      if (status === 'confirmado') statusCell.textContent = 'Confirmado';
+      else if (status === 'cancelado') statusCell.textContent = 'Cancelado';
+      else statusCell.textContent = 'Aguardando confirmação';
     }
 
   } catch (err) {

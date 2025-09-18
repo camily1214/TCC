@@ -140,8 +140,9 @@ router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) =>
 
 
       return {
-        _id: e._id, // mantém _id para frontend
+  _id: e._id,
   status: statusFormatado,
+  usuarioNome: e.usuarioId?.nome || '-',
   tipo_evento: e.tipo_evento || '-',
   acesso: e.acesso || '-',
   num_convidados: e.num_convidados || '-',

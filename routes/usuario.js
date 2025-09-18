@@ -200,4 +200,12 @@ router.get('/api/usuarios/debug', autenticar, apenasProfissionais, async (req, r
   }
 });
 
+router.get('/tipo', (req, res) => {
+  if (req.session.usuario) {
+    res.json({ tipo: req.session.usuario.tipo }); // cliente ou profissional
+  } else {
+    res.json({ tipo: null });
+  }
+});
+
 module.exports = router;

@@ -267,11 +267,36 @@
     });
   });
 
-    // Carregar navbar
-    fetch('/components/navbar.html')
-      .then(res => res.ok ? res.text() : Promise.reject('Erro ao carregar navbar'))
-      .then(html => document.getElementById('navbar-placeholder').innerHTML = html)
-      .catch(err => console.error(err));
+// Carregar navbar
+  async function carregarNavbar() {
+    try {
+      // 1. Pergunta ao backend o tipo do usuário
+      const resposta = await fetch('/api/usuarios/tipo', { credentials: 'include' });
+      if (!resposta.ok) throw new Error("Falha ao validar usuário");
+
+      const dados = await resposta.json();
+      let urlNavbar = "";
+
+      // 2. Decide qual navbar carregar
+      if (dados.tipo === "cliente") {
+        urlNavbar = "/components/navbarclient.html";
+      } else if (dados.tipo === "profissional") {
+        urlNavbar = "/components/navbarprof.html";
+      } else {
+        console.warn("Usuário não autenticado ou tipo indefinido");
+        return;
+      }
+
+      // 3. Carrega a navbar correta
+      const htmlNavbar = await fetch(urlNavbar).then(res => res.text());
+      document.getElementById("navbar-placeholder").innerHTML = htmlNavbar;
+
+    } catch (err) {
+      console.error("Erro ao carregar navbar:", err);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", carregarNavbar);
   </script>
 
 </body>
