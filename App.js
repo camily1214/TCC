@@ -53,7 +53,7 @@ app.use('/api/eventos', eventosRoutes);
 
 // ROTAS DE PÁGINAS HTML
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'models/Login.html'));
+  res.sendFile(path.join(__dirname, 'models/PaginaInicial.html'));
 });
 
 // Cadastro de usuário

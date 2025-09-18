@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Página Inicial</title>
 
+    <!-- Navbar -->
+  <link rel="stylesheet" href="/css/navbar.css" />
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -68,6 +71,19 @@
       margin-top: 60px;
       font-size: 14px;
     }
+        /* Navbar personalizada */
+    .custom-navbar {
+      background-color: #727277 !important;
+    }
+
+    .custom-navbar .nav-link {
+      color: #fff !important;
+      font-weight: bold;
+    }
+
+    .custom-navbar .nav-link:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -81,7 +97,6 @@
     <div class="buttons">
       <a href="/login" class="btn">Ja tenho cadastro</a>
       <a href="/api/usuarios/cadastro" class="btn">Quero me cadastrar</a>
-      <a href="/api/eventos/escolher-data" class="btn">Agendar meu evento</a>
     </div>
   </div>
 
@@ -90,7 +105,11 @@
   </div>
 
   <script>
-
+      // Carregar navbar
+fetch('/components/navbarinicial.html')
+  .then(res => res.text())
+  .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; })
+  .catch(err => console.error('Erro ao carregar navbar do cliente:', err));
   </script>
 </body>
 </html>

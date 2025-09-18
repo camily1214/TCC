@@ -100,6 +100,8 @@
     </div>
   </div>
 
+    <div id="footer-placeholder"></div>
+
   <!-- Script para carregar navbar -->
   <script>
     fetch('/components/navbarprof.html')
@@ -113,6 +115,14 @@
       .catch(error => {
         console.error('Erro ao carregar navbar:', error);
       });
+
+      // carregar footer
+        fetch('/components/footer.html')
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById('footer-placeholder').innerHTML = data;
+    })
+    .catch(err => console.error('Erro ao carregar rodapé:', err));
   </script>
 </body>
 </html>

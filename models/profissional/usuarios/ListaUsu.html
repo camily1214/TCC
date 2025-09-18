@@ -89,6 +89,8 @@
     <tbody id="ListaUsu"></tbody>
   </table>
 
+    <div id="footer-placeholder"></div>
+
  <script>
 async function carregarUsuarios() {
   try {
@@ -161,6 +163,14 @@ carregarUsuarios();
       .catch(error => {
         console.error('Erro ao carregar navbar:', error);
       });
+
+// carregar footer
+        fetch('/components/footer.html')
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById('footer-placeholder').innerHTML = data;
+    })
+    .catch(err => console.error('Erro ao carregar rodapé:', err));
 </script>
 
 </body>

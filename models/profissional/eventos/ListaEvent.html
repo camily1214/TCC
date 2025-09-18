@@ -110,6 +110,8 @@
     <tbody id="lista-eventos"></tbody>
   </table>
 
+    <div id="footer-placeholder"></div>
+
 <script>
 let todosEventos = [];
 
@@ -227,10 +229,25 @@ document.getElementById('filtro-data').addEventListener('input', filtrarEventos)
 document.addEventListener('DOMContentLoaded', carregarEventos);
 
 // Carregar navbar
-fetch('/components/navbar.html')
-  .then(res => res.text())
-  .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; })
-  .catch(err => console.error('Erro ao carregar navbar:', err));
+    fetch('/components/navbarprof.html')
+      .then(response => {
+        if (!response.ok) throw new Error('Erro ao carregar a navbar');
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('navbar-placeholder').innerHTML = data;
+      })
+      .catch(error => {
+        console.error('Erro ao carregar navbar:', error);
+      });
+
+  // carregar footer
+        fetch('/components/footer.html')
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById('footer-placeholder').innerHTML = data;
+    })
+    .catch(err => console.error('Erro ao carregar rodapé:', err));
 </script>
 </body>
 </html>

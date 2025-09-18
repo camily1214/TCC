@@ -77,9 +77,9 @@
   <div class="container" id="detalhes-evento">
     <h2>Detalhes do Evento</h2>
     <!-- Conteúdo via JS -->
-  </div>
+  </div> <a href="/eventos/lista" class="btn-voltar"> ← Voltar à Lista de Eventos</a>
 
-    <a href="/eventos/lista" class="btn-voltar"> ← Voltar à Lista de Eventos</a>
+  <div id="footer-placeholder"></div>
 
   <script>
     async function carregarDetalhes() {
@@ -134,6 +134,14 @@
   }
 
   document.addEventListener("DOMContentLoaded", carregarNavbar);
+
+  // carregar footer
+        fetch('/components/footer.html')
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById('footer-placeholder').innerHTML = data;
+    })
+    .catch(err => console.error('Erro ao carregar rodapé:', err));
   </script>
 </body>
 </html>

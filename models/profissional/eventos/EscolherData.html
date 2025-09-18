@@ -179,6 +179,8 @@
     </div>
   </div>
 
+  <div id="footer-placeholder"></div>
+
   <script>
   const corpoCalendario = document.getElementById("corpo-calendario");
   const mesAno          = document.getElementById("mesAno");
@@ -367,6 +369,14 @@
   }
 
   document.addEventListener("DOMContentLoaded", carregarNavbar);
+
+  // carregar footer
+        fetch('/components/footer.html')
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById('footer-placeholder').innerHTML = data;
+    })
+    .catch(err => console.error('Erro ao carregar rodapé:', err));
 </script>
 </body>
 </html>

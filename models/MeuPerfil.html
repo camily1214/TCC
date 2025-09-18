@@ -197,6 +197,8 @@
     </form>
   </div>
 
+  <div id="footer-placeholder"></div>
+
   <script>
     const form = document.getElementById('formPerfil');
 
@@ -233,11 +235,18 @@
     });
 
 // Carregar navbar do cliente
-fetch('/components/navbarClient.html')
-  .then(res => res.text())
-  .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; })
-  .catch(err => console.error('Erro ao carregar navbar do cliente:', err));
-  
+  fetch('/components/navbarClient.html')
+    .then(res => res.text())
+    .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; })
+    .catch(err => console.error('Erro ao carregar navbar do cliente:', err));
+
+// carregar footer
+        fetch('/components/footer.html')
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById('footer-placeholder').innerHTML = data;
+    })
+    .catch(err => console.error('Erro ao carregar rodapé:', err));
 </script>
 </body>
 </html>

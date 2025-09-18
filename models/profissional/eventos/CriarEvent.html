@@ -279,6 +279,8 @@
   </form>
   </div>
 
+  <div id="footer-placeholder"></div>
+
 <script>
  // Função para pegar parâmetros da URL
   function obterParametroURL(nome) {
@@ -347,6 +349,14 @@
   }
 
   document.addEventListener("DOMContentLoaded", carregarNavbar);
+
+  // carregar footer
+        fetch('/components/footer.html')
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById('footer-placeholder').innerHTML = data;
+    })
+    .catch(err => console.error('Erro ao carregar rodapé:', err));
 </script>
 
 </body>
