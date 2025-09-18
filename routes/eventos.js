@@ -125,7 +125,9 @@ router.get('/datas-agendadas', autenticar, async (req, res) => {
 // API: Listar todos os eventos (somente profissionais) com dados formatados
 router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) => {
   try {
-    const eventos = await Evento.find().lean();
+        const eventos = await Evento.find()
+      .populate('usuarioId', 'nome telefone') // <-- popula somente os campos necessários
+      .lean();
 
     const eventosFormatados = eventos.map(e => {
       // garantir que a data_evento seja Date
@@ -143,6 +145,7 @@ router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) =>
   _id: e._id,
   status: statusFormatado,
   usuarioNome: e.usuarioId?.nome || '-',
+  usuarioTelefone: e.usuarioId?.telefone || '-',
   tipo_evento: e.tipo_evento || '-',
   acesso: e.acesso || '-',
   num_convidados: e.num_convidados || '-',

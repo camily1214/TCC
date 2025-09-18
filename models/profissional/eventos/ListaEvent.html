@@ -96,6 +96,7 @@
     <thead>
       <tr>
         <th>Usuário</th>
+        <th>Telefone</th> 
         <th>Data</th>
         <th>Hora</th>
         <th>Tipo Evento</th>
@@ -149,6 +150,7 @@ function exibirEventos(lista) {
     linha.id = `evento-${evento._id}`;
     linha.innerHTML = `
       <td>${evento.usuarioNome || '-'}</td>
+      <td>${evento.usuarioTelefone || '-'}</td> 
       <td>${dataFormatada}</td>
       <td>${evento.hora_evento || '-'}</td>
       <td>${evento.tipo_evento || '-'}</td>
