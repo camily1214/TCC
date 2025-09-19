@@ -137,9 +137,9 @@ function exibirEventos(lista) {
     const numConvidados = evento.num_convidados || '-';
 
     // 👇 status formatado
-    let statusFormatado = '⏳ Aguardando confirmação';
-    if (evento.status === 'confirmado') statusFormatado = '✅ Confirmado';
-    if (evento.status === 'cancelado') statusFormatado = '❌ Cancelado';
+    let statusFormatado = 'Aguardando confirmação';
+    if (evento.status === 'confirmado') statusFormatado = 'Confirmado';
+    if (evento.status === 'cancelado') statusFormatado = 'Cancelado';
 
     const linha = document.createElement('tr');
     linha.innerHTML = `

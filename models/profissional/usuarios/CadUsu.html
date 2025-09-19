@@ -111,12 +111,13 @@
     <div id="erros" class="alert alert-danger d-none" role="alert"></div>
 
     <form action="/api/usuarios/cadastro" method="POST">
+
+    <!-- ETAPA 1: Informações do Usuario -->
+      <div id="etapa-info-usu">
       <div class="section">
-        <img
-          src="/imagens/logo.png"
-          alt="Logo"
-          style="width: 110px; height: auto; display: block; margin: 0 auto 10px; border-radius: 10px"
-        />
+          <img src="/imagens/logo.png" 
+         alt="Logo"
+         style="width: 110px; height: auto; display: block; margin: 0 auto 1px; border-radius: 10px" />
       </div>
 
       <div class="section">
@@ -199,10 +200,16 @@
           <input type="password" id="confirmaSenha" name="confirmaSenha" placeholder="Confirme sua senha" required minlength="6" />
         </div>
 
+        <button type="button" id="btn-avancar">Avançar ➡️</button>
+        
+      </div>
       </div>
 
-      <div class="section">
-        <h3>Endereço do Usuário</h3>
+      <!-- ETAPA 2: Endereço do Evento (inicialmente escondido) -->
+    <div id="etapa-endereco" style="display:none;">
+    <div class="section">
+    <h3>Descreva Sobre o Seu Endereço</h3>
+
 
         <div class="form-group">
           <label for="rua">Rua</label>
@@ -269,11 +276,31 @@
         </div>
       </div>
 
-      <button type="submit">Cadastrar</button>
+    <button type="button" id="btn-voltar">⬅️ Voltar</button>
+    <button type="submit">Cadastrar Usuário</button>
     </form>
   </div>
+</div>
   
   <div id="footer-placeholder"></div>
+
+  <script>
+  // Script para alternar etapas
+  const etapaEvento = document.getElementById("etapa-info-usu");
+  const etapaEndereco = document.getElementById("etapa-endereco");
+  const btnAvancar = document.getElementById("btn-avancar");
+  const btnVoltar = document.getElementById("btn-voltar");
+
+  btnAvancar.addEventListener("click", () => {
+    etapaEvento.style.display = "none";
+    etapaEndereco.style.display = "block";
+  });
+
+  btnVoltar.addEventListener("click", () => {
+    etapaEndereco.style.display = "none";
+    etapaEvento.style.display = "block";
+  });
+</script>
 
   <script>
   const form = document.querySelector('form');

@@ -2,12 +2,31 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const bcrypt = require('bcrypt');
+const dns = require("dns");
 const Usuario = require('../models/profissional/usuarios/usuarios');
 const Evento = require('../models/profissional/eventos/Event');
 
 
 // Importar middleware de autenticação
 const { autenticar, apenasClientes, apenasProfissionais } = require('../middlewares/autenticar');
+
+function verificarEmailGoogle(email) {
+  return new Promise((resolve, reject) => {
+    const dominio = email.split("@")[1];
+    dns.resolveMx(dominio, (err, addresses) => {
+      if (err || !addresses || addresses.length === 0) {
+        return resolve(false); // se não tem MX, não é válido
+      }
+
+      // Google usa "google.com" ou "l.google.com"
+      const isGoogle = addresses.some(mx =>
+        mx.exchange.includes("google")
+      );
+
+      resolve(isGoogle);
+    });
+  });
+}
 
 /* --ROTAS DE PÁGINAS--*/
 
@@ -105,10 +124,16 @@ router.post('/cadastro', async (req, res) => {
     }
 
     // Verifica se o E-MAIL já está cadastrado
-    const emailExistente = await Usuario.findOne({ email });
-    if (emailExistente) {
-      return res.status(400).json({ mensagem: 'E-mail já cadastrado.' });
-    }
+      const emailExistente = await Usuario.findOne({ email });
+        if (emailExistente) {
+        return res.status(400).json({ mensagem: 'E-mail já cadastrado.' });
+      }
+
+    // Verifica se o domínio do email é do Google (Gmail ou GSuite)
+      const emailGoogle = await verificarEmailGoogle(email);
+        if (!emailGoogle) {
+        return res.status(400).json({ mensagem: 'O email informado não pertence ao Google (Gmail/GSuite).' });
+      }
 
     // Criptografar senha
     const senhaCriptografada = await bcrypt.hash(senha, 10);

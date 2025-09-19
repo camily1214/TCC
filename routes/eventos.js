@@ -136,9 +136,9 @@ router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) =>
       const horaFormatada = e.hora_evento ? e.hora_evento : '--:--';
 
       // Formata status corretamente usando o campo 'status'
-      let statusFormatado = '⏳ Aguardando confirmação';
-      if (e.status === 'confirmado') statusFormatado = '✅ Confirmado';
-      if (e.status === 'cancelado') statusFormatado = '❌ Cancelado';
+      let statusFormatado = 'Aguardando confirmação';
+      if (e.status === 'confirmado') statusFormatado = 'Confirmado';
+      if (e.status === 'cancelado') statusFormatado = 'Cancelado';
 
 
       return {
