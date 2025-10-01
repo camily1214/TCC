@@ -4,7 +4,7 @@ const path = require('path');
 const Evento = require('../models/profissional/eventos/Event');
 
 // Importar middleware de autenticação
-const { autenticar, apenasClientes, apenasProfissionais } = require('../middlewares/autenticar');
+const { autenticar, apenasClientes, apenasProfissionais, permitirTipos } = require('../middlewares/autenticar');
 
 // Rota para abrir a página HTML de lista de eventos
 router.get('/lista-eventos-html', autenticar, (req, res) => {
@@ -17,7 +17,7 @@ router.get('/escolher-data', (req, res) => {
 });
 
 // Página de criação de evento (apenas clientes logados podem criar)
-router.get('/criar', autenticar, apenasClientes, (req, res) => {
+router.get('/criar', autenticar, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/CriarEvent.html'));
 });
 
@@ -52,7 +52,7 @@ router.get('/meus-eventos', autenticar, apenasClientes, (req, res) => {
 });
 
 // Salvar evento via POST (apenas clientes)
-router.post('/novo-evento', autenticar, apenasClientes, async (req, res) => {
+router.post('/novo-evento', autenticar, async (req, res) => {
   try {
     const {
       acesso, tipo_evento, tipo_comida, tipo_bebida,

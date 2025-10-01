@@ -352,6 +352,17 @@
     });
   });
 
+  document.addEventListener("DOMContentLoaded", () => {
+  const dataSelecionada = localStorage.getItem("dataSelecionada");
+  if (dataSelecionada) {
+    const campoData = document.getElementById("data_evento");
+    if (campoData) {
+      campoData.value = dataSelecionada;  // preenche o input com a data escolhida
+    }
+    localStorage.removeItem("dataSelecionada"); // limpa para não ficar persistindo
+  }
+});
+
 // Carregar navbar
   async function carregarNavbar() {
     try {

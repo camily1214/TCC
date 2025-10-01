@@ -31,8 +31,19 @@ function apenasProfissionais(req, res, next) {
   next();
 }
 
+// Vários tipos permitidos
+function permitirTipos(...tiposPermitidos) {
+  return (req, res, next) => {
+    if (req.session.usuario && tiposPermitidos.includes(req.session.usuario.tipo)) {
+      return next();
+    }
+    return res.status(403).json({ mensagem: "Acesso negado para este tipo de usuário." });
+  };
+}
+
 module.exports = {
   autenticar,
   apenasClientes,
-  apenasProfissionais
+  apenasProfissionais,
+  permitirTipos
 };

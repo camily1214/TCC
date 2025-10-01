@@ -6,12 +6,12 @@
   <title>Lista de Usuários</title>
 
   <!--Navbar-->
- <link rel="stylesheet" href="/css/navbar.css" />
+  <link rel="stylesheet" href="/css/navbar.css" />
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #000;
+      background-color: #727277;
       color: #fff;
       margin: 0;
       padding: 20px;
@@ -48,6 +48,26 @@
       background-color: #c0392b;
     }
 
+    #pagination {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #pagination button {
+      margin: 5px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #555;
+      color: #fff;
+    }
+
+    #pagination button:disabled {
+      background-color: #999;
+      cursor: default;
+    }
+
     .navbar-nav .nav-link {
       font-family: Arial, sans-serif;
       font-weight: bold;
@@ -55,7 +75,6 @@
       color: #000 !important;
     }
 
-        /* Navbar personalizada */
     .custom-navbar {
       background-color: #727277 !important;
     }
@@ -89,18 +108,36 @@
     <tbody id="ListaUsu"></tbody>
   </table>
 
-    <div id="footer-placeholder"></div>
+  <div id="pagination"></div>
+  <div id="footer-placeholder"></div>
 
- <script>
-async function carregarUsuarios() {
-  try {
-    // se a rota /dados for pública não precisa de credentials, mas não faz mal incluir
-    const resposta = await fetch('/api/usuarios/dados', { credentials: 'include' });
-    const usuarios = await resposta.json().catch(() => []);
+<script>
+  // paginação
+  let usuarios = [];
+  let paginaAtual = 1;
+  const limitePorPagina = 15;
+
+  async function carregarUsuarios() {
+    try {
+      const resposta = await fetch('/api/usuarios/dados', { credentials: 'include' });
+      usuarios = await resposta.json().catch(() => []);
+      paginaAtual = 1; // sempre começa na página 1
+      renderizarTabela();
+      renderizarPaginacao();
+    } catch (erro) {
+      console.error('Erro ao carregar usuários:', erro);
+    }
+  }
+
+  function renderizarTabela() {
     const tabela = document.getElementById('ListaUsu');
     tabela.innerHTML = '';
 
-    usuarios.forEach(usuario => {
+    const inicio = (paginaAtual - 1) * limitePorPagina;
+    const fim = inicio + limitePorPagina;
+    const usuariosPagina = usuarios.slice(inicio, fim);
+
+    usuariosPagina.forEach(usuario => {
       const linha = document.createElement('tr');
       linha.innerHTML = `
         <td>${usuario.nome} ${usuario.sobrenome || '-'}</td>
@@ -111,66 +148,69 @@ async function carregarUsuarios() {
       `;
       tabela.appendChild(linha);
     });
-  } catch (erro) {
-    console.error('Erro ao carregar usuários:', erro);
-  }
-}
-
-async function deletarUsuario(id) {
-  if (!id) {
-    alert('ID inválido. Não é possível excluir.');
-    return;
   }
 
-  if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
+  function renderizarPaginacao() {
+    const totalPaginas = Math.ceil(usuarios.length / limitePorPagina);
+    const container = document.getElementById('pagination');
+    container.innerHTML = '';
 
-  try {
-    // <-- importantíssimo: enviar credentials para que o cookie de sessão seja incluído
-    const resposta = await fetch(`/api/usuarios/${id}`, {
-      method: 'DELETE',
-      credentials: 'include',
-      headers: { 'Accept': 'application/json' }
-    });
-
-    // evitar erro se o corpo vier vazio
-    const data = await resposta.json().catch(() => ({}));
-
-    console.log('DELETE /api/usuarios/: status=', resposta.status, 'body=', data);
-
-    if (resposta.ok) {
-      alert(data.mensagem || 'Usuário excluído com sucesso.');
-      carregarUsuarios();
-    } else {
-      alert('Erro ao excluir o usuário: ' + (data.mensagem || data.erro || `Status ${resposta.status}`));
+    for (let i = 1; i <= totalPaginas; i++) {
+      const botao = document.createElement('button');
+      botao.textContent = i;
+      botao.disabled = i === paginaAtual;
+      botao.onclick = () => {
+        paginaAtual = i;
+        renderizarTabela();
+        renderizarPaginacao();
+      };
+      container.appendChild(botao);
     }
-  } catch (erro) {
-    console.error('Erro no fetch (DELETE):', erro);
-    alert('Erro ao excluir o usuário (fetch). Veja o console para detalhes.');
   }
-}
 
-carregarUsuarios();
+  async function deletarUsuario(id) {
+    if (!id) {
+      alert('ID inválido. Não é possível excluir.');
+      return;
+    }
 
-// carregar navbar
-    fetch('/components/navbarprof.html')
-      .then(response => {
-        if (!response.ok) throw new Error('Erro ao carregar a navbar');
-        return response.text();
-      })
-      .then(data => {
-        document.getElementById('navbar-placeholder').innerHTML = data;
-      })
-      .catch(error => {
-        console.error('Erro ao carregar navbar:', error);
+    if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
+
+    try {
+      const resposta = await fetch(`/api/usuarios/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: { 'Accept': 'application/json' }
       });
 
-// carregar footer
-        fetch('/components/footer.html')
+      const data = await resposta.json().catch(() => ({}));
+      if (resposta.ok) {
+        alert(data.mensagem || 'Usuário excluído com sucesso.');
+        carregarUsuarios();
+      } else {
+        alert('Erro ao excluir: ' + (data.mensagem || data.erro || `Status ${resposta.status}`));
+      }
+    } catch (erro) {
+      console.error('Erro no fetch (DELETE):', erro);
+      alert('Erro ao excluir o usuário.');
+    }
+  }
+
+  carregarUsuarios();
+
+  // carregar navbar
+  fetch('/components/navbarprof.html')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('navbar-placeholder').innerHTML = data;
+    });
+
+  // carregar footer
+  fetch('/components/footer.html')
     .then(res => res.text())
     .then(data => {
       document.getElementById('footer-placeholder').innerHTML = data;
-    })
-    .catch(err => console.error('Erro ao carregar rodapé:', err));
+    });
 </script>
 
 </body>

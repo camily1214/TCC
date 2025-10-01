@@ -11,8 +11,8 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #000;
-      color: #fff;
+      background-color: #c5c6c8;
+      color: #000;
       margin: 0;
       padding: 0;
     }
@@ -83,9 +83,8 @@
       vertical-align: middle;
       border-radius: 15px;
       font-size: 18px;
-      transition: background-color 0.3s ease;
       cursor: pointer;
-      color: white;
+      color: #000;
     }
 
     .tabela-calendario td:hover {
@@ -93,7 +92,7 @@
     }
 
     .disponivel {
-      background-color: #999;
+      background-color: #727277;
     }
 
     .feriado {
@@ -189,19 +188,19 @@
   let eventosAgendados  = [];                // será preenchido via fetch
   const feriados        = [];                // mantenha aqui se precisar
 
-  /* ------------------------------------------------------------------ */
+
   /* 1. Busca no backend as datas de eventos já confirmados ------------ */
   async function carregarDatasAgendadas() {
     try {
       const resp = await fetch('/api/eventos/datas-agendadas');
       if (!resp.ok) throw new Error('Erro ao buscar datas');
-      eventosAgendados = await resp.json();  // ["2025-07-01", "2025-07-14", …]
+      eventosAgendados = await resp.json();
     } catch (err) {
       console.error('Falha ao carregar datas agendadas:', err);
     }
   }
 
-  /* ------------------------------------------------------------------ */
+
   /* 2. Funções auxiliares e geração do calendário --------------------- */
   function formatarDataLocal(date) {
     const ano = date.getFullYear();
@@ -260,9 +259,10 @@
     gerarCalendario(dataAtual.getFullYear(), dataAtual.getMonth());
   }
 
-  function selecionarData(data) {
-    window.location.href = `/api/eventos/criar?data=${data}`;
-  }
+function selecionarData(data) {
+  // Redireciona para a página de criação de evento passando a data como parâmetro
+  window.location.href = `/api/eventos/criar?data=${data}`;
+}
 
   /* ------------------------------------------------------------------ */
   /* 3. Permite editar mês/ano clicando no cabeçalho ------------------- */
