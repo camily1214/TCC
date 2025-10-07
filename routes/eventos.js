@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
+const Notificacao = require('../models/Notificacao'); 
 const Evento = require('../models/profissional/eventos/Event');
 
 // Importar middleware de autenticação
-const { autenticar, apenasClientes, apenasProfissionais, permitirTipos } = require('../middlewares/autenticar');
+const { autenticar, apenasClientes, apenasProfissionais } = require('../middlewares/autenticar');
 
 // Rota para abrir a página HTML de lista de eventos
 router.get('/lista-eventos-html', autenticar, (req, res) => {
@@ -73,6 +74,17 @@ router.post('/novo-evento', autenticar, async (req, res) => {
     });
 
     await novoEvento.save();
+
+    // 🔔 Criar notificação de solicitação (para profissional)
+    const notificacao = new Notificacao({
+      usuarioId: req.session.usuario.id, // cliente que criou
+      titulo: 'Nova Solicitação de Evento',
+      mensagem: `O cliente ${req.session.usuario.nome} solicitou um novo evento.`,
+      tipo: 'solicitacao'
+    });
+
+    await notificacao.save();
+
     res.redirect('/api/eventos/sucesso');
   } catch (err) {
     console.error('Erro ao cadastrar evento:', err);
@@ -188,24 +200,51 @@ router.get('/:id', autenticar, async (req, res) => {
 router.put('/:id/status', autenticar, apenasProfissionais, async (req, res) => {
   try {
     const { status } = req.body;
+
+    // Validação do status
     if (!['confirmado', 'cancelado'].includes(status)) {
-      return res.status(400).send('Status inválido');
+      return res.status(400).json({ erro: 'Status inválido' });
     }
 
-    const eventoAtualizado = await Evento.findByIdAndUpdate(
+    // Atualiza o evento e popula dados do cliente
+    const evento = await Evento.findByIdAndUpdate(
       req.params.id,
-      { status }, // atualiza o campo "status"
+      { status },
       { new: true }
-    );
+    ).populate('usuarioId', 'nome telefone'); // só traz campos necessários
 
-    if (!eventoAtualizado) return res.status(404).send('Evento não encontrado');
+    if (!evento) {
+      return res.status(404).json({ erro: 'Evento não encontrado' });
+    }
 
-    res.json(eventoAtualizado);
+    // Criar notificação para o cliente
+    const titulo = status === 'confirmado' ? 'Evento Confirmado' : 'Evento Cancelado';
+    const mensagem = status === 'confirmado'
+      ? `Seu evento (${evento.tipo_evento}) foi confirmado pelo profissional.`
+      : `Seu evento (${evento.tipo_evento}) foi cancelado pelo profissional.`;
+
+    const notificacao = new Notificacao({
+      usuarioId: evento.usuarioId._id, // cliente que receberá a notificação
+      titulo,
+      mensagem,
+      tipo: status === 'confirmado' ? 'confirmacao' : 'cancelamento'
+    });
+
+    await notificacao.save();
+
+    // Retorna o evento atualizado e a notificação criada
+    res.json({
+      mensagem: 'Status atualizado e notificação enviada.',
+      evento,
+      notificacao
+    });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Erro ao atualizar status do evento');
+    console.error('Erro ao atualizar status:', err);
+    res.status(500).json({ erro: 'Erro ao atualizar status.' });
   }
 });
+
 
 // API: Deletar evento (clientes só podem deletar os próprios, profissional pode deletar qualquer)
 router.delete('/:id', autenticar, async (req, res) => {
@@ -224,28 +263,6 @@ router.delete('/:id', autenticar, async (req, res) => {
   }
 });
 
-// Atualizar status do evento (confirmado/cancelado) - apenas profissionais
-router.put('/:id/status', autenticar, apenasProfissionais, async (req, res) => {
-  try {
-    const { status } = req.body;
-    if (!['confirmado', 'cancelado'].includes(status)) {
-      return res.status(400).send('Status inválido');
-    }
-
-    const eventoAtualizado = await Evento.findByIdAndUpdate(
-      req.params.id,
-      { status }, // atualiza o campo "status"
-      { new: true }
-    );
-
-    if (!eventoAtualizado) return res.status(404).send('Evento não encontrado');
-
-    res.json(eventoAtualizado);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Erro ao atualizar status do evento');
-  }
-});
 
 // Atualizar evento (cliente só pode atualizar o próprio)
 router.put('/:id', autenticar, async (req, res) => {

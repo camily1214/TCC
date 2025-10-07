@@ -56,21 +56,6 @@
       border-radius: 5px;
     }
 
-    button {
-      background-color: rgb(43, 47, 47);
-      color: white;
-      padding: 12px;
-      border: none;
-      width: 100%;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-
-    button:hover {
-      background-color: rgb(0, 0, 0);
-    }
-
     .custom-navbar {
       background-color: #727277 !important;
     }
@@ -97,6 +82,42 @@
     .custom-navbar .nav-link:hover {
       text-decoration: underline;
     }
+
+        button {
+      background-color: rgb(0, 0, 0);
+      color: white;
+      padding: 12px;
+      border: none;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: rgb(81, 80, 80);
+    }
+
+
+    .btnExcluir {
+      background-color: #c0392b; 
+      margin-top: 10px;
+    }
+
+    .btnExcluir:hover {
+      background-color: rgb(231, 90, 90);
+    }
+
+    .btnCancelar {
+      flex: 1; 
+      background-color: #c8c9c9;
+      margin-top: 10px;
+    }
+
+    .btnCancelar:hover {
+      background-color: rgb(120, 120, 120);
+    }
+
   </style>
 </head>
 <body>
@@ -193,7 +214,12 @@
         <input type="text" id="cep" name="cep" required />
       </div>
 
-      <button type="submit">Salvar Alterações</button>
+      <button type="submit">Salvar Alterações </button>
+
+      <button type="button" id="btnCancelar" clss="btnCancelar">Cancelar</button>
+
+      <button type="button" id="btnExcluir" class="btnExcluir"> Excluir Conta </button>
+
     </form>
   </div>
 
@@ -232,6 +258,38 @@
         alert('Erro ao atualizar perfil.');
         console.error(err);
       });
+    });
+
+    // Botão cancelar
+    const btnCancelar = document.getElementById('btnCancelar');
+    btnCancelar.addEventListener('click', () => {
+      if (confirm('Cancelar alterações e voltar para a página inicial?')) {
+        window.location.href = '/'; // ou "/dashboard" se você tiver página de perfil inicial
+      }
+    });
+
+      // Botão excluir
+      const btnExcluir = document.getElementById('btnExcluir');
+
+    btnExcluir.addEventListener('click', () => {
+      if (confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.')) {
+        fetch('/api/usuarios/me', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(res => {
+          if (res.ok) {
+            alert('Conta excluída com sucesso!');
+            window.location.href = '/'; // redireciona para página inicial ou login
+          } else {
+            return res.json().then(data => { throw new Error(data.mensagem || 'Erro ao excluir conta.'); });
+          }
+        })
+        .catch(err => {
+          alert(err.message);
+          console.error(err);
+        });
+      }
     });
 
 // Carregar navbar do cliente

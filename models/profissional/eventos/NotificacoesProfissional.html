@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notificações de Solicitações</title>
+
+  <style>
+        body {
+        background-color: #c5c6c8;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding-top: 80px;
+      }
+
+      .container {
+        max-width: 700px;
+        margin: 0 auto;
+        background: #737372;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px #000;
+      }
+
+      h2 {
+        text-align: center;
+        color: #fff;
+        margin-bottom: 20px;
+      }
+
+      /* NOTIFICAÇÕES */
+      .notificacao {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 0 5px #00000055;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border-left: 5px solid #3498db; /* cor padrão para solicitações */
+      }
+
+      .notificacao:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 12px #00000088;
+      }
+
+      .data {
+        font-size: 14px;
+        color: #555;
+      }
+
+      /* MODAL */
+      .modal {
+        display: none; /* invisível por padrão */
+        position: fixed;
+        z-index: 10;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+
+        /* centralização */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 0 10px #000;
+        text-align: center;
+      }
+
+      .modal-content h3 {
+        margin-bottom: 10px;
+        color: #333;
+      }
+
+      .modal-content p {
+        margin: 8px 0;
+      }
+
+      /* Navbar personalizada */
+      .custom-navbar {
+        background-color: #727277 !important;
+      }
+
+      .custom-navbar .nav-link {
+        color: #fff !important;
+        font-weight: bold;
+      }
+
+      .custom-navbar .nav-link:hover {
+        text-decoration: underline;
+      }
+
+  </style>
+</head>
+<body>
+      <!-- Navbar -->
+  <div id="navbar-placeholder"></div>
+
+  <div class="container">
+    <h2>Novas Solicitações de Evento</h2>
+    <div id="listaNotificacoes"></div>
+  </div>
+
+    <!-- Modal -->
+  <div id="modalDetalhes" class="modal">
+    <div class="modal-content">
+      <h3>Detalhes da Solicitação</h3>
+      <p id="modalMensagem"></p>
+      <p id="modalData" class="data"></p>
+      <button class="btn-fechar" onclick="fecharModal()">Fechar</button>
+    </div>
+  </div>
+
+<script>
+  async function carregarNotificacoes() {
+    const resposta = await fetch('/api/notificacoes/profissional');
+    const notificacoes = await resposta.json();
+
+    const lista = document.getElementById('listaNotificacoes');
+    lista.innerHTML = '';
+
+    notificacoes.forEach(n => {
+      const div = document.createElement('div');
+      div.className = 'notificacao';
+      div.innerHTML = `
+        <p><strong>${n.mensagem}</strong></p>
+        <p class="data">${new Date(n.data).toLocaleString('pt-BR')}</p>
+      `;
+
+      // Adiciona evento para abrir modal
+      div.addEventListener('click', () => abrirModal(n.mensagem, n.data));
+
+      lista.appendChild(div);
+    });
+  }
+
+  function abrirModal(mensagem, data) {
+    document.getElementById('modalMensagem').textContent = mensagem;
+    document.getElementById('modalData').textContent = new Date(data).toLocaleString('pt-BR');
+    document.getElementById('modalDetalhes').style.display = 'flex';
+  }
+
+  function fecharModal() {
+    document.getElementById('modalDetalhes').style.display = 'none';
+  }
+
+  carregarNotificacoes();
+
+  // Script para carregar navbar
+  fetch('/components/navbarprof.html')
+    .then(response => {
+      if (!response.ok) throw new Error('Erro ao carregar a navbar');
+      return response.text();
+    })
+    .then(data => {
+      document.getElementById('navbar-placeholder').innerHTML = data;
+    })
+    .catch(error => {
+      console.error('Erro ao carregar navbar:', error);
+    });
+
+  // Carregar footer
+  fetch('/components/footer.html')
+    .then(res => res.text())
+    .then(data => {
+      // Verifica se já existe o placeholder, senão cria
+      let footer = document.getElementById('footer-placeholder');
+      if (!footer) {
+        footer = document.createElement('div');
+        footer.id = 'footer-placeholder';
+        document.body.appendChild(footer);
+      }
+      footer.innerHTML = data;
+    })
+    .catch(err => console.error('Erro ao carregar rodapé:', err));
+</script>
+
+</body>
+</html>

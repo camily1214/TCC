@@ -9,6 +9,7 @@ const Evento = require('./models/profissional/eventos/Event');
 
 const usuarioRoutes = require('./routes/usuario');
 const eventosRoutes = require('./routes/eventos');
+const notificacoesRoutes = require('./routes/notificacoes');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -35,6 +36,8 @@ app.use(session({
   saveUninitialized: false,
   cookie: { secure: false } // se usar HTTPS -> true
 }));
+
+app.use('/api/notificacoes', notificacoesRoutes);
 
 // VIEWS (se usar EJS)
 app.set('view engine', 'ejs');
@@ -75,6 +78,16 @@ app.get('/eventos/ProfPosLogin', (req, res) => {
 app.get('/login', (req, res) =>
   res.sendFile(path.join(__dirname, 'models/Login.html'))
 );
+
+// 🔔 Páginas de notificações
+app.get('/notificacoes/cliente', (req, res) => {
+  res.sendFile(path.join(__dirname, 'models/profissional/usuarios/NotificacoesCliente.html'));
+});
+
+app.get('/notificacoes/profissional', (req, res) => {
+  res.sendFile(path.join(__dirname, 'models/profissional/eventos/NotificacoesProfissional.html'));
+});
+
 
 
 app.get('/eventos/meus-eventos.html', async (req, res) => {

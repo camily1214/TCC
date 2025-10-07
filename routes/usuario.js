@@ -35,6 +35,11 @@ router.get('/login', (req, res) => {
   res.sendFile(path.resolve(__dirname, '../models/Login.html'));
 });
 
+// Página de meu perfil
+router.get('/meu-perfil', autenticar, (req, res) => {
+  res.sendFile(path.join(__dirname, '../models/profissional/usuarios/MeuPerfil.html'));
+});
+
 // Página de cadastro
 router.get('/cadastro', (req, res) => {
   res.sendFile(path.resolve(__dirname, '../models/profissional/usuarios/CadUsu.html'));
@@ -52,6 +57,17 @@ router.get('/ListaUsu', autenticar, apenasProfissionais, (req, res) => {
 
 router.get('/pos-login', autenticar, apenasClientes, (req, res) => {
   res.redirect('/api/eventos/pos-login');
+});
+
+router.get('/me', autenticar, apenasClientes, async (req, res) => {
+  try {
+    const usuario = await Usuario.findById(req.session.usuario.id).select('-senha');
+    if (!usuario) return res.status(404).json({ mensagem: 'Usuário não encontrado.' });
+    res.json(usuario);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensagem: 'Erro ao buscar dados do usuário.' });
+  }
 });
 
 /* ---ROTAS DE AUTENTICAÇÃO---*/
@@ -85,6 +101,7 @@ router.post('/login', async (req, res) => {
     // 4. Cria sessão
     req.session.usuario = {
       id: usuario._id.toString(),
+      nome: usuario.nome,
       email: usuario.email,
       tipo: usuario.tipo
     };
@@ -224,6 +241,30 @@ router.get('/api/usuarios/debug', autenticar, apenasProfissionais, async (req, r
     res.status(500).json({ erro: 'Erro ao buscar usuários' });
   }
 });
+
+// Deletar a própria conta (cliente)
+router.delete('/me', autenticar, apenasClientes, async (req, res) => {
+  try {
+    const usuarioId = req.session.usuario.id;
+
+    // Deleta eventos vinculados
+    await Evento.deleteMany({ usuarioId });
+
+    // Deleta usuário
+    await Usuario.findByIdAndDelete(usuarioId);
+
+    // Finaliza sessão
+    req.session.destroy(err => {
+      if (err) console.error(err);
+    });
+
+    res.status(200).json({ mensagem: 'Conta excluída com sucesso.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensagem: 'Erro ao excluir conta.' });
+  }
+});
+
 
 router.get('/tipo', (req, res) => {
   if (req.session.usuario) {
