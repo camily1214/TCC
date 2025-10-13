@@ -3,36 +3,50 @@ const router = express.Router();
 const Notificacao = require('../models/Notificacao');
 const { autenticar, apenasClientes, apenasProfissionais } = require('../middlewares/autenticar');
 
-// 🔔 CLIENTE — Buscar todas as notificações (confirmado/cancelado)
+// 🔔 CLIENTE — Ver notificações de confirmação/cancelamento
 router.get('/cliente', autenticar, apenasClientes, async (req, res) => {
   try {
     const notificacoes = await Notificacao.find({
-      usuarioId: req.session.usuario.id, // CORREÇÃO: usar session.usuario.id
+      usuarioId: req.session.usuario.id,
       tipo: { $in: ['confirmacao', 'cancelamento'] }
     })
-      .sort({ createdAt: -1 }) // as mais recentes primeiro
-      .lean();
+    .sort({ data: -1 })
+    .lean();
 
     res.json(notificacoes);
   } catch (err) {
     console.error('Erro ao buscar notificações do cliente:', err);
-    res.status(500).json({ erro: 'Erro ao buscar notificações' });
+    res.status(500).json({ erro: 'Erro ao buscar notificações.' });
   }
 });
 
 
-
-// 💼 PROFISSIONAL — Ver novas solicitações de eventos
-router.get('/profissional', autenticar, apenasProfissionais, async (req, res) => {
+// Solicitações pendentes
+router.get('/profissional/pendentes', autenticar, apenasProfissionais, async (req, res) => {
   try {
     const notificacoes = await Notificacao.find({
-      tipo: 'solicitacao'
+      tipo: 'solicitacao',
+      lida: false
     }).sort({ data: -1 }).lean();
 
     res.json(notificacoes);
   } catch (err) {
-    console.error('Erro ao buscar notificações do profissional:', err);
-    res.status(500).json({ erro: 'Erro ao buscar notificações' });
+    console.error('Erro ao buscar notificações pendentes:', err);
+    res.status(500).json({ erro: 'Erro ao buscar notificações pendentes' });
+  }
+});
+
+// Histórico de ações (confirmadas ou canceladas)
+router.get('/profissional/historico', autenticar, apenasProfissionais, async (req, res) => {
+  try {
+    const notificacoes = await Notificacao.find({
+      tipo: { $in: ['confirmacao', 'cancelamento'] }
+    }).sort({ data: -1 }).lean();
+
+    res.json(notificacoes);
+  } catch (err) {
+    console.error('Erro ao buscar histórico de notificações:', err);
+    res.status(500).json({ erro: 'Erro ao buscar histórico de notificações' });
   }
 });
 

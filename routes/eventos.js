@@ -142,34 +142,32 @@ router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) =>
       .lean();
 
     const eventosFormatados = eventos.map(e => {
-      // garantir que a data_evento seja Date
       const d = new Date(e.data_evento);
       const dataFormatada = d.toLocaleDateString('pt-BR', { timeZone: 'UTC' });
-      const horaFormatada = e.hora_evento ? e.hora_evento : '--:--';
-
-      // Formata status corretamente usando o campo 'status'
-      let statusFormatado = 'Aguardando confirmação';
-      if (e.status === 'confirmado') statusFormatado = 'Confirmado';
-      if (e.status === 'cancelado') statusFormatado = 'Cancelado';
-
+      const horaFormatada = e.hora_evento || '--:--';
 
       return {
-  _id: e._id,
-  status: statusFormatado,
-  usuarioNome: e.usuarioId?.nome || '-',
-  usuarioTelefone: e.usuarioId?.telefone || '-',
-  tipo_evento: e.tipo_evento || '-',
-  acesso: e.acesso || '-',
-  num_convidados: e.num_convidados || '-',
-  tipo_bebida: e.tipo_bebida || '-',
-  tipo_comida: e.tipo_comida || '-',
-  data_evento: dataFormatada || '-',
-  hora_evento: horaFormatada || '--:--',
-  endereco: `${e.rua || '-'}${e.numero ? ', ' + e.numero : ''} - ${e.bairro || '-'}, ${e.cidade || '-'} - ${e.estado || '-'}, CEP: ${e.cep || '-'}`,
-  complemento: e.complemento || '---',
-  usuarioId: e.usuarioId || 'N/A'
+        _id: e._id,
+        status: e.status, // devolve o valor puro do banco ✅
+        usuarioNome: e.usuarioId?.nome || '-',
+        usuarioTelefone: e.usuarioId?.telefone || '-',
+        tipo_evento: e.tipo_evento || '-',
+        acesso: e.acesso || '-',
+        num_convidados: e.num_convidados || '-',
+        tipo_bebida: e.tipo_bebida || '-',
+        tipo_comida: e.tipo_comida || '-',
+        data_evento: dataFormatada,
+        hora_evento: horaFormatada,
+        rua: e.rua || '-',
+        numero: e.numero || '-',
+        complemento: e.complemento || '-',
+        bairro: e.bairro || '-',
+        cidade: e.cidade || '-',
+        estado: e.estado || '-',
+        cep: e.cep || '-'
       };
     });
+
 
     res.json(eventosFormatados);
   } catch (err) {
@@ -201,21 +199,20 @@ router.put('/:id/status', autenticar, apenasProfissionais, async (req, res) => {
   try {
     const { status } = req.body;
 
-    // Validação do status
+    // Validar o novo status
     if (!['confirmado', 'cancelado'].includes(status)) {
       return res.status(400).json({ erro: 'Status inválido' });
     }
 
-    // Atualiza o evento e popula dados do cliente
-    const evento = await Evento.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    ).populate('usuarioId', 'nome telefone'); // só traz campos necessários
+    // Atualiza o evento com novo status
+    const evento = await Evento.findById(req.params.id);
+    if (!evento) return res.status(404).json({ erro: 'Evento não encontrado' });
 
-    if (!evento) {
-      return res.status(404).json({ erro: 'Evento não encontrado' });
-    }
+    evento.status = status;
+    evento.alteradoPor = req.session.usuario.id;
+    evento.dataAlteracaoStatus = new Date();
+
+    await evento.save();
 
     // Criar notificação para o cliente
     const titulo = status === 'confirmado' ? 'Evento Confirmado' : 'Evento Cancelado';
@@ -224,19 +221,17 @@ router.put('/:id/status', autenticar, apenasProfissionais, async (req, res) => {
       : `Seu evento (${evento.tipo_evento}) foi cancelado pelo profissional.`;
 
     const notificacao = new Notificacao({
-      usuarioId: evento.usuarioId._id, // cliente que receberá a notificação
+      usuarioId: evento.usuarioId,
       titulo,
       mensagem,
-      tipo: status === 'confirmado' ? 'confirmacao' : 'cancelamento'
+      tipo: status
     });
-
     await notificacao.save();
 
-    // Retorna o evento atualizado e a notificação criada
     res.json({
-      mensagem: 'Status atualizado e notificação enviada.',
-      evento,
-      notificacao
+      sucesso: true,
+      mensagem: `Status atualizado para "${status}" com sucesso.`,
+      evento
     });
 
   } catch (err) {

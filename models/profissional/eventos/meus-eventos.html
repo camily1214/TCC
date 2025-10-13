@@ -2,196 +2,315 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Meus Eventos</title>
-
-  <!-- Navbar -->
   <link rel="stylesheet" href="/css/navbar.css" />
 
   <style>
     body {
-      font-family: Arial, sans-serif;
       background-color: #c5c6c8;
-      color: #000000;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding-top: 80px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
       padding: 20px;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: #737372;
-      font-size: 14px;
-    }
-
-    th, td {
-      padding: 10px;
-      border: 1px solid #555;
-      text-align: left;
-    }
-
-    th {
-      background-color: #b7b4af;
-    }
-
-    button {
-      padding: 6px 10px;
-      background-color: #e74c3c;
+    h2 {
+      text-align: center;
       color: #fff;
+      margin-bottom: 20px;
+      background-color: #727277;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px #00000055;
+    }
+
+    /* CARD DO EVENTO */
+    .evento {
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 5px #00000055;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .evento:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 12px #00000088;
+    }
+
+    /* Bordas de status */
+    .status-aguardando { border-left: 5px solid #f1c40f; }
+    .status-confirmado { border-left: 5px solid #27ae60; }
+    .status-cancelado { border-left: 5px solid #c0392b; }
+
+    .evento p { margin: 5px 0; }
+    .evento .data { font-size: 14px; color: #555; }
+
+    /* Botões */
+    .btn-acao {
+      margin-top: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center; /* centraliza os botões */
+    }
+
+    .btn-acao button {
+      padding: 8px 14px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      color: #fff;
+      font-size: 13px;
+      flex: 0 1 auto;
+      transition: background-color 0.2s ease;
+      min-width: 120px;
     }
 
-    .btn-ver-mais { background-color: #3498db; color: #fff; }
+    .btn-ver-mais { background-color: #3498db; }
     .btn-ver-mais:hover { background-color: #2980b9; }
-    .btn-editar { background-color: #f39c12; margin-left: 5px; color: #fff; }
+
+    .btn-editar { background-color: #f39c12; }
     .btn-editar:hover { background-color: #e67e22; }
-    .btn-excluir { background-color: #e74c3c; color: #fff; }
-    .btn-excluir:hover { background-color: #c0392b; }
 
-    .custom-navbar { background-color: #727277 !important; }
-    .custom-navbar .nav-link { color: #fff !important; font-weight: bold; }
-    .custom-navbar .nav-link:hover { text-decoration: underline; }
+    .btn-excluir { background-color: #c0392b; }
+    .btn-excluir:hover { background-color: #992d22; }
 
-    .mensagem {
-      background-color: #444;
-      padding: 15px;
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 0 10px #000;
+      text-align: left;
+    }
+
+    .btn-fechar {
+      border: none;
       border-radius: 5px;
-      margin-bottom: 20px;
-      text-align: center;
-      font-size: 16px;
+      cursor: pointer;
+      padding: 8px 14px;
+      color: #fff;
+      background-color: #727277;
+      margin-top: 15px;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-fechar:hover { background-color: #555; }
+
+    /* Paginação */
+    .paginacao {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .paginacao button {
+      background-color: #727277;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .paginacao button:hover {
+      background-color: #555;
+      transform: scale(1.05);
+    }
+
+    .paginacao button:disabled {
+      background-color: #ccc;
+      color: #666;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .pagina-atual {
+      background-color: #3498db;
     }
   </style>
 </head>
 <body>
-  <!-- Navbar -->
   <div id="navbar-placeholder"></div>
 
-  <h1>Meus Eventos</h1>
+  <div class="container">
+    <h2>Meus Eventos</h2>
+    <div id="listaEventos"></div>
 
-  <div id="mensagem-vazia" class="mensagem" style="display:none;">
-    Você ainda não possui eventos cadastrados. 
-    <a href="/api/eventos/criar">Clique aqui</a> para cadastrar um evento.
+    <div id="paginacao" class="paginacao" style="display:none;"></div>
+
+    <div id="mensagem-vazia" style="display:none; text-align:center; color:#555; margin-top:20px;">
+      Você ainda não possui eventos cadastrados. 
+      <a href="/api/eventos/criar">Clique aqui</a> para cadastrar um evento.
+    </div>
   </div>
 
-  <table id="tabela-eventos" style="display:none;">
-    <thead>
-      <tr>
-        <th>Data</th>
-        <th>Hora</th>
-        <th>Tipo Evento</th>
-        <th>Acesso</th>
-        <th>Comida</th>
-        <th>Bebida</th>
-        <th>Nº Convidados</th>
-        <th>Status</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody id="meus-eventos"></tbody>
-  </table>
+  <!-- Modal -->
+  <div id="modalDetalhes" class="modal">
+    <div class="modal-content">
+      <h3>Detalhes do Evento</h3>
+      <div id="modalConteudo"></div>
+      <div style="text-align: center;">
+        <button class="btn-fechar" onclick="fecharModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
 
-  <div id="footer-placeholder"></div>
+  <script>
+    let meusEventos = [];
+    let paginaAtual = 1;
+    const eventosPorPagina = 5;
 
-<script>
-let meusEventos = [];
+    async function carregarEventos() {
+      try {
+        const resposta = await fetch('/api/eventos/meus-eventos/dados', { credentials: 'include' });
+        if (!resposta.ok) throw new Error("Falha ao buscar eventos");
+        meusEventos = await resposta.json();
 
-// Carregar eventos do usuário logado
-async function carregarEventos() {
-  try {
-    const resposta = await fetch('/api/eventos/meus-eventos/dados', { credentials: 'include' });
-    if (!resposta.ok) throw new Error("Falha ao buscar eventos");
+        const lista = document.getElementById('listaEventos');
+        const mensagem = document.getElementById('mensagem-vazia');
 
-    meusEventos = await resposta.json();
-
-    const tabela = document.getElementById('tabela-eventos');
-    const mensagem = document.getElementById('mensagem-vazia');
-
-    if (!meusEventos || meusEventos.length === 0) {
-      tabela.style.display = 'none';
-      mensagem.style.display = 'block';
-    } else {
-      tabela.style.display = 'table';
-      mensagem.style.display = 'none';
-      exibirEventos(meusEventos);
+        if (!meusEventos || meusEventos.length === 0) {
+          lista.style.display = 'none';
+          mensagem.style.display = 'block';
+        } else {
+          lista.style.display = 'block';
+          mensagem.style.display = 'none';
+          exibirEventos(meusEventos);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar eventos:', err);
+        alert('Erro ao carregar seus eventos.');
+      }
     }
-  } catch (err) {
-    console.error('Erro ao carregar eventos:', err);
-    alert('Erro ao carregar seus eventos.');
-  }
-}
 
-// Exibir eventos na tabela
-function exibirEventos(lista) {
-  const tbody = document.getElementById('meus-eventos');
-  tbody.innerHTML = '';
+    function exibirEventos(lista) {
+      const container = document.getElementById('listaEventos');
+      const paginacao = document.getElementById('paginacao');
+      container.innerHTML = '';
 
-  lista.forEach(evento => {
-    const data = evento.data_evento ? new Date(evento.data_evento) : null;
-    const dataFormatada = data ? data.toLocaleDateString('pt-BR') : '-';
-    const horaFormatada = evento.hora_evento || '-';
-    const tipoEvento = evento.tipo_evento || '-';
-    const acesso = evento.acesso || '-';
-    const comida = evento.tipo_comida || '-';
-    const bebida = evento.tipo_bebida || '-';
-    const numConvidados = evento.num_convidados || '-';
+      const totalPaginas = Math.ceil(lista.length / eventosPorPagina);
+      const inicio = (paginaAtual - 1) * eventosPorPagina;
+      const fim = inicio + eventosPorPagina;
+      const eventosPagina = lista.slice(inicio, fim);
 
-    // 👇 status formatado
-    let statusFormatado = 'Aguardando confirmação';
-    if (evento.status === 'confirmado') statusFormatado = 'Confirmado';
-    if (evento.status === 'cancelado') statusFormatado = 'Cancelado';
+      eventosPagina.forEach(evento => {
+        const data = evento.data_evento ? new Date(evento.data_evento) : null;
+        const dataFormatada = data ? data.toLocaleDateString('pt-BR') : '-';
+        const horaFormatada = evento.hora_evento || '-';
+        let status = evento.status || 'aguardando';
 
-    const linha = document.createElement('tr');
-    linha.innerHTML = `
-      <td>${dataFormatada}</td>
-      <td>${horaFormatada}</td>
-      <td>${tipoEvento}</td>
-      <td>${acesso}</td>
-      <td>${comida}</td>
-      <td>${bebida}</td>
-      <td>${numConvidados}</td>
-      <td>${statusFormatado}</td>
-      <td>
-        <button class="btn-ver-mais" onclick="verDetalhes('${evento._id}')">Ver Mais</button>
-        <button class="btn-editar" onclick="editarEvento('${evento._id}')">Editar</button>
-        <button class="btn-excluir" onclick="deletarEvento('${evento._id}')">Excluir</button>
-      </td>
-    `;
-    tbody.appendChild(linha);
-  });
-}
+        const div = document.createElement('div');
+        div.className = `evento status-${status}`;
+        div.innerHTML = `
+          <p><strong>Data:</strong> ${dataFormatada}</p>
+          <p><strong>Hora:</strong> ${horaFormatada}</p>
+          <p><strong>Tipo Evento:</strong> ${evento.tipo_evento || '-'}</p>
+          <p><strong>Acesso:</strong> ${evento.acesso || '-'}</p>
+          <p><strong>Comida:</strong> ${evento.tipo_comida || '-'}</p>
+          <p><strong>Bebida:</strong> ${evento.tipo_bebida || '-'}</p>
+          <p><strong>Nº Convidados:</strong> ${evento.num_convidados || '-'}</p>
+          <p><strong>Status:</strong> ${
+            status === 'confirmado' ? 'Confirmado' :
+            status === 'cancelado' ? 'Cancelado' : 'Aguardando confirmação'
+          }</p>
 
-function verDetalhes(id) {
-  window.location.href = `/api/eventos/detalhes?id=${id}`;
-}
+          <div class="btn-acao">
+            <button class="btn-ver-mais" onclick="verDetalhes('${evento._id}')">Ver Mais</button>
+            <button class="btn-editar" onclick="editarEvento('${evento._id}')">Editar</button>
+            <button class="btn-excluir" onclick="deletarEvento('${evento._id}')">Excluir</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
 
-function editarEvento(id) {
-  window.location.href = `/api/eventos/editar?id=${id}`;
-}
+      // Paginação
+      if (totalPaginas > 1) {
+        paginacao.style.display = 'flex';
+        paginacao.innerHTML = `
+          <button onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''}>Anterior</button>
+          ${Array.from({ length: totalPaginas }, (_, i) => `
+            <button class="${paginaAtual === i + 1 ? 'pagina-atual' : ''}" onclick="mudarPagina(${i + 1})">${i + 1}</button>
+          `).join('')}
+          <button onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled' : ''}>Próxima</button>
+        `;
+      } else paginacao.style.display = 'none';
+    }
 
-async function deletarEvento(id) {
-  if (!confirm('Deseja realmente excluir este evento?')) return;
-  const resposta = await fetch(`/api/eventos/${id}`, { method: 'DELETE', credentials: 'include' });
-  if (resposta.ok) carregarEventos();
-  else alert('Erro ao excluir evento.');
-}
+    function mudarPagina(novaPagina) {
+      const totalPaginas = Math.ceil(meusEventos.length / eventosPorPagina);
+      if (novaPagina >= 1 && novaPagina <= totalPaginas) {
+        paginaAtual = novaPagina;
+        exibirEventos(meusEventos);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
 
-// Inicializar página
-document.addEventListener('DOMContentLoaded', carregarEventos);
+    function verDetalhes(id) {
+      const evento = meusEventos.find(e => e._id === id);
+      if (!evento) return;
+      const conteudo = document.getElementById('modalConteudo');
+      conteudo.innerHTML = `
+        <p><strong>Data:</strong> ${new Date(evento.data_evento).toLocaleDateString('pt-BR')}</p>
+        <p><strong>Hora:</strong> ${evento.hora_evento}</p>
+        <p><strong>Tipo Evento:</strong> ${evento.tipo_evento}</p>
+        <p><strong>Acesso:</strong> ${evento.acesso}</p>
+        <p><strong>Comida:</strong> ${evento.tipo_comida}</p>
+        <p><strong>Bebida:</strong> ${evento.tipo_bebida}</p>
+        <p><strong>Nº Convidados:</strong> ${evento.num_convidados}</p>
+        <p><strong>Endereço:</strong> ${evento.rua}, ${evento.numero || ''} - ${evento.bairro}, ${evento.cidade} - ${evento.estado}</p>
+        <p><strong>Complemento:</strong> ${evento.complemento || '-'}</p>
+      `;
+      document.getElementById('modalDetalhes').style.display = 'flex';
+    }
 
-  // Carregar navbar
-fetch('/components/navbarClient.html')
-  .then(res => res.text())
-  .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; })
-  .catch(err => console.error('Erro ao carregar navbar do cliente:', err));
+    function fecharModal() { document.getElementById('modalDetalhes').style.display = 'none'; }
 
-    // carregar footer
-        fetch('/components/footer.html')
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById('footer-placeholder').innerHTML = data;
-    })
-    .catch(err => console.error('Erro ao carregar rodapé:', err));
-</script>
+    async function deletarEvento(id) {
+      if (!confirm('Deseja realmente excluir este evento?')) return;
+      const resposta = await fetch(`/api/eventos/${id}`, { method: 'DELETE', credentials: 'include' });
+      if (resposta.ok) carregarEventos();
+      else alert('Erro ao excluir evento.');
+    }
+
+    function editarEvento(id) { window.location.href = `/api/eventos/editar?id=${id}`; }
+
+    document.addEventListener('DOMContentLoaded', carregarEventos);
+
+    // Navbar
+    fetch('/components/navbarClient.html')
+      .then(res => res.text())
+      .then(data => document.getElementById('navbar-placeholder').innerHTML = data)
+      .catch(err => console.error('Erro ao carregar navbar do cliente:', err));
+  </script>
 </body>
 </html>
+

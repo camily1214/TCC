@@ -2,255 +2,352 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Lista de Eventos</title>
-
-  <!-- Navbar -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eventos Cadastrados</title>
   <link rel="stylesheet" href="/css/navbar.css" />
 
   <style>
     body {
-      font-family: Arial, sans-serif;
       background-color: #c5c6c8;
-      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding-top: 80px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
       padding: 20px;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    h2 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 20px;
       background-color: #727277;
-      font-size: 14px;
-      color: #000000;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px #00000055;
     }
 
-    th, td {
-      padding: 10px;
-      border: 1px solid #555;
+    /* CARD DO EVENTO */
+    .evento {
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 5px #00000055;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .evento:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 12px #00000088;
+    }
+
+    /* Bordas de status */
+    .status-aguardando { border-left: 5px solid #f1c40f; }
+    .status-confirmado { border-left: 5px solid #27ae60; }
+    .status-cancelado { border-left: 5px solid #c0392b; }
+
+    .evento p { margin: 5px 0; }
+    .evento .data { font-size: 14px; color: #555; }
+
+    /* Botões */
+    .btn-acao {
+      margin-top: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center; /* 🔹 centraliza os botões */
+    }
+
+    .btn-acao button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: #fff;
+      font-size: 13px;
+      flex: 0 1 auto;
+      transition: background-color 0.2s ease;
+      min-width: 120px;
+    }
+
+    .btn-confirmar { background-color: #27ae60; }
+    .btn-confirmar:hover { background-color: #1e874b; }
+
+    .btn-cancelar { background-color: #c0392b; }
+    .btn-cancelar:hover { background-color: #992d22; }
+
+    .btn-ver-mais { background-color: #3498db; }
+    .btn-ver-mais:hover { background-color: #2980b9; }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 0 10px #000;
       text-align: left;
     }
 
-    th {
-      background-color: #ffffff;
-      color: #000000;
-    }
-
-    button {
-      padding: 6px 10px;
-      background-color: #ffffff;
-      border-radius: 0,5px ;
+    .btn-fechar, .btn-editar {
+      border: none;
       border-radius: 5px;
       cursor: pointer;
-      color: #000000;
+      padding: 8px 14px;
+      color: #fff;
+      margin-top: 15px;
+      transition: background-color 0.2s ease;
     }
 
-    .btn-confirmar:hover { background-color: #27ae60; }
+    .btn-fechar { background-color: #727277; }
+    .btn-fechar:hover { background-color: #555; }
 
-    .btn-cancelar:hover { background-color: #c0392b; }
-
-    .btn-ver-mais:hover { background-color: #2980b9; }
-
+    .btn-editar { background-color: #f39c12; }
     .btn-editar:hover { background-color: #e67e22; }
 
-    .custom-navbar {
-      background-color: #727277 !important;
+    /* Centralização dos botões do modal */
+    .modal-content button {
+      display: inline-block;
+      margin-right: 10px;
     }
 
-    .custom-navbar .nav-link {
-      color: #fff !important;
-      font-weight: bold;
-    }
-
-    .custom-navbar .nav-link:hover {
-      text-decoration: underline;
-    }
-
-    .filtros {
+    .paginacao {
       display: flex;
+      justify-content: center;
+      align-items: center;
       gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
+      margin-top: 20px;
     }
 
-    .filtros input {
-      padding: 10px;
-      font-size: 16px;
+    .paginacao button {
+      background-color: #727277;
+      color: white;
+      border: none;
+      padding: 8px 14px;
       border-radius: 5px;
-      border: 1px solid #ccc;
-      flex: 1;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .paginacao button:hover {
+      background-color: #555;
+      transform: scale(1.05);
+    }
+
+    .paginacao button:disabled {
+      background-color: #ccc;
+      color: #666;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .pagina-atual {
+      background-color: #3498db;
     }
   </style>
 </head>
 <body>
-  <!-- Navbar -->
   <div id="navbar-placeholder"></div>
 
-  <h1>Eventos Cadastrados</h1>
+  <div class="container">
+    <h2>Eventos Cadastrados</h2>
+    <div id="lista-eventos"></div>
 
-  <!-- Filtros -->
-  <div class="filtros">
-    <input type="date" id="filtro-data" placeholder="Filtrar por data" />
-    <input type="text" id="filtro-tipo" placeholder="Filtrar por tipo de evento..." />
+    <div id="paginacao" class="paginacao" style="display:none;"></div>
+
+    <div id="mensagem-vazia" style="display:none; text-align:center; color:#555; margin-top:20px;">
+      Nenhum evento cadastrado no momento.
+    </div>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Usuário</th>
-        <th>Telefone</th> 
-        <th>Data</th>
-        <th>Hora</th>
-        <th>Tipo Evento</th>
-        <th>Acesso</th>
-        <th>Comida</th>
-        <th>Bebida</th>
-        <th>Nº Convidados</th>
-        <th>Status</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody id="lista-eventos"></tbody>
-  </table>
+  <!-- Modal -->
+  <div id="modalDetalhes" class="modal">
+    <div class="modal-content">
+      <h3>Detalhes do Evento</h3>
+      <div id="modalConteudo"></div>
+      <div style="text-align: center;">
+        <button id="btnEditar" class="btn-editar">Editar</button>
+        <button class="btn-fechar" onclick="fecharModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
 
-    <div id="footer-placeholder"></div>
+  <script>
+    let todosEventos = [];
+    let paginaAtual = 1;
+    const eventosPorPagina = 5;
 
-<script>
-let todosEventos = [];
+    async function carregarEventos() {
+      try {
+        const resposta = await fetch('/api/eventos/lista-evento', { credentials: 'include' });
+        if (!resposta.ok) throw new Error('Erro ao buscar eventos');
+        todosEventos = await resposta.json();
 
-// Carregar todos os eventos (profissionais)
-async function carregarEventos() {
-  try {
-    const resposta = await fetch('/api/eventos/lista-evento', { credentials: 'include' });
-    if (!resposta.ok) throw new Error('Erro ao buscar eventos');
-    todosEventos = await resposta.json();
-    exibirEventos(todosEventos);
-  } catch (err) {
-    console.error(err);
-    alert('Erro ao carregar eventos.');
-  }
-}
-
-// Exibir eventos na tabela
-function exibirEventos(lista) {
-  const tabela = document.getElementById('lista-eventos');
-  tabela.innerHTML = '';
-
-  lista.forEach(evento => {
-    const dataFormatada = evento.data_evento
-      ? new Date(evento.data_evento).toLocaleDateString('pt-BR')
-      : '-';
-
-    let statusFormatado = 'Aguardando confirmação';
-    if (evento.status === 'confirmado') statusFormatado = 'Confirmado';
-    if (evento.status === 'cancelado') statusFormatado = 'Cancelado';
-
-    // Verifica se deve mostrar botões de confirmar/cancelar
-    const mostrarBotoesConfirmarCancelar = !['confirmado', 'cancelado'].includes(evento.status);
-
-    const linha = document.createElement('tr');
-    linha.id = `evento-${evento._id}`;
-    linha.innerHTML = `
-      <td>${evento.usuarioNome || '-'}</td>
-      <td>${evento.usuarioTelefone || '-'}</td> 
-      <td>${dataFormatada}</td>
-      <td>${evento.hora_evento || '-'}</td>
-      <td>${evento.tipo_evento || '-'}</td>
-      <td>${evento.acesso || '-'}</td>
-      <td>${evento.tipo_comida || '-'}</td>
-      <td>${evento.tipo_bebida || '-'}</td>
-      <td>${evento.num_convidados || '-'}</td>
-      <td class="status-cell">${evento.status || '-'}</td>
-      <td>
-        <button class="btn-confirmar" onclick="alterarStatus('${evento._id}', 'confirmado')">✅ Confirmar</button>
-        <button class="btn-cancelar" onclick="alterarStatus('${evento._id}', 'cancelado')">❌ Cancelar</button>
-        <button class="btn-ver-mais" onclick="verDetalhes('${evento._id}')">Ver Mais</button>
-        <button class="btn-editar" onclick="editarEvento('${evento._id}')">Editar</button>
-      </td>
-    `;
-    tabela.appendChild(linha);
-  });
-}
-
-// Filtrar eventos por data e tipo
-function filtrarEventos() {
-  const tipo = document.getElementById('filtro-tipo').value.toLowerCase();
-  const data = document.getElementById('filtro-data').value;
-
-  const filtrados = todosEventos.filter(evento => {
-    const dataEvento = new Date(evento.data_evento).toISOString().split('T')[0];
-    const tipoMatch = evento.tipo_evento?.toLowerCase().includes(tipo);
-    const dataMatch = !data || dataEvento === data;
-    return tipoMatch && dataMatch;
-  });
-
-  exibirEventos(filtrados);
-}
-
-// Funções de ação
-function verDetalhes(id) { window.location.href = `/api/eventos/detalhes?id=${id}`; }
-function editarEvento(id) { window.location.href = `/api/eventos/editar?id=${id}`; }
-
-// Alterar status do evento (confirmar/cancelar)
-async function alterarStatus(id, status) {
-  if (!confirm(`Deseja realmente marcar o evento como "${status}"?`)) return;
-
-  try {
-    const resposta = await fetch(`/api/eventos/${id}/status`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-      credentials: 'include'
-    });
-
-    if (!resposta.ok) throw new Error('Erro ao atualizar status');
-
-    // Atualizar status no array local
-    const evento = todosEventos.find(e => e._id === id);
-    if (evento) evento.status = status;
-
-    // Atualizar apenas a célula de status da linha correspondente
-    const linha = document.getElementById(`evento-${id}`);
-    if (linha) {
-      const statusCell = linha.querySelector('.status-cell');
-      if (status === 'confirmado') statusCell.textContent = 'Confirmado';
-      else if (status === 'cancelado') statusCell.textContent = 'Cancelado';
-      else statusCell.textContent = 'Aguardando confirmação';
+        if (!todosEventos.length) {
+          document.getElementById('lista-eventos').style.display = 'none';
+          document.getElementById('mensagem-vazia').style.display = 'block';
+        } else {
+          document.getElementById('lista-eventos').style.display = 'block';
+          document.getElementById('mensagem-vazia').style.display = 'none';
+          exibirEventos(todosEventos);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao carregar eventos.');
+      }
     }
 
-  } catch (err) {
-    console.error(err);
-    alert('Erro ao atualizar status do evento.');
-  }
-}
+    function exibirEventos(lista) {
+      const container = document.getElementById('lista-eventos');
+      const paginacao = document.getElementById('paginacao');
+      container.innerHTML = '';
 
+      const totalPaginas = Math.ceil(lista.length / eventosPorPagina);
+      const inicio = (paginaAtual - 1) * eventosPorPagina;
+      const fim = inicio + eventosPorPagina;
+      const eventosPagina = lista.slice(inicio, fim);
 
-// Eventos dos filtros
-document.getElementById('filtro-tipo').addEventListener('input', filtrarEventos);
-document.getElementById('filtro-data').addEventListener('input', filtrarEventos);
+      eventosPagina.forEach(evento => {
+        const data = evento.data_evento ? new Date(evento.data_evento) : null;
+        const dataFormatada = data ? data.toLocaleDateString('pt-BR') : '-';
+        const status = evento.status || 'aguardando';
 
-// Inicializar
-document.addEventListener('DOMContentLoaded', carregarEventos);
-
-// Carregar navbar
-    fetch('/components/navbarprof.html')
-      .then(response => {
-        if (!response.ok) throw new Error('Erro ao carregar a navbar');
-        return response.text();
-      })
-      .then(data => {
-        document.getElementById('navbar-placeholder').innerHTML = data;
-      })
-      .catch(error => {
-        console.error('Erro ao carregar navbar:', error);
+        const div = document.createElement('div');
+        div.className = `evento status-${status}`;
+        div.innerHTML = `
+          <p><strong>Cliente:</strong> ${evento.usuarioNome || '-'}</p>
+          <p><strong>Telefone:</strong> ${evento.usuarioTelefone || '-'}</p>
+          <p><strong>Data:</strong> ${dataFormatada}</p>
+          <p><strong>Tipo de Evento:</strong> ${evento.tipo_evento || '-'}</p>
+          <p><strong>Status:</strong> ${
+            status === 'confirmado'
+              ? 'Confirmado'
+              : status === 'cancelado'
+              ? 'Cancelado'
+              : 'Aguardando confirmação'
+          }</p>
+          
+          <div class="btn-acao">
+            <button class="btn-confirmar" onclick="alterarStatus('${evento._id}', 'confirmado')">Confirmar</button>
+            <button class="btn-cancelar" onclick="alterarStatus('${evento._id}', 'cancelado')">Cancelar</button>
+            <button class="btn-ver-mais" onclick="verDetalhes('${evento._id}')">Ver Mais</button>
+          </div>
+        `;
+        container.appendChild(div);
       });
 
-  // carregar footer
-        fetch('/components/footer.html')
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById('footer-placeholder').innerHTML = data;
-    })
-    .catch(err => console.error('Erro ao carregar rodapé:', err));
-</script>
+      if (totalPaginas > 1) {
+        paginacao.style.display = 'flex';
+        paginacao.innerHTML = `
+          <button onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''}>Anterior</button>
+          ${Array.from({ length: totalPaginas }, (_, i) => `
+            <button class="${paginaAtual === i + 1 ? 'pagina-atual' : ''}" onclick="mudarPagina(${i + 1})">${i + 1}</button>
+          `).join('')}
+          <button onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled' : ''}>Próxima</button>
+        `;
+      } else {
+        paginacao.style.display = 'none';
+      }
+    }
+
+    function mudarPagina(novaPagina) {
+      const totalPaginas = Math.ceil(todosEventos.length / eventosPorPagina);
+      if (novaPagina >= 1 && novaPagina <= totalPaginas) {
+        paginaAtual = novaPagina;
+        exibirEventos(todosEventos);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function verDetalhes(id) {
+      const evento = todosEventos.find(e => e._id === id);
+      if (!evento) return;
+      const conteudo = document.getElementById('modalConteudo');
+      conteudo.innerHTML = `
+        <p><strong>Cliente:</strong> ${evento.usuarioNome}</p>
+        <p><strong>Telefone:</strong> ${evento.usuarioTelefone}</p>
+        <p><strong>Data:</strong> ${new Date(evento.data_evento).toLocaleDateString('pt-BR')}</p>
+        <p><strong>Hora:</strong> ${evento.hora_evento || '-'}</p>
+        <p><strong>Acesso:</strong> ${evento.acesso || '-'}</p>
+        <p><strong>Comida:</strong> ${evento.tipo_comida || '-'}</p>
+        <p><strong>Bebida:</strong> ${evento.tipo_bebida || '-'}</p>
+        <p><strong>Convidados:</strong> ${evento.num_convidados || '-'}</p>
+        <p><strong>Endereço:</strong> ${evento.rua}, ${evento.numero || ''} ${evento.bairro}, ${evento.cidade} - ${evento.estado}</p>
+        <p><strong>Complemento:</strong> ${evento.complemento || '-'}</p>
+      `;
+      document.getElementById('btnEditar').onclick = () => editarEvento(id);
+      document.getElementById('modalDetalhes').style.display = 'flex';
+    }
+
+    function fecharModal() {
+      document.getElementById('modalDetalhes').style.display = 'none';
+    }
+
+    async function alterarStatus(id, status) {
+      if (!confirm(`Deseja realmente marcar este evento como "${status}"?`)) return;
+      try {
+        const resposta = await fetch(`/api/eventos/${id}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status }),
+          credentials: 'include'
+        });
+
+        if (!resposta.ok) throw new Error('Erro ao atualizar status');
+
+        const eventoCard = document.querySelector(`.evento button[onclick*="${id}"]`)?.closest('.evento');
+        if (eventoCard) {
+          eventoCard.classList.remove('status-aguardando', 'status-confirmado', 'status-cancelado');
+          eventoCard.classList.add(`status-${status}`);
+
+          const statusParagrafo = Array.from(eventoCard.querySelectorAll('p')).find(p => p.textContent.includes('Status:'));
+          if (statusParagrafo) {
+            statusParagrafo.innerHTML = `<strong>Status:</strong> ${
+              status === 'confirmado'
+                ? 'Confirmado'
+                : status === 'cancelado'
+                ? 'Cancelado'
+                : 'Aguardando confirmação'
+            }`;
+          }
+        }
+
+        alert(`Evento marcado como "${status}".`);
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao atualizar status.');
+      }
+    }
+
+    function editarEvento(id) {
+      window.location.href = `/api/eventos/editar?id=${id}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', carregarEventos);
+
+    fetch('/components/navbarprof.html')
+      .then(r => r.text())
+      .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; });
+  </script>
 </body>
 </html>
