@@ -27,12 +27,21 @@ router.get('/sucesso', autenticar, apenasClientes, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/EventSucesso.html'));
 });
 
-// Página de edição de evento (apenas clientes podem editar os próprios eventos)
-router.get('/editar', autenticar, apenasClientes, (req, res) => {
-  res.sendFile(path.join(__dirname, '../models/profissional/eventos/EditarEvent.html'));
+
+//  Página de edição de evento (clientes e profissionais podem acessar)
+router.get('/editar', autenticar, (req, res) => {
+  const filePath = path.join(__dirname, '../models/profissional/eventos/EditarEvent.html');
+
+  // 🔹 Garante que o ?id= continua visível na URL após o HTML carregar
+  res.sendFile(filePath, {
+    headers: {
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+    }
+  });
 });
 
-// CANCELAR ALTERAÇÕES (voltar sem salvar) — deve vir ANTES do /:id
+
+// CANCELAR ALTERAÇÕES (voltar sem salvar)
 router.get('/editar/cancelar', autenticar, apenasClientes, (req, res) => {
   res.redirect('/api/eventos/lista-evento');
 });
@@ -61,9 +70,7 @@ router.post('/novo-evento', autenticar, async (req, res) => {
       rua, numero, complemento, bairro, cidade, estado, cep,
     } = req.body;
 
-    // separa ano, mês, dia
     const [ano, mes, dia] = data_evento.split('-').map(Number);
-    // cria objeto Date no fuso local (sem UTC)
     const dataFinal = new Date(ano, mes - 1, dia);
 
     const novoEvento = new Evento({
@@ -75,17 +82,16 @@ router.post('/novo-evento', autenticar, async (req, res) => {
 
     await novoEvento.save();
 
-    // 🔔 Criar notificação de solicitação (para profissional)
     const notificacao = new Notificacao({
-      usuarioId: req.session.usuario.id, // cliente que criou
+      usuarioId: req.session.usuario.id,
       titulo: 'Nova Solicitação de Evento',
       mensagem: `O cliente ${req.session.usuario.nome} solicitou um novo evento.`,
       tipo: 'solicitacao'
     });
 
     await notificacao.save();
-
     res.redirect('/api/eventos/sucesso');
+
   } catch (err) {
     console.error('Erro ao cadastrar evento:', err);
     res.status(500).send('Erro ao cadastrar evento.');
@@ -115,7 +121,7 @@ router.get('/eventos/lista', autenticar, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/ListaEvent.html'));
 });
 
-// Rota para retornar somente as datas dos eventos agendados (acesso comum)
+// Rota para retornar somente as datas dos eventos agendados
 router.get('/datas-agendadas', autenticar, async (req, res) => {
   try {
     const eventos = await Evento.find({}, 'data_evento').lean();
@@ -134,11 +140,11 @@ router.get('/datas-agendadas', autenticar, async (req, res) => {
   }
 });
 
-// API: Listar todos os eventos (somente profissionais) com dados formatados
+// API: Listar todos os eventos (somente profissionais)
 router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) => {
   try {
-        const eventos = await Evento.find()
-      .populate('usuarioId', 'nome telefone') // <-- popula somente os campos necessários
+    const eventos = await Evento.find()
+      .populate('usuarioId', 'nome telefone')
       .lean();
 
     const eventosFormatados = eventos.map(e => {
@@ -148,7 +154,7 @@ router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) =>
 
       return {
         _id: e._id,
-        status: e.status, // devolve o valor puro do banco ✅
+        status: e.status, 
         usuarioNome: e.usuarioId?.nome || '-',
         usuarioTelefone: e.usuarioId?.telefone || '-',
         tipo_evento: e.tipo_evento || '-',
@@ -168,7 +174,6 @@ router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) =>
       };
     });
 
-
     res.json(eventosFormatados);
   } catch (err) {
     console.error('Erro ao buscar eventos:', err);
@@ -176,15 +181,13 @@ router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) =>
   }
 });
 
-
-// API: Buscar evento por ID — (vem depois da lista)
+// API: Buscar evento por ID
 router.get('/:id', autenticar, async (req, res) => {
   try {
     const evento = await Evento.findById(req.params.id);
     if (!evento) return res.status(404).send('Evento não encontrado');
 
-    // cliente só pode acessar o próprio evento
-    if (req.session.usuario.tipo === 'cliente' && evento.usuario.id.toString() !== req.session.usuario.id) {
+    if (req.session.usuario.tipo === 'cliente' && evento.usuarioId.toString() !== req.session.usuario.id) {
       return res.status(403).send('Acesso negado');
     }
 
@@ -194,27 +197,22 @@ router.get('/:id', autenticar, async (req, res) => {
   }
 });
 
-// Atualizar status do evento (confirmado/cancelado) - apenas profissionais
+// Atualizar status (apenas profissionais)
 router.put('/:id/status', autenticar, apenasProfissionais, async (req, res) => {
   try {
     const { status } = req.body;
-
-    // Validar o novo status
     if (!['confirmado', 'cancelado'].includes(status)) {
       return res.status(400).json({ erro: 'Status inválido' });
     }
 
-    // Atualiza o evento com novo status
     const evento = await Evento.findById(req.params.id);
     if (!evento) return res.status(404).json({ erro: 'Evento não encontrado' });
 
     evento.status = status;
     evento.alteradoPor = req.session.usuario.id;
     evento.dataAlteracaoStatus = new Date();
-
     await evento.save();
 
-    // Criar notificação para o cliente
     const titulo = status === 'confirmado' ? 'Evento Confirmado' : 'Evento Cancelado';
     const mensagem = status === 'confirmado'
       ? `Seu evento (${evento.tipo_evento}) foi confirmado pelo profissional.`
@@ -240,8 +238,7 @@ router.put('/:id/status', autenticar, apenasProfissionais, async (req, res) => {
   }
 });
 
-
-// API: Deletar evento (clientes só podem deletar os próprios, profissional pode deletar qualquer)
+// API: Deletar evento (cliente só o próprio, profissional qualquer)
 router.delete('/:id', autenticar, async (req, res) => {
   try {
     const evento = await Evento.findById(req.params.id);
@@ -258,25 +255,41 @@ router.delete('/:id', autenticar, async (req, res) => {
   }
 });
 
-
-// Atualizar evento (cliente só pode atualizar o próprio)
+// Atualizar evento (clientes podem editar os próprios, profissionais qualquer um)
 router.put('/:id', autenticar, async (req, res) => {
   try {
+    const usuario = req.session.usuario;
     const evento = await Evento.findById(req.params.id);
-    if (!evento) return res.status(404).send('Evento não encontrado');
 
-    if (req.session.usuario.tipo === 'cliente' && evento.usuarioId.toString() !== req.session.usuarioId) {
-      return res.status(403).send('Você não pode atualizar este evento');
+    if (!evento) {
+      return res.status(404).json({ erro: 'Evento não encontrado' });
     }
 
-    const eventoAtualizado = await Evento.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(eventoAtualizado);
+    // 🔹 Se for cliente, só pode editar o próprio evento
+    if (usuario.tipo === 'cliente') {
+      if (evento.usuarioId.toString() !== usuario.id) {
+        return res.status(403).json({ erro: 'Você não pode editar este evento.' });
+      }
+    }
+
+    // 🔹 Atualiza campos permitidos
+    Object.assign(evento, req.body);
+    await evento.save();
+
+    res.json({
+      sucesso: true,
+      mensagem: 'Evento atualizado com sucesso!',
+      evento
+    });
+
   } catch (err) {
-    res.status(500).json({ error: 'Erro ao atualizar evento.' });
+    console.error('Erro ao atualizar evento:', err);
+    res.status(500).json({ erro: 'Erro ao atualizar evento.' });
   }
 });
 
-// Confirmar evento (apenas profissional pode confirmar)
+
+// Confirmar evento (apenas profissional)
 router.put('/:id/confirmar', autenticar, apenasProfissionais, async (req, res) => {
   try {
     const evento = await Evento.findByIdAndUpdate(
@@ -290,5 +303,6 @@ router.put('/:id/confirmar', autenticar, apenasProfissionais, async (req, res) =
     res.status(500).send('Erro ao confirmar evento');
   }
 });
+
 
 module.exports = router;

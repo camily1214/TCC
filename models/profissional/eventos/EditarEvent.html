@@ -4,22 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Editar Evento</title>
-
-  <!-- Navbar -->
   <link rel="stylesheet" href="/css/navbar.css" />
 
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #c5c6c8;
-      color: #000000;
+      color: #000;
       margin: 0;
       padding: 0;
     }
 
     .container {
-      max-width: 600px;
-      margin: 50px auto;
+      max-width: 650px;
+      margin: 60px auto;
       background-color: #727277;
       padding: 30px;
       border-radius: 10px;
@@ -27,18 +25,12 @@
 
     h2 {
       text-align: center;
-      color: #000000;
+      color: #000;
+      margin-bottom: 25px;
     }
 
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: bold;
-    }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 6px; font-weight: bold; }
 
     input, select {
       width: 100%;
@@ -48,141 +40,176 @@
       font-size: 16px;
     }
 
+    .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+
+    /* ===== BOTÕES PADRONIZADOS ===== */
     button {
-      background-color: #000000;
-      color: #fff;
-      padding: 12px;
       border: none;
-      border-radius: 5px;
-      width: 100%;
+      border-radius: 6px;
       font-size: 16px;
       cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 12px;
+      height: 45px;
     }
 
-    button:hover {
-      background-color: #232424;
-    }
-    
-        .bebida-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    .btn-primary {
+      flex: 1;
+      background-color: #000;
+      color: #fff;
+      font-weight: 500;
     }
 
+    .btn-primary:hover { background-color: #232424; }
+    .btn-secondary { flex: 1; background-color: #000; color: #fff; font-weight: 500; }
+    .btn-secondary:hover { background-color: #333; }
+    .btn-full { width: 100%; background-color: #000000; color: #fff; font-weight: 500; }
+    .btn-full:hover { background-color: #333; }
+    .form-row button { min-width: 48%; text-align: center; }
+
+    .bebida-container { display: flex; flex-wrap: wrap; gap: 8px; }
     .bebida-opcao {
-      font-family: Arial, sans-serif;
-      padding: 6px 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      cursor: pointer;
-      background-color: #f0f0f0;
-      font-size: 14px;
-      transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+      padding: 6px 10px; border: 1px solid #ccc; border-radius: 6px;
+      cursor: pointer; background-color: #f0f0f0; font-size: 14px; transition: all 0.2s;
     }
+    .bebida-opcao.selecionado { background-color: #000; color: white; border-color: #000; }
 
-    .bebida-opcao.selecionado {
-      background-color: #000000;
-      color: white;
-      border-color: #000000;
-    }
-
-    /* Navbar personalizada */
-    .custom-navbar {
-      background-color: #727277 !important;
-    }
-
-    .custom-navbar .nav-link {
-      color: #fff !important;
-      font-weight: bold;
-    }
-
-    .custom-navbar .nav-link:hover {
-      text-decoration: underline;
-    }
+    .custom-navbar { background-color: #727277 !important; }
+    .custom-navbar .nav-link { color: #fff !important; font-weight: bold; }
+    .custom-navbar .nav-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-
-  <!-- Navbar -->
   <div id="navbar-placeholder"></div>
 
   <div class="container">
     <h2>Editar Evento</h2>
     <form id="form-editar-evento">
-      <div class="form-group">
-        <label for="data_evento">Data do Evento</label>
-        <input type="date" id="data_evento" name="data_evento" required>
+      <!-- PASSO 1 -->
+      <div id="passo1">
+        <div class="form-row">
+          <div class="form-group" style="flex:1; margin-right:10px;">
+            <label for="data_evento">Data do Evento</label>
+            <input type="date" id="data_evento" name="data_evento" readonly>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label for="hora_evento">Horário</label>
+            <input type="time" id="hora_evento" name="hora_evento" readonly>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex:1;">
+            <label for="tipo_evento">Tipo de Evento</label>
+            <select id="tipo_evento" name="tipo_evento" required>
+              <option value="">Selecione...</option>
+              <option value="aniversario">Aniversário</option>
+              <option value="casamento">Casamento</option>
+              <option value="empresarial">Empresarial</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label for="acesso">Acesso</label>
+            <select id="acesso" name="acesso" required>
+              <option value="">Selecione...</option>
+              <option value="pulseira">Pulseira</option>
+              <option value="lista">Lista</option>
+              <option value="livre">Livre</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label for="num_convidados">Nº de Convidados</label>
+            <select id="num_convidados" name="num_convidados" required>
+              <option value="">Selecione...</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+              <option value="200">200</option>
+              <option value="300">300</option>
+              <option value="500">500</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex:1;">
+            <label for="tipo_comida">Tipo de Comida</label>
+            <select id="tipo_comida" name="tipo_comida" required>
+              <option value="">Selecione...</option>
+              <option value="buffet">Buffet</option>
+              <option value="coquetel">Coquetel</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="tipo_bebida">Tipo de Bebida</label>
+          <div id="bebida-opcoes" class="bebida-container">
+            <div class="bebida-opcao" data-value="refrigerante">Refrigerante</div>
+            <div class="bebida-opcao" data-value="agua">Água</div>
+            <div class="bebida-opcao" data-value="suco">Suco</div>
+            <div class="bebida-opcao" data-value="cerveja">Cerveja</div>
+            <div class="bebida-opcao" data-value="vinho">Vinho</div>
+          </div>
+          <input type="hidden" id="tipo_bebida" name="tipo_bebida" required>
+        </div>
+
+        <div class="form-row" style="margin-top:20px;">
+          <button type="button" class="btn-secondary" onclick="window.location.href='/api/eventos/editar/cancelar'">Cancelar</button>
+          <button type="button" class="btn-primary" id="btn-avancar">Avançar</button>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label for="hora_evento">Horário</label>
-        <input type="time" id="hora_evento" name="hora_evento" required>
+      <!-- PASSO 2 -->
+      <div id="passo2" style="display:none;">
+        <div class="form-row">
+          <div class="form-group" style="flex:1;">
+            <label for="rua">Rua</label>
+            <input type="text" id="rua" name="rua" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex:1;">
+            <label for="numero">Número</label>
+            <input type="text" id="numero" name="numero" required>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label for="cep">CEP</label>
+            <input type="text" id="cep" name="cep" required>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label for="estado">Estado</label>
+            <input type="text" id="estado" name="estado" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group" style="flex:1;">
+            <label for="cidade">Cidade</label>
+            <input type="text" id="cidade" name="cidade" required>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label for="bairro">Bairro</label>
+            <input type="text" id="bairro" name="bairro" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="complemento">Complemento</label>
+          <input type="text" id="complemento" name="complemento">
+        </div>
+
+        <div class="form-row" style="margin-top:15px;">
+          <button type="button" class="btn-secondary" id="btn-voltar">Voltar</button>
+          <button type="submit" class="btn-primary">Salvar Alterações</button>
+        </div>
+
+        <div style="margin-top:8px;">
+          <button type="button" class="btn-full" onclick="window.location.href='/api/eventos/editar/cancelar'">
+            Cancelar alterações
+          </button>
+        </div>
       </div>
-
-      <div class="form-group">
-        <label for="tipo_evento">Tipo de Evento</label>
-        <select id="tipo_evento" name="tipo_evento" required>
-          <option value="">Selecione...</option>
-          <option value="aniversario">Aniversário</option>
-          <option value="casamento">Casamento</option>
-          <option value="empresarial">Empresarial</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="acesso">Acesso</label>
-        <select id="acesso" name="acesso" required>
-          <option value="">Selecione...</option>
-          <option value="pulseira">Pulseira</option>
-          <option value="lista">Lista</option>
-          <option value="livre">Livre</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="tipo_comida">Tipo de Comida</label>
-        <select id="tipo_comida" name="tipo_comida" required>
-          <option value="">Selecione...</option>
-          <option value="buffet">Buffet</option>
-          <option value="coquetel">Coquetel</option>
-        </select>
-      </div>
-
-     <div class="form-group">
-  <label for="tipo_bebida">Tipo de Bebida</label>
-  <div id="bebida-opcoes" class="bebida-container">
-    <div class="bebida-opcao" data-value="refrigerante">Refrigerante</div>
-    <div class="bebida-opcao" data-value="agua">Água</div>
-    <div class="bebida-opcao" data-value="suco">Suco</div>
-    <div class="bebida-opcao" data-value="cerveja">Cerveja</div>
-    <div class="bebida-opcao" data-value="vinho">Vinho</div>
-  </div>
-  <input type="hidden" id="tipo_bebida" name="tipo_bebida" required>
-</div>
-
-      <div class="form-group">
-        <label for="num_convidados">Número de Convidados</label>
-        <select id="num_convidados" name="num_convidados" required>
-          <option value="">Selecione...</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-          <option value="200">200</option>
-          <option value="300">300</option>
-          <option value="500">500</option>
-        </select>
-      </div>
-
-      <button type="submit">Salvar Alterações</button>
-
-      <br></br>
-
-      <button
-         type="button"
-         class="btn btn-secondary"
-         onclick="window.location.href='/api/eventos/editar/cancelar'">
-         Cancelar alterações
-      </button>
-
     </form>
   </div>
 
@@ -191,123 +218,113 @@
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const eventoId = urlParams.get('id');
+    const passo1 = document.getElementById('passo1');
+    const passo2 = document.getElementById('passo2');
+    const btnAvancar = document.getElementById('btn-avancar');
+    const btnVoltar = document.getElementById('btn-voltar');
+    const form = document.getElementById('form-editar-evento');
+    const campoHidden = document.getElementById('tipo_bebida');
+    const opcoesBebida = document.querySelectorAll('.bebida-opcao');
+    let selecionados = [];
+    let tipoUsuario = "";
 
     async function carregarDados() {
       if (!eventoId) return alert('ID do evento não informado');
-
       try {
         const resposta = await fetch(`/api/eventos/${eventoId}`);
         const evento = await resposta.json();
-
-        document.getElementById('data_evento').value = evento.data_evento.split('T')[0];
-        document.getElementById('hora_evento').value = evento.hora_evento;
-        document.getElementById('tipo_evento').value = evento.tipo_evento;
-        document.getElementById('acesso').value = evento.acesso;
-        document.getElementById('tipo_comida').value = evento.tipo_comida;
-        document.getElementById('tipo_bebida').value = evento.tipo_bebida;
-        document.getElementById('num_convidados').value = evento.num_convidados;
+        document.getElementById('data_evento').value = new Date(evento.data_evento).toISOString().split('T')[0];
+        document.getElementById('hora_evento').value = evento.hora_evento || '';
+        document.getElementById('tipo_evento').value = evento.tipo_evento || '';
+        document.getElementById('acesso').value = evento.acesso || '';
+        document.getElementById('tipo_comida').value = evento.tipo_comida || '';
+        document.getElementById('num_convidados').value = evento.num_convidados || '';
+        selecionados = evento.tipo_bebida ? evento.tipo_bebida.split(',') : [];
+        opcoesBebida.forEach(o => { if (selecionados.includes(o.dataset.value)) o.classList.add('selecionado'); });
+        campoHidden.value = selecionados.join(',');
+        ['rua','numero','cep','estado','cidade','bairro','complemento'].forEach(campo=>{
+          document.getElementById(campo).value = evento[campo] || '';
+        });
       } catch (err) {
         alert('Erro ao carregar dados do evento');
       }
     }
 
-    document.getElementById('form-editar-evento').addEventListener('submit', async (e) => {
+    btnAvancar.onclick = () => { passo1.style.display = 'none'; passo2.style.display = 'block'; };
+    btnVoltar.onclick = () => { passo2.style.display = 'none'; passo1.style.display = 'block'; };
+
+    opcoesBebida.forEach(opcao => {
+      opcao.onclick = () => {
+        const valor = opcao.dataset.value;
+        if (selecionados.includes(valor)) {
+          selecionados = selecionados.filter(v => v !== valor);
+          opcao.classList.remove('selecionado');
+        } else {
+          selecionados.push(valor);
+          opcao.classList.add('selecionado');
+        }
+        campoHidden.value = selecionados.join(',');
+      };
+    });
+
+    async function carregarNavbar() {
+      const r = await fetch('/api/usuarios/tipo', { credentials: 'include' });
+      if (!r.ok) return;
+      const d = await r.json();
+      tipoUsuario = d.tipo;
+      const htmlNavbar = await fetch(
+        d.tipo === 'cliente' ? '/components/navbarclient.html' : '/components/navbarprof.html'
+      ).then(res => res.text());
+      document.getElementById("navbar-placeholder").innerHTML = htmlNavbar;
+    }
+
+    // === ✅ NOVA FUNÇÃO DE SALVAR ALTERAÇÕES ===
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const dados = {
-        data_evento: document.getElementById('data_evento').value,
-        hora_evento: document.getElementById('hora_evento').value,
-        tipo_evento: document.getElementById('tipo_evento').value,
-        acesso: document.getElementById('acesso').value,
-        tipo_comida: document.getElementById('tipo_comida').value,
-        num_convidados: document.getElementById('num_convidados').value
-      };
-
-      try {
-        const resposta = await fetch(`/api/eventos/${eventoId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(dados)
-        });
-
-        if (resposta.ok) {
-          alert('Evento atualizado com sucesso!');
-          window.location.href = '/api/eventos/lista';
-        } else {
-          alert('Erro ao atualizar evento.');
-        }
-      } catch (err) {
-        alert('Erro ao enviar os dados.');
-      }
-    });
-
-    // Carregar dados ao abrir a página
-    carregarDados();
-
-      const opcoes = document.querySelectorAll('.bebida-opcao');
-  const campoHidden = document.getElementById('tipo_bebida');
-  let selecionados = [];
-
-  document.querySelector('form').addEventListener('submit', function (e) {
-  if (!campoHidden.value) {
-    alert("Selecione pelo menos uma opção de bebida.");
-    e.preventDefault();
-  }
-});
-
-  opcoes.forEach(opcao => {
-    opcao.addEventListener('click', () => {
-      const valor = opcao.getAttribute('data-value');
-      if (selecionados.includes(valor)) {
-        selecionados = selecionados.filter(v => v !== valor);
-        opcao.classList.remove('selecionado');
-      } else {
-        selecionados.push(valor);
-        opcao.classList.add('selecionado');
-      }
-      campoHidden.value = selecionados.join(',');
-    });
-  });
-
-// Carregar navbar
-  async function carregarNavbar() {
-    try {
-      // 1. Pergunta ao backend o tipo do usuário
-      const resposta = await fetch('/api/usuarios/tipo', { credentials: 'include' });
-      if (!resposta.ok) throw new Error("Falha ao validar usuário");
-
-      const dados = await resposta.json();
-      let urlNavbar = "";
-
-      // 2. Decide qual navbar carregar
-      if (dados.tipo === "cliente") {
-        urlNavbar = "/components/navbarclient.html";
-      } else if (dados.tipo === "profissional") {
-        urlNavbar = "/components/navbarprof.html";
-      } else {
-        console.warn("Usuário não autenticado ou tipo indefinido");
+      if (!eventoId) {
+        alert("Evento inválido. Recarregue a página.");
         return;
       }
 
-      // 3. Carrega a navbar correta
-      const htmlNavbar = await fetch(urlNavbar).then(res => res.text());
-      document.getElementById("navbar-placeholder").innerHTML = htmlNavbar;
+      const dados = Object.fromEntries(new FormData(form).entries());
 
-    } catch (err) {
-      console.error("Erro ao carregar navbar:", err);
-    }
-  }
+      try {
+        const resposta = await fetch(`/api/eventos/${eventoId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dados),
+        });
 
-  document.addEventListener("DOMContentLoaded", carregarNavbar);
+        const texto = await resposta.text();
+        let resultado;
+        try {
+          resultado = JSON.parse(texto);
+        } catch {
+          throw new Error(`Resposta inesperada do servidor: ${texto}`);
+        }
 
-  // carregar footer
-        fetch('/components/footer.html')
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById('footer-placeholder').innerHTML = data;
-    })
-    .catch(err => console.error('Erro ao carregar rodapé:', err));
+        if (!resposta.ok) {
+          throw new Error(resultado.erro || resultado.mensagem || "Erro ao atualizar evento.");
+        }
+
+        alert("✅ " + resultado.mensagem);
+        window.location.href = "/api/eventos/lista-eventos-html";
+      } catch (err) {
+        console.error("Erro ao enviar alterações:", err);
+        alert("Erro ao enviar alterações: " + err.message);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      await carregarNavbar();
+      await carregarDados();
+      const footerHtml = await fetch('/components/footer.html').then(r => r.text());
+      document.getElementById('footer-placeholder').innerHTML = footerHtml;
+    });
+
+    document.addEventListener("DOMContentLoaded", carregarNavbar);
+    fetch('/components/footer.html').then(r => r.text()).then(d => document.getElementById('footer-placeholder').innerHTML = d);
   </script>
-
 </body>
 </html>
