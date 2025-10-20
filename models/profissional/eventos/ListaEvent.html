@@ -230,6 +230,7 @@
       eventosPagina.forEach(evento => {
         const data = evento.data_evento ? new Date(evento.data_evento) : null;
         const dataFormatada = data ? data.toLocaleDateString('pt-BR') : '-';
+        const horaFormatada = evento.hora_evento || '-';
         const status = evento.status || 'aguardando';
 
         const div = document.createElement('div');

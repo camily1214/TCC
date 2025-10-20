@@ -1,78 +1,142 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Navbar Personalizada</title>
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Navbar Cliente Padronizada</title>
   <style>
     /* Reset básico */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       padding-top: 100px; /* espaço para a navbar fixa */
+      background-color: #f4f4f4;
     }
 
     /* NAVBAR */
-   .navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background-color: #737372;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 40px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-}
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      background-color: #737372;
+      color: #000;
+      display: flex;
+      align-items: center;
+      z-index: 1000;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
 
-.navbar .logo img {
-  height: 60px;
-}
+    .navbar-container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 24px;
+    }
 
-.nav-links {
-  display: flex;
-  gap: 20px;
-  list-style: none;
-}
+    .logo img {
+      height: 60px;
+      display: block;
+    }
 
-.nav-links li a {
-  color: #000000;
-  text-decoration: none;
-  font-size: 1rem;
-  padding: 12px 20px;
-  display: block;
-  border-radius: 5px;
-}
+    .nav-links {
+      display: flex;
+      gap: 18px;
+      list-style: none;
+      align-items: center;
+    }
 
-.nav-links li a:hover {
-  background-color: #b7b4af;
-  color: #000;
-  border-radius: 10px;
-}
+    .nav-links li {
+      position: relative;
+    }
+
+    .nav-links a {
+      display: block;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #000;
+      text-decoration: none;
+      transition: background-color .15s ease;
+    }
+
+    .nav-links a:hover {
+      background-color: #8c8c8c;
+      color: #000;
+    }
+
+    /* Dropdown */
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      background-color: #737372;
+      border-radius: 8px;
+      min-width: 200px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+      z-index: 999;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .dropdown-content a {
+      padding: 10px 14px;
+      color: #000;
+      text-decoration: none;
+      display: block;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #8c8c8c;
+    }
+
+    /* mostrar dropdown on hover (desktop) */
+    .nav-links li:hover .dropdown-content {
+      display: flex;
+    }
+
+    /* seta pequena */
+    .arrow { margin-left: 6px; font-size: .85rem; }
+
+    /* responsividade básica: empilha (mobile) */
+    @media (max-width: 780px) {
+      .navbar-container { padding: 10px 12px; }
+      .nav-links { gap: 8px; }
+      .nav-links a { padding: 8px 10px; font-size: .95rem; }
+      .logo img { height: 48px; }
+    }
   </style>
 </head>
 <body>
-  <!-- Navbar personalizada -->
-  <nav id="navbar-client" class="navbar">
-  <div class="logo">
-    <a href="/"><img src="/imagens/logo.png" alt="Logo" /></a>
-  </div>
+  <nav class="navbar" aria-label="Barra de navegação principal">
+    <div class="navbar-container">
+      <div class="logo">
+        <a href="/"><img src="/imagens/logo.png" alt="Logo" /></a>
+      </div>
 
-  <ul class="nav-links">
-    <li><a href="/notificacoes/cliente">Notificações</a></li>
-    <li><a href="/api/eventos/meus-eventos">Meus Eventos</a></li>
-    <li><a href="/api/eventos/escolher-data">Criar Um Novo Agendamento</a></li>
-    <li><a href="/api/usuarios/meu-perfil">Meu Perfil</a></li>
-    <li><a href="/api/usuarios/logout">Sair</a></li>
-  </ul>
-</nav>
+      <ul class="nav-links">
+        <!-- Dropdown Eventos -->
+        <li>
+          <a href="#" aria-haspopup="true" aria-expanded="false">
+            Serviços<span class="arrow">▼</span>
+          </a>
+          <div class="dropdown-content" role="menu" aria-label="Menu de eventos">
+            <a href="/api/eventos/meus-eventos" role="menuitem">Meus Serviços</a>
+            <a href="/api/eventos/escolher-data" role="menuitem">Agendar Serviço</a>
+          </div>
+        </li>
+
+        <!-- Links simples -->
+        <li><a href="/api/usuarios/meu-perfil">Meu Perfil</a></li>
+        <li><a href="/api/usuarios/logout">Sair</a></li>
+      </ul>
+    </div>
+  </nav>
 </body>
 </html>
