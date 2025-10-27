@@ -56,7 +56,7 @@ router.get('/ListaUsu', autenticar, apenasProfissionais, (req, res) => {
 });
 
 router.get('/pos-login', autenticar, apenasClientes, (req, res) => {
-  res.redirect('/api/eventos/pos-login');
+  res.sendFile(path.join(__dirname, '../models/profissional/usuarios/PosLogin.html'));
 });
 
 router.get('/me', autenticar, apenasClientes, async (req, res) => {
@@ -122,42 +122,27 @@ router.post('/cadastro', async (req, res) => {
       rua, numero, complemento, bairro, cidade, estado, cep
     } = req.body;
 
-    // Validação de campos obrigatórios
-    if (
-      !tipo || !nome || !sobrenome || !cpf || !datanasc || !telefone || !genero ||
-      !email || !senha || !confirmaSenha || !rua || !numero || !bairro || !cidade || !estado || !cep
-    ) {
-      return res.status(400).json({ mensagem: 'Preencha todos os campos obrigatórios.' });
+    if (!tipo || !nome || !sobrenome || !cpf || !datanasc || !telefone || !genero ||
+        !email || !senha || !confirmaSenha || !rua || !numero || !bairro || !cidade || !estado || !cep) {
+      return res.status(400).send('Preencha todos os campos obrigatórios.');
     }
 
     if (senha !== confirmaSenha) {
-      return res.status(400).json({ mensagem: 'As senhas não coincidem.' });
+      return res.status(400).send('As senhas não coincidem.');
     }
 
     // Verifica se o CPF já está cadastrado
     const cpfExistente = await Usuario.findOne({ cpf });
-    if (cpfExistente) {
-      return res.status(400).json({ mensagem: 'CPF já cadastrado.' });
-    }
+    if (cpfExistente) return res.status(400).send('CPF já cadastrado.');
 
-    // Verifica se o E-MAIL já está cadastrado
-      const emailExistente = await Usuario.findOne({ email });
-        if (emailExistente) {
-        return res.status(400).json({ mensagem: 'E-mail já cadastrado.' });
-      }
-
-    // Verifica se o domínio do email é do Google (Gmail ou GSuite)
-      const emailGoogle = await verificarEmailGoogle(email);
-        if (!emailGoogle) {
-        return res.status(400).json({ mensagem: 'O email informado não pertence ao Google (Gmail/GSuite).' });
-      }
+    const emailExistente = await Usuario.findOne({ email });
+    if (emailExistente) return res.status(400).send('E-mail já cadastrado.');
 
     // Criptografar senha
     const senhaCriptografada = await bcrypt.hash(senha, 10);
 
-    // Criar novo usuário
     const novoUsuario = new Usuario({
-      tipo: tipo.toLowerCase(), // garante "cliente" ou "profissional"
+      tipo: tipo.toLowerCase(),
       nome,
       sobrenome,
       datanasc: new Date(datanasc),
@@ -175,13 +160,22 @@ router.post('/cadastro', async (req, res) => {
       cep
     });
 
-    await novoUsuario.save();
+    const usuarioSalvo = await novoUsuario.save();
 
-    res.redirect('/cadastro-sucesso');
+    // Cria sessão automaticamente após cadastro
+    req.session.usuario = {
+      id: usuarioSalvo._id.toString(),
+      nome: usuarioSalvo.nome,
+      email: usuarioSalvo.email,
+      tipo: usuarioSalvo.tipo
+    };
+
+    // Retorna o tipo para o frontend decidir o redirecionamento
+    res.status(200).json({ mensagem: 'Usuário cadastrado com sucesso', tipo: usuarioSalvo.tipo });
 
   } catch (erro) {
     console.error('Erro ao cadastrar usuário:', erro);
-    res.status(500).json({ mensagem: 'Erro ao cadastrar usuário.' });
+    res.status(500).send('Erro ao cadastrar usuário.');
   }
 });
 

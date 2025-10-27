@@ -6,8 +6,6 @@ const Evento = require('../models/profissional/eventos/Event');
 // Importar middlewares de autenticação
 const { autenticar, apenasClientes, apenasProfissionais } = require('../middlewares/autenticar');
 
-// 🔹 PÁGINAS HTML
-
 // Lista de eventos
 router.get('/lista-eventos-html', autenticar, (req, res) => {
   res.sendFile(path.join(__dirname, '../models/profissional/eventos/ListaEvent.html'));
@@ -75,7 +73,7 @@ router.post('/novo-evento', autenticar, async (req, res) => {
   try {
     const {
       acesso, tipo_evento, tipo_comida, tipo_bebida,
-      num_convidados, data_evento, hora_evento,
+      num_convidados, data_evento, hora_evento, hora_fim_evento, descricao_evento,
       rua, numero, complemento, bairro, cidade, estado, cep,
     } = req.body;
 
@@ -84,13 +82,13 @@ router.post('/novo-evento', autenticar, async (req, res) => {
 
     const novoEvento = new Evento({
       acesso, tipo_evento, tipo_comida, tipo_bebida,
-      num_convidados, data_evento: dataFinal, hora_evento,
+      num_convidados, data_evento: dataFinal, hora_evento, hora_fim_evento, descricao_evento,
       rua, numero, complemento, bairro, cidade, estado, cep,
       usuarioId: req.session.usuario.id
     });
 
     await novoEvento.save();
-    res.redirect('/api/eventos/sucesso');
+    res.redirect('/sucesso');
   } catch (err) {
     console.error('Erro ao cadastrar evento:', err);
     res.status(500).send('Erro ao cadastrar evento.');
@@ -111,24 +109,25 @@ router.get('/meus-eventos/dados', autenticar, apenasClientes, async (req, res) =
   }
 });
 
-// Datas agendadas (para calendário)
-router.get('/datas-agendadas', autenticar, async (req, res) => {
+router.get('/datas-agendadas', async (req, res) => {
   try {
-    const eventos = await Evento.find({}, 'data_evento').lean();
-    const datas = eventos.map(e => {
-      const d = new Date(e.data_evento);
-      const ano = d.getFullYear();
-      const mes = String(d.getMonth() + 1).padStart(2, '0');
-      const dia = String(d.getDate()).padStart(2, '0');
-      return `${ano}-${mes}-${dia}`;
-    });
-    const datasUnicas = [...new Set(datas)];
-    res.json(datasUnicas);
+    // Apenas eventos confirmados pelo profissional
+    const eventosConfirmados = await Evento.find(
+      { status: 'confirmado' },
+      'data_evento'
+    );
+
+    const datasConfirmadas = eventosConfirmados.map(e =>
+      e.data_evento.toISOString().split('T')[0]
+    );
+
+    res.json(datasConfirmadas);
   } catch (err) {
-    console.error('Erro ao buscar datas:', err);
-    res.status(500).json({ error: 'Erro ao buscar datas' });
+    console.error('Erro ao buscar datas confirmadas:', err);
+    res.status(500).json({ erro: 'Erro ao buscar eventos confirmados' });
   }
 });
+
 
 // Listar todos os eventos (profissionais)
 router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) => {
@@ -165,6 +164,8 @@ router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) =>
         tipo_comida: e.tipo_comida || '-',
         data_evento: dataFormatada,
         hora_evento: e.hora_evento || '--:--',
+        hora_fim_evento: e.hora_fim_evento || '--:--',
+        descricao_evento: e.descricao_evento || '-',
         rua: e.rua || '-',
         numero: e.numero || '-',
         complemento: e.complemento || '-',
@@ -261,15 +262,15 @@ router.delete('/:id', autenticar, async (req, res) => {
 // Confirmar evento (profissional)
 router.put('/:id/confirmar', autenticar, apenasProfissionais, async (req, res) => {
   try {
-    const evento = await Evento.findByIdAndUpdate(
+    await Evento.findByIdAndUpdate(
       req.params.id,
-      { confirmado: true },
-      { new: true }
+      { status: 'confirmado' },
+      { runValidators: false } // ✅ ignora os campos obrigatórios
     );
-    if (!evento) return res.status(404).send('Evento não encontrado');
-    res.json(evento);
+    res.json({ sucesso: true });
   } catch (err) {
-    res.status(500).send('Erro ao confirmar evento');
+    console.error("Erro ao atualizar status:", err);
+    res.status(500).json({ erro: "Erro ao atualizar status" });
   }
 });
 

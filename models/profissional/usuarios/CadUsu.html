@@ -65,6 +65,7 @@
       border: 1px solid #ccc;
       border-radius: 5px;
       box-sizing: border-box;
+      gap: 8px;
     }
 
     input::placeholder {
@@ -80,6 +81,7 @@
       font-size: 16px;
       cursor: pointer;
       border-radius: 5px;
+      gap: 8px;
     }
 
     button:hover {
@@ -302,86 +304,65 @@
   });
 </script>
 
-  <script>
-  const form = document.querySelector('form');
-  const errosDiv = document.getElementById('erros');
+<script>
+const form = document.querySelector('form');
+const errosDiv = document.getElementById('erros');
 
-  form.addEventListener('submit', async function (event) {
-    errosDiv.classList.add('d-none');
-    errosDiv.innerHTML = '';
+form.addEventListener('submit', async function (event) {
+  event.preventDefault();
+  errosDiv.classList.add('d-none');
+  errosDiv.innerHTML = '';
 
-    const erros = [];
+  const formData = {
+    tipo: document.getElementById('tipo').value,
+    nome: document.getElementById('nome').value.trim(),
+    sobrenome: document.getElementById('sobrenome').value.trim(),
+    cpf: document.getElementById('cpf').value.trim(),
+    datanasc: document.getElementById('datanasc').value,
+    telefone: document.getElementById('telefone').value.trim(),
+    genero: document.getElementById('genero').value,
+    email: document.getElementById('email').value.trim(),
+    senha: document.getElementById('senha').value,
+    confirmaSenha: document.getElementById('confirmaSenha').value,
+    rua: document.getElementById('rua').value.trim(),
+    numero: document.getElementById('numero').value.trim(),
+    complemento: document.getElementById('complemento').value.trim(),
+    bairro: document.getElementById('bairro').value.trim(),
+    cidade: document.getElementById('cidade').value.trim(),
+    estado: document.getElementById('estado').value,
+    cep: document.getElementById('cep').value.trim()
+  };
 
-    const tipo = document.getElementById('tipo').value.trim();
-    const nome = document.getElementById('nome').value.trim();
-    const sobrenome = document.getElementById('sobrenome').value.trim();
-    const cpf = document.getElementById('cpf').value.trim();
-    const datanasc = document.getElementById('datanasc').value;
-    const telefone = document.getElementById('telefone').value.trim();
-    const genero = document.getElementById('genero').value;
-    const email = document.getElementById('email').value.trim();
-    const senha = document.getElementById('senha').value;
-    const confirmaSenha = document.getElementById('confirmaSenha').value;
-    const rua = document.getElementById('rua').value.trim();
-    const numero = document.getElementById('numero').value.trim();
-    const complemento = document.getElementById('complemento').value.trim();
-    const bairro = document.getElementById('bairro').value.trim();
-    const cidade = document.getElementById('cidade').value.trim();
-    const estado = document.getElementById('estado').value;
-    const cep = document.getElementById('cep').value.trim();
-
-    // Validações
-    if (tipo === '') erros.push('O campo Tipo é obrigatório.');
-    if (nome === '') erros.push('O campo Nome é obrigatório.');
-    if (sobrenome === '') erros.push('O campo Sobrenome é obrigatório.');
-    if (!datanasc) erros.push('A Data de Nascimento é obrigatória.');
-    if (!genero) erros.push('Selecione um gênero.');
-    if (email === '') erros.push('O campo E-mail é obrigatório.');
-    if (telefone === '') erros.push('O campo Telefone é obrigatório.');
-    if (!senha) erros.push('O campo Senha é obrigatório.');
-    if (!confirmaSenha) erros.push('O campo Confirmação de Senha é obrigatório.');
-    if (senha && senha.length < 6) erros.push('A senha deve ter pelo menos 6 caracteres.');
-    if (senha && confirmaSenha && senha !== confirmaSenha) erros.push('As senhas não coincidem.');
-    if (rua === '') erros.push('O campo Rua é obrigatório.');
-    if (numero === '') erros.push('O campo Número é obrigatório.');
-    if (bairro === '') erros.push('O campo Bairro é obrigatório.');
-    if (cidade === '') erros.push('O campo Cidade é obrigatório.');
-    if (!estado) erros.push('Selecione um estado.');
-    if (cep === '') erros.push('O campo CEP é obrigatório.');
-
-    if (erros.length > 0) {
-      event.preventDefault();
-      errosDiv.innerHTML = erros.map(erro => `<div>${erro}</div>`).join('');
-      errosDiv.classList.remove('d-none');
-      window.scrollTo(0, 0);
-      return;
-    }
-
-    // Envio com fetch (AJAX)
-    event.preventDefault(); // Impede envio padrão
-    const formData = {
-      tipo, nome, sobrenome, cpf, datanasc, telefone, genero, email, senha, confirmaSenha,
-      rua, numero, complemento, bairro, cidade, estado, cep
-    };
-
-    try {
-      const resposta = await fetch('/api/usuarios/cadastro', {  // corrigido
+  try {
+    const resposta = await fetch('/api/usuarios/cadastro', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(formData)
     });
 
-      if (resposta.ok) {
-        window.location.href = '/ListaUsu';
-      } else {
-        const msg = await resposta.text();
-        alert('Erro ao cadastrar usuário:\n' + msg);
-      }
-    } catch (err) {
-      console.error('Erro:', err);
-      alert('Erro ao tentar enviar o formulário.');
+    if (!resposta.ok) {
+      const msg = await resposta.text();
+      alert('Erro ao cadastrar: ' + msg);
+      return;
     }
-  });
+
+    const dados = await resposta.json();
+
+    // Redirecionamento automático
+    if (dados.tipo === 'cliente') {
+      window.location.href = '/api/eventos/pos-login'; // página do cliente
+    } else if (dados.tipo === 'profissional') {
+      window.location.href = '/api/profissional/pagina-inicial'; // página do profissional
+    } else {
+      alert('Cadastro concluído, mas tipo de usuário não identificado.');
+    }
+
+  } catch (err) {
+    console.error('Erro:', err);
+    alert('Erro ao tentar enviar o formulário.');
+  }
+});
 
 // Carregar navbar
   async function carregarNavbar() {

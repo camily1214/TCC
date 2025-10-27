@@ -228,8 +228,8 @@
       const eventosPagina = lista.slice(inicio, fim);
 
       eventosPagina.forEach(evento => {
-        const data = evento.data_evento ? new Date(evento.data_evento) : null;
-        const dataFormatada = data ? data.toLocaleDateString('pt-BR') : '-';
+        const dataFormatada = evento.data_evento && evento.data_evento !== '-' 
+        ? evento.data_evento : '-';
         const horaFormatada = evento.hora_evento || '-';
         const status = evento.status || 'aguardando';
 

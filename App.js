@@ -76,6 +76,11 @@ app.get('/login', (req, res) =>
   res.sendFile(path.join(__dirname, 'models/Login.html'))
 );
 
+app.get('/pos-login', (req, res) => 
+  res.sendFile(path.join (__dirname,'/models/profissional/eventos/PosLogin.html'))
+);
+
+
 app.get('/eventos/meus-eventos.html', async (req, res) => {
   try {
     if (!req.session.usuario.id) return res.redirect('/login');

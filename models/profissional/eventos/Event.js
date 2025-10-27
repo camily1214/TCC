@@ -6,16 +6,24 @@ const EventSchema = new mongoose.Schema({
   tipo_bebida: String,
   tipo_comida: String,
   num_convidados: {
-    type: Number, // número deve ser numérico, não string
+    type: Number, 
     required: true
   },
   data_evento: {
-    type: Date, // data em formato Date para funcionar bem com filtros e ordenações
+    type: Date, 
     required: true
   },
   hora_evento: {
     type: String,
     required: true
+  },
+  hora_fim_evento: { 
+    type: String,
+    required: true
+  },
+  descricao_evento: { 
+    type: String,
+    default: ''
   },
   rua: String,
   numero: String,
@@ -37,7 +45,7 @@ const EventSchema = new mongoose.Schema({
     default: 'aguardando'
   },
 
-  // 👇 Campos adicionados para registrar quem e quando alterou o status
+  // Campos adicionados para registrar quem e quando alterou o status
   alteradoPor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Usuario'

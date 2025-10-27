@@ -4,405 +4,405 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cadastro de Evento</title>
-
-  <!--Navbar-->
   <link rel="stylesheet" href="/css/navbar.css" />
-
   <style>
+    :root {
+      --bg: #c5c6c8;
+      --card: #727277;
+      --white: #fff;
+      --black: #000;
+      --gap: 10px;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
       font-family: Arial, sans-serif;
-      background-color: #c5c6c8;
-      color: #000000;
+      background-color: var(--bg);
+      color: var(--black);
       margin: 0;
       padding: 0;
     }
 
-    .form-wrapper, .container-form {
+    .form-wrapper {
       display: flex;
       justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      min-height: 100vh;
+      align-items: flex-start;
       padding: 20px;
       padding-top: 80px;
+      min-height: 100vh;
     }
 
     form {
-      background-color: #727277;
+      background-color: var(--card);
       width: 100%;
-      max-width: 800px;
-      padding: 25px;
+      max-width: 600px;
+      padding: 22px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgb(0, 0, 0);
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
+      overflow: hidden;
+      position: relative;
     }
+
+    /* Classe geral para etapas */
+    .etapa { display: none; }
+    .etapa.ativa { display: block; }
 
     h2, h3 {
       text-align: center;
-      color: #000000;
-    }
-
-    .section {
-      margin-bottom: 25px;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
+      color: var(--black);
+      margin: 6px 0 14px;
     }
 
     label {
-      display: block;
-      margin-bottom: 5px;
-      color: #111;
+      display:block;
+      margin-bottom:6px;
+      font-weight:600;
+      color:#111;
+      font-size:14px;
     }
 
-    input, select {
+    input[type="text"], input[type="date"], input[type="time"], select,
+    textarea {
       width: 100%;
-      padding: 10px;
-      border-radius: 5px;
+      padding: 8px 10px;
+      border-radius: 6px;
       border: none;
-      font-size: 16px;
-    }
-
-    input::placeholder {
-      color: #000000;
+      font-size:14px;
     }
 
     input[readonly] {
-      background-color: #e0e0e0;
-      color: #333;
+      background:#e9e9e9;
+      color:#333;
     }
-
 
     button {
-      background-color: rgb(43, 47, 47);
-      color: white;
-      padding: 12px;
       border: none;
-      width: 100%;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-
-    button:hover {
-      background-color: rgb(0, 0, 0);
-    }
-
-    /* Navbar personalizada */
-    .custom-navbar {
-      background-color: #727277 !important;
-    }
-
-    .custom-navbar .nav-link {
-      color: #fff !important;
-      font-weight: bold;
-    }
-
-    .custom-navbar .nav-link:hover {
-      text-decoration: underline;
-    }
-
-    .bebida-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .bebida-opcao {
-      font-family: Arial, sans-serif;
-      padding: 6px 10px;
-      border: 1px solid #ccc;
       border-radius: 6px;
+      font-size: 15px;
       cursor: pointer;
-      background-color: #f0f0f0;
-      font-size: 14px;
-      transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+      transition: background .18s ease;
+      padding: 10px 12px;
     }
 
-    .bebida-opcao.selecionado {
-      background-color: #000000;
-      color: white;
-      border-color: #000000;
+    .btn-primary { background:#000; color:#fff; font-weight:600; }
+    .btn-primary:hover { background:#232424; }
+    .btn-secondary { background:#444; color:#fff; font-weight:600; }
+    .btn-secondary:hover { background:#333; }
+
+    .section { margin-bottom: 14px; }
+
+    .row {
+      display:flex;
+      gap: var(--gap);
+      align-items:flex-start;
+      margin-bottom:12px;
     }
+
+    .col { flex:1; min-width:0; }
+    .col.small { flex:0 0 160px; }
+    .col.mid { flex:0 0 180px; }
+
+    /* Opções de bebida */
+    .bebida-container {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .bebida-opcao {
+      padding:6px 10px;
+      border-radius:6px;
+      border:1px solid #ccc;
+      background:#f0f0f0;
+      cursor:pointer;
+      font-size:14px;
+      user-select:none;
+    }
+    .bebida-opcao.selecionado {
+      background:#000;
+      color:#fff;
+      border-color:#000;
+    }
+
+    @media (max-width:760px) {
+      .row { flex-direction:column; }
+      .col.small, .col.mid { flex:1; }
+    }
+
+    .placeholder { margin-top:12px; }
+
+    /* Transições suaves */
+    .fade-in {
+      animation: fadeIn .6s ease forwards;
+    }
+    .fade-out {
+      animation: fadeOut .5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-15px); }
+    }
+
+    /* Inicialmente, etapa dados visível e endereço oculto */
+    #etapa-dados { display: block; }
+    #etapa-endereco { display: none; }
+
   </style>
 </head>
 <body>
-
-  <!--Navbar-->
   <div id="navbar-placeholder"></div>
+
   <div class="form-wrapper">
+    <form id="form-evento" action="/api/eventos/novo-evento" method="POST">
 
-  <form action="/api/eventos/novo-evento" method="POST">
+      <!-- Etapa Dados do Evento -->
+      <div id="etapa-dados" class="etapa ativa">
+        <div class="section" style="text-align:center; margin-bottom:10px;">
+          <img src="/imagens/logo.png" alt="Logo" style="width:100px; border-radius:8px;">
+        </div>
+        <h2>Informações do Evento</h2>
 
-    <!-- ETAPA 1: Informações do Evento -->
-      <div id="etapa-evento">
-        <div class="section">
-      <img src="/imagens/logo.png" 
-         alt="Logo"
-         style="width: 110px; height: auto; display: block; margin: 0 auto 1px; border-radius: 10px" />
+        <div class="row">
+          <div class="col small">
+            <label for="data_evento">Data do Evento</label>
+            <input type="date" id="data_evento" name="data_evento" readonly>
+          </div>
+          <div class="col small">
+            <label for="hora_evento">Horário de Início</label>
+            <input type="time" id="hora_evento" name="hora_evento">
+          </div>
+          <div class="col small">
+            <label for="hora_fim_evento">Horário de Término</label>
+            <input type="time" id="hora_fim_evento" name="hora_fim_evento">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col mid">
+            <label for="num_convidados">Nº de Convidados</label>
+            <select id="num_convidados" name="num_convidados" required>
+              <option value="">Selecione...</option>
+              <option value="30">30</option><option value="50">50</option>
+              <option value="100">100</option><option value="150">150</option>
+              <option value="200">200</option><option value="250">250</option>
+              <option value="300">300</option><option value="500">500</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col mid">
+            <label for="acesso">Acesso</label>
+            <select id="acesso" name="acesso" required>
+              <option value="">Selecione...</option>
+              <option value="pulseira">Pulseira</option>
+              <option value="lista">Lista</option>
+              <option value="livre">Livre</option>
+            </select>
+          </div>
+          <div class="col mid">
+            <label for="tipo_evento">Tipo de Evento</label>
+            <select id="tipo_evento" name="tipo_evento" required>
+              <option value="">Selecione...</option>
+              <option value="aniversario">Aniversário</option>
+              <option value="formatura">Formatura</option>
+              <option value="casamento">Casamento</option>
+              <option value="empresarial">Empresarial</option>
+            </select>
+          </div>
+          <div class="col mid">
+            <label for="tipo_comida">Tipo de Comida</label>
+            <select id="tipo_comida" name="tipo_comida" required>
+              <option value="">Selecione...</option>
+              <option value="buffet">Buffet</option>
+              <option value="coquetel">Coquetel</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="tipo_bebida">Tipo de Bebida</label>
+            <div id="bebida-opcoes" class="bebida-container">
+              <div class="bebida-opcao" data-value="agua">Água</div>
+              <div class="bebida-opcao" data-value="suco">Suco</div>
+              <div class="bebida-opcao" data-value="refrigerante">Refrigerante</div>
+              <div class="bebida-opcao" data-value="chop">Chop</div>
+              <div class="bebida-opcao" data-value="cerveja">Cerveja</div>
+              <div class="bebida-opcao" data-value="vinho">Vinho</div>
+              <div class="bebida-opcao" data-value="espumante">Espumante</div>
+            </div>
+            <input type="hidden" id="tipo_bebida" name="tipo_bebida" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="descricao_evento">Descrição / Observações</label>
+            <textarea id="descricao_evento" name="descricao_evento" rows="4" placeholder="Escreva aqui informações extras sobre o evento (opcional)" style="width:100%; padding:8px 10px; border-radius:6px; border:none; font-size:14px;"></textarea>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:18px;">
+          <div class="col" style="display:flex; gap:10px;">
+            <button type="button" id="btn-avancar" class="btn-secondary" style="flex:1;">Avançar ➡️</button>
+            <button type="reset" class="btn-primary" style="flex:1;">Limpar</button>
+          </div>
+        </div>
       </div>
 
-    <div class="section">
-      <h2>Informações do Evento</h2>
+      <!-- Etapa Endereço -->
+      <div id="etapa-endereco" class="etapa">
+        <div class="section" style="text-align:center; margin-bottom:10px;">
+          <img src="/imagens/logo.png" alt="Logo" style="width:100px; border-radius:8px;">
+        </div>
+        <h3>Endereço do Evento</h3>
 
-      <div class="form-group">
-        <label for="acesso">Acesso</label>
-        <select id="acesso" name="acesso" required>
-          <option value="">Selecione...</option>
-          <option value="pulseira">Pulseira</option>
-          <option value="lista">Lista</option>
-          <option value="livre">Livre</option>
-        </select>
+        <div class="row">
+          <div class="col">
+            <label for="rua">Rua</label>
+            <input type="text" id="rua" name="rua" placeholder="Rua" required>
+          </div>
+          <div class="col small">
+            <label for="numero_endereco">Número</label>
+            <input type="text" id="numero_endereco" name="numero" placeholder="00" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="bairro">Bairro</label>
+            <input type="text" id="bairro" name="bairro" placeholder="Bairro" required>
+          </div>
+          <div class="col">
+            <label for="cidade">Cidade</label>
+            <input type="text" id="cidade" name="cidade" placeholder="Cidade" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col mid">
+            <label for="estado">Estado</label>
+            <select id="estado" name="estado" required>
+              <option value="">Selecione...</option>
+              <option value="SP">SP</option><option value="RJ">RJ</option>
+              <option value="MG">MG</option><option value="RS">RS</option>
+              <option value="SC">SC</option><option value="PR">PR</option>
+            </select>
+          </div>
+          <div class="col">
+            <label for="cep">CEP</label>
+            <input type="text" id="cep" name="cep" placeholder="00000-000" pattern="\d{5}-\d{3}" required>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <div class="col" style="display:flex; gap:10px;">
+            <button type="button" id="btn-voltar" class="btn-secondary" style="flex:1;">⬅️ Voltar</button>
+            <button type="submit" class="btn-primary" style="flex:1;">Cadastrar Evento</button>
+          </div>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label for="tipo_evento">Tipo de Evento</label>
-        <select id="tipo_evento" name="tipo_evento" required>
-          <option value="">Selecione...</option>
-          <option value="aniversario">Aniversário</option>
-          <option value="empresarial">Formatura</option>
-          <option value="casamento">Casamento</option>
-          <option value="empresarial">Empresarial</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="tipo_comida">Tipo de Comida</label>
-        <select id="tipo_comida" name="tipo_comida" required>
-          <option value="">Selecione...</option>
-          <option value="buffet">Buffet</option>
-          <option value="coquetel">Coquetel</option>
-        </select>
-      </div>
-
-     <div class="form-group">
-  <label for="tipo_bebida">Tipo de Bebida</label>
-  <div id="bebida-opcoes" class="bebida-container">
-    <div class="bebida-opcao" data-value="agua">Água</div>
-    <div class="bebida-opcao" data-value="suco">Suco</div>
-    <div class="bebida-opcao" data-value="refrigerante">Refrigerante</div>
-    <div class="bebida-opcao" data-value="chop">Chop</div>
-    <div class="bebida-opcao" data-value="cerveja">Cerveja</div>
-    <div class="bebida-opcao" data-value="vinho">Vinho</div>
-    <div class="bebida-opcao" data-value="Espumante">Espumante</div>
+    </form>
   </div>
-  <input type="hidden" id="tipo_bebida" name="tipo_bebida" required>
-</div>
-
-
-      <div class="form-group">
-        <label for="num_convidados">Número de Convidados</label>
-        <select id="num_convidados" name="num_convidados" required>
-          <option value="">Selecione...</option>
-          <option value="50">30</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-          <option value="150">150</option>
-          <option value="200">200</option>
-          <option value="250">250</option>
-          <option value="300">300</option>
-          <option value="500">500</option>
-        </select>
-      </div>
-
-    <div class="form-group">
-      <label for="data_evento">Data do Evento</label>
-      <input type="date" id="data_evento" name="data_evento" value="" readonly>
-    </div>
-
-    <div class="form-group">
-      <label for="hora_evento">Horário do Evento</label>
-      <input type="time" id="hora_evento" name="hora_evento" value="">
-    </div>
-      <button type="button" id="btn-avancar">Avançar ➡️</button>
-    </div>
-    </div>
-
-      <!-- ETAPA 2: Endereço do Evento (inicialmente escondido) -->
-      <div id="etapa-endereco" style="display:none;">
-      <div class="section">
-      <h3>Endereço do Evento</h3>
-
-      <div class="form-group">
-        <label for="rua">Rua</label>
-        <input type="text" id="rua" name="rua" placeholder="Digite o nome da rua" required>
-      </div>
-
-      <div class="form-group">
-        <label for="numero_endereco">Número</label>
-        <input type="text" id="numero_endereco" name="numero_endereco" placeholder="Número do local" required>
-      </div>
-
-      <div class="form-group">
-        <label for="complemento">Complemento</label>
-        <input type="text" id="complemento" name="complemento" placeholder="Ex: Salão de festas, Apto 101...">
-      </div>
-
-      <div class="form-group">
-        <label for="bairro">Bairro</label>
-        <input type="text" id="bairro" name="bairro" placeholder="Digite o bairro" required>
-      </div>
-
-      <div class="form-group">
-        <label for="cidade">Cidade</label>
-        <input type="text" id="cidade" name="cidade" placeholder="Digite a cidade" required>
-      </div>
-
-      <div class="form-group">
-  <label for="estado">Estado</label>
-  <select id="estado" name="estado" required>
-    <option value="">Selecione o estado</option>
-    <option value="AC">Acre (AC)</option>
-    <option value="AL">Alagoas (AL)</option>
-    <option value="AP">Amapá (AP)</option>
-    <option value="AM">Amazonas (AM)</option>
-    <option value="BA">Bahia (BA)</option>
-    <option value="CE">Ceará (CE)</option>
-    <option value="DF">Distrito Federal (DF)</option>
-    <option value="ES">Espírito Santo (ES)</option>
-    <option value="GO">Goiás (GO)</option>
-    <option value="MA">Maranhão (MA)</option>
-    <option value="MT">Mato Grosso (MT)</option>
-    <option value="MS">Mato Grosso do Sul (MS)</option>
-    <option value="MG">Minas Gerais (MG)</option>
-    <option value="PA">Pará (PA)</option>
-    <option value="PB">Paraíba (PB)</option>
-    <option value="PR">Paraná (PR)</option>
-    <option value="PE">Pernambuco (PE)</option>
-    <option value="PI">Piauí (PI)</option>
-    <option value="RJ">Rio de Janeiro (RJ)</option>
-    <option value="RN">Rio Grande do Norte (RN)</option>
-    <option value="RS">Rio Grande do Sul (RS)</option>
-    <option value="RO">Rondônia (RO)</option>
-    <option value="RR">Roraima (RR)</option>
-    <option value="SC">Santa Catarina (SC)</option>
-    <option value="SP">São Paulo (SP)</option>
-    <option value="SE">Sergipe (SE)</option>
-    <option value="TO">Tocantins (TO)</option>
-  </select>
-</div>
-
-
-      <div class="form-group">
-        <label for="cep">CEP</label>
-        <input type="text" id="cep" name="cep" placeholder="00000-000" pattern="\d{5}-\d{3}" required>
-      </div>
-    </div>
-
-    <button type="button" id="btn-voltar">⬅️ Voltar</button>
-    <button type="submit">Cadastrar Evento</button>
-  </form>
-  </div>
-  </div>
-
-  <div id="footer-placeholder"></div>
-
 <script>
-  // Script para alternar etapas
-  const etapaEvento = document.getElementById("etapa-evento");
+document.addEventListener("DOMContentLoaded", () => {
+  const etapaDados = document.getElementById("etapa-dados");
   const etapaEndereco = document.getElementById("etapa-endereco");
   const btnAvancar = document.getElementById("btn-avancar");
   const btnVoltar = document.getElementById("btn-voltar");
+  const form = document.getElementById("form-evento");
 
+  // Limpar classes de animação
+  function limparAnimacoes(elemento) {
+    elemento.classList.remove("fade-in", "fade-out");
+    void elemento.offsetWidth;
+  }
+
+  // Avançar para a etapa de endereço
   btnAvancar.addEventListener("click", () => {
-    etapaEvento.style.display = "none";
-    etapaEndereco.style.display = "block";
+    limparAnimacoes(etapaDados);
+    etapaDados.classList.add("fade-out");
+
+    setTimeout(() => {
+      etapaDados.style.display = "none";
+      limparAnimacoes(etapaEndereco);
+      etapaEndereco.style.display = "block";
+      etapaEndereco.classList.add("fade-in");
+    }, 400);
   });
 
+  // Voltar para etapa anterior
   btnVoltar.addEventListener("click", () => {
-    etapaEndereco.style.display = "none";
-    etapaEvento.style.display = "block";
+    limparAnimacoes(etapaEndereco);
+    etapaEndereco.classList.add("fade-out");
+
+    setTimeout(() => {
+      etapaEndereco.style.display = "none";
+      limparAnimacoes(etapaDados);
+      etapaDados.style.display = "block";
+      etapaDados.classList.add("fade-in");
+    }, 400);
   });
-</script>
 
-<script>
- // Função para pegar parâmetros da URL
-  function obterParametroURL(nome) {
-    const params = new URLSearchParams(window.location.search);
-    return params.get(nome);
-  }
+  // Limpa sessionStorage quando o formulário é enviado
+  form.addEventListener("submit", () => {
+    sessionStorage.clear();
+  });
 
-  // Preenche automaticamente a data do evento se vier na URL
-  const dataSelecionada = obterParametroURL("data");
-  if (dataSelecionada) {
-    document.getElementById("data_evento").value = dataSelecionada;
-  }
+  // Preencher data a partir da URL (sem armazenar)
+  const campoData = document.getElementById("data_evento");
+  const urlParams = new URLSearchParams(window.location.search);
+  const dataUrl = urlParams.get("data");
+  if (dataUrl) campoData.value = dataUrl;
+  campoData.readOnly = true;
 
+  // Seleção de bebidas (sem salvar entre eventos)
   const opcoes = document.querySelectorAll('.bebida-opcao');
   const campoHidden = document.getElementById('tipo_bebida');
   let selecionados = [];
 
-  document.querySelector('form').addEventListener('submit', function (e) {
-  if (!campoHidden.value) {
-    alert("Selecione pelo menos uma opção de bebida.");
-    e.preventDefault();
-  }
-});
-
-  opcoes.forEach(opcao => {
-    opcao.addEventListener('click', () => {
-      const valor = opcao.getAttribute('data-value');
-      if (selecionados.includes(valor)) {
-        selecionados = selecionados.filter(v => v !== valor);
-        opcao.classList.remove('selecionado');
+  opcoes.forEach(op => {
+    op.addEventListener('click', () => {
+      const v = op.dataset.value;
+      if (selecionados.includes(v)) {
+        selecionados = selecionados.filter(x => x !== v);
+        op.classList.remove('selecionado');
       } else {
-        selecionados.push(valor);
-        opcao.classList.add('selecionado');
+        selecionados.push(v);
+        op.classList.add('selecionado');
       }
       campoHidden.value = selecionados.join(',');
     });
   });
 
-  document.addEventListener("DOMContentLoaded", () => {
-  const dataSelecionada = localStorage.getItem("dataSelecionada");
-  if (dataSelecionada) {
-    const campoData = document.getElementById("data_evento");
-    if (campoData) {
-      campoData.value = dataSelecionada;  // preenche o input com a data escolhida
-    }
-    localStorage.removeItem("dataSelecionada"); // limpa para não ficar persistindo
-  }
-});
-
-// Carregar navbar
+  // Carregar navbar de acordo com o tipo de usuário
   async function carregarNavbar() {
     try {
-      // 1. Pergunta ao backend o tipo do usuário
       const resposta = await fetch('/api/usuarios/tipo', { credentials: 'include' });
       if (!resposta.ok) throw new Error("Falha ao validar usuário");
 
       const dados = await resposta.json();
       let urlNavbar = "";
 
-      // 2. Decide qual navbar carregar
-      if (dados.tipo === "cliente") {
-        urlNavbar = "/components/navbarclient.html";
-      } else if (dados.tipo === "profissional") {
-        urlNavbar = "/components/navbarprof.html";
-      } else {
-        console.warn("Usuário não autenticado ou tipo indefinido");
-        return;
-      }
+      if (dados.tipo === "cliente") urlNavbar = "/components/navbarclient.html";
+      else if (dados.tipo === "profissional") urlNavbar = "/components/navbarprof.html";
+      else return;
 
-      // 3. Carrega a navbar correta
       const htmlNavbar = await fetch(urlNavbar).then(res => res.text());
       document.getElementById("navbar-placeholder").innerHTML = htmlNavbar;
-
     } catch (err) {
       console.error("Erro ao carregar navbar:", err);
     }
   }
-
-  document.addEventListener("DOMContentLoaded", carregarNavbar);
-
-  // carregar footer
-        fetch('/components/footer.html')
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById('footer-placeholder').innerHTML = data;
-    })
-    .catch(err => console.error('Erro ao carregar rodapé:', err));
+  carregarNavbar();
+});
 </script>
-
 </body>
 </html>
