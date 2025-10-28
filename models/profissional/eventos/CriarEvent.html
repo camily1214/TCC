@@ -36,7 +36,7 @@
     form {
       background-color: var(--card);
       width: 100%;
-      max-width: 600px;
+      max-width: 680px;
       padding: 22px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.15);
@@ -161,156 +161,164 @@
     <form id="form-evento" action="/api/eventos/novo-evento" method="POST">
 
       <!-- Etapa Dados do Evento -->
-      <div id="etapa-dados" class="etapa ativa">
-        <div class="section" style="text-align:center; margin-bottom:10px;">
-          <img src="/imagens/logo.png" alt="Logo" style="width:100px; border-radius:8px;">
-        </div>
-        <h2>Informações do Evento</h2>
-
-        <div class="row">
-          <div class="col small">
-            <label for="data_evento">Data do Evento</label>
-            <input type="date" id="data_evento" name="data_evento" readonly>
-          </div>
-          <div class="col small">
-            <label for="hora_evento">Horário de Início</label>
-            <input type="time" id="hora_evento" name="hora_evento">
-          </div>
-          <div class="col small">
-            <label for="hora_fim_evento">Horário de Término</label>
-            <input type="time" id="hora_fim_evento" name="hora_fim_evento">
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col mid">
-            <label for="num_convidados">Nº de Convidados</label>
-            <select id="num_convidados" name="num_convidados" required>
-              <option value="">Selecione...</option>
-              <option value="30">30</option><option value="50">50</option>
-              <option value="100">100</option><option value="150">150</option>
-              <option value="200">200</option><option value="250">250</option>
-              <option value="300">300</option><option value="500">500</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col mid">
-            <label for="acesso">Acesso</label>
-            <select id="acesso" name="acesso" required>
-              <option value="">Selecione...</option>
-              <option value="pulseira">Pulseira</option>
-              <option value="lista">Lista</option>
-              <option value="livre">Livre</option>
-            </select>
-          </div>
-          <div class="col mid">
-            <label for="tipo_evento">Tipo de Evento</label>
-            <select id="tipo_evento" name="tipo_evento" required>
-              <option value="">Selecione...</option>
-              <option value="aniversario">Aniversário</option>
-              <option value="formatura">Formatura</option>
-              <option value="casamento">Casamento</option>
-              <option value="empresarial">Empresarial</option>
-            </select>
-          </div>
-          <div class="col mid">
-            <label for="tipo_comida">Tipo de Comida</label>
-            <select id="tipo_comida" name="tipo_comida" required>
-              <option value="">Selecione...</option>
-              <option value="buffet">Buffet</option>
-              <option value="coquetel">Coquetel</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col">
-            <label for="tipo_bebida">Tipo de Bebida</label>
-            <div id="bebida-opcoes" class="bebida-container">
-              <div class="bebida-opcao" data-value="agua">Água</div>
-              <div class="bebida-opcao" data-value="suco">Suco</div>
-              <div class="bebida-opcao" data-value="refrigerante">Refrigerante</div>
-              <div class="bebida-opcao" data-value="chop">Chop</div>
-              <div class="bebida-opcao" data-value="cerveja">Cerveja</div>
-              <div class="bebida-opcao" data-value="vinho">Vinho</div>
-              <div class="bebida-opcao" data-value="espumante">Espumante</div>
-            </div>
-            <input type="hidden" id="tipo_bebida" name="tipo_bebida" required>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col">
-            <label for="descricao_evento">Descrição / Observações</label>
-            <textarea id="descricao_evento" name="descricao_evento" rows="4" placeholder="Escreva aqui informações extras sobre o evento (opcional)" style="width:100%; padding:8px 10px; border-radius:6px; border:none; font-size:14px;"></textarea>
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:18px;">
-          <div class="col" style="display:flex; gap:10px;">
-            <button type="button" id="btn-avancar" class="btn-secondary" style="flex:1;">Avançar ➡️</button>
-            <button type="reset" class="btn-primary" style="flex:1;">Limpar</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Etapa Endereço -->
-      <div id="etapa-endereco" class="etapa">
-        <div class="section" style="text-align:center; margin-bottom:10px;">
-          <img src="/imagens/logo.png" alt="Logo" style="width:100px; border-radius:8px;">
-        </div>
-        <h3>Endereço do Evento</h3>
-
-        <div class="row">
-          <div class="col">
-            <label for="rua">Rua</label>
-            <input type="text" id="rua" name="rua" placeholder="Rua" required>
-          </div>
-          <div class="col small">
-            <label for="numero_endereco">Número</label>
-            <input type="text" id="numero_endereco" name="numero" placeholder="00" required>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col">
-            <label for="bairro">Bairro</label>
-            <input type="text" id="bairro" name="bairro" placeholder="Bairro" required>
-          </div>
-          <div class="col">
-            <label for="cidade">Cidade</label>
-            <input type="text" id="cidade" name="cidade" placeholder="Cidade" required>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col mid">
-            <label for="estado">Estado</label>
-            <select id="estado" name="estado" required>
-              <option value="">Selecione...</option>
-              <option value="SP">SP</option><option value="RJ">RJ</option>
-              <option value="MG">MG</option><option value="RS">RS</option>
-              <option value="SC">SC</option><option value="PR">PR</option>
-            </select>
-          </div>
-          <div class="col">
-            <label for="cep">CEP</label>
-            <input type="text" id="cep" name="cep" placeholder="00000-000" pattern="\d{5}-\d{3}" required>
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:12px;">
-          <div class="col" style="display:flex; gap:10px;">
-            <button type="button" id="btn-voltar" class="btn-secondary" style="flex:1;">⬅️ Voltar</button>
-            <button type="submit" class="btn-primary" style="flex:1;">Cadastrar Evento</button>
-          </div>
-        </div>
-      </div>
-
-    </form>
+<div id="etapa-dados" class="etapa ativa">
+  <div class="section" style="text-align:center; margin-bottom:10px;">
+    <img src="/imagens/logo.png" alt="Logo" style="width:100px; border-radius:8px;">
   </div>
+  <h2>Informações do Evento</h2>
+
+  <!-- Linha 1 -->
+  <div class="row">
+    <div class="col small">
+      <label for="data_evento">Data do Evento</label>
+      <input type="date" id="data_evento" name="data_evento" readonly>
+    </div>
+    <div class="col small">
+      <label for="hora_evento">Horário de Início</label>
+      <input type="time" id="hora_evento" name="hora_evento">
+    </div>
+    <div class="col small">
+      <label for="hora_fim_evento">Horário de Término</label>
+      <input type="time" id="hora_fim_evento" name="hora_fim_evento">
+    </div>
+    <div class="col small" style="flex: 0 0 100px;">
+      <label for="num_convidados">Nº</label>
+      <select id="num_convidados" name="num_convidados" required style="width: 110%; font-size: 14px; padding: 8px 10px; border-radius: 6px;">
+        <option value="">Selecione...</option>
+        <option value="30">30</option><option value="50">50</option>
+        <option value="100">100</option><option value="150">150</option>
+        <option value="200">200</option><option value="250">250</option>
+        <option value="300">300</option><option value="500">500</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Linha 2 -->
+  <div class="row">
+    <div class="col mid">
+      <label for="acesso">Acesso</label>
+      <select id="acesso" name="acesso" required>
+        <option value="">Selecione...</option>
+        <option value="pulseira">Pulseira</option>
+        <option value="lista">Lista</option>
+        <option value="livre">Livre</option>
+      </select>
+    </div>
+    <div class="col mid">
+      <label for="tipo_evento">Tipo de Evento</label>
+      <select id="tipo_evento" name="tipo_evento" required>
+        <option value="">Selecione...</option>
+        <option value="aniversario">Aniversário</option>
+        <option value="formatura">Formatura</option>
+        <option value="casamento">Casamento</option>
+        <option value="empresarial">Empresarial</option>
+      </select>
+    </div>
+    <div class="col mid">
+      <label for="tipo_comida">Tipo de Comida</label>
+      <select id="tipo_comida" name="tipo_comida" required>
+        <option value="">Selecione...</option>
+        <option value="buffet">Buffet</option>
+        <option value="coquetel">Coquetel</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Linha 3 -->
+  <div class="row">
+    <div class="col">
+      <label for="tipo_bebida">Tipo de Bebida</label>
+      <div id="bebida-opcoes" class="bebida-container">
+        <div class="bebida-opcao" data-value="agua">Água</div>
+        <div class="bebida-opcao" data-value="suco">Suco</div>
+        <div class="bebida-opcao" data-value="refrigerante">Refrigerante</div>
+        <div class="bebida-opcao" data-value="chop">Chop</div>
+        <div class="bebida-opcao" data-value="cerveja">Cerveja</div>
+        <div class="bebida-opcao" data-value="vinho">Vinho</div>
+        <div class="bebida-opcao" data-value="espumante">Espumante</div>
+      </div>
+      <input type="hidden" id="tipo_bebida" name="tipo_bebida" required>
+    </div>
+  </div>
+
+  <!-- Linha 4 -->
+  <div class="row">
+    <div class="col">
+      <label for="descricao_evento">Descrição / Observações</label>
+      <textarea id="descricao_evento" name="descricao_evento" rows="4" placeholder="Escreva aqui informações extras sobre o evento (opcional)" style="width:100%; padding:8px 10px; border-radius:6px; border:none; font-size:14px;"></textarea>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:18px;">
+    <div class="col" style="display:flex; gap:10px;">
+      <button type="button" id="btn-avancar" class="btn-secondary" style="flex:1;">Avançar ➡️</button>
+      <button type="reset" class="btn-primary" style="flex:1;">Limpar</button>
+    </div>
+  </div>
+</div>
+
+  <!-- Etapa Endereço -->
+  <div id="etapa-endereco" class="etapa">
+    <div class="section" style="text-align:center; margin-bottom:10px;">
+      <img src="/imagens/logo.png" alt="Logo" style="width:100px; border-radius:8px;">
+    </div>
+    <h3>Endereço do Evento</h3>
+
+    <!-- Linha 1: CEP, Estado, Cidade -->
+    <div class="row">
+      <div class="col mid">
+        <label for="cep">CEP</label>
+        <input type="text" id="cep" name="cep" placeholder="00000-000" pattern="\d{5}-\d{3}" required>
+      </div>
+      <div class="col mid">
+        <label for="estado">Estado</label>
+        <select id="estado" name="estado" required>
+          <option value="">Selecione...</option>
+          <option value="SP">SP</option><option value="RJ">RJ</option>
+          <option value="MG">MG</option><option value="RS">RS</option>
+          <option value="SC">SC</option><option value="PR">PR</option>
+        </select>
+      </div>
+      <div class="col">
+        <label for="cidade">Cidade</label>
+        <input type="text" id="cidade" name="cidade" placeholder="Cidade" required>
+      </div>
+    </div>
+
+    <!-- Linha 2: Rua, Bairro, Número -->
+    <div class="row">
+      <div class="col">
+        <label for="rua">Rua</label>
+        <input type="text" id="rua" name="rua" placeholder="Rua" required>
+      </div>
+      <div class="col">
+        <label for="bairro">Bairro</label>
+        <input type="text" id="bairro" name="bairro" placeholder="Bairro" required>
+      </div>
+      <div class="col small">
+        <label for="numero_endereco">Número</label>
+        <input type="text" id="numero_endereco" name="numero" placeholder="00" required>
+      </div>
+    </div>
+
+    <!-- Linha 3: Complemento -->
+    <div class="row">
+      <div class="col">
+        <label for="complemento">Complemento</label>
+        <input type="text" id="complemento" name="complemento" placeholder="Apartamento, bloco, salão..." style="width:100%;">
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:12px;">
+      <div class="col" style="display:flex; gap:10px;">
+        <button type="button" id="btn-voltar" class="btn-secondary" style="flex:1;">⬅️ Voltar</button>
+        <button type="submit" class="btn-primary" style="flex:1;">Cadastrar Evento</button>
+      </div>
+    </div>
+  </div>
+
+</form>
+</div> 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const etapaDados = document.getElementById("etapa-dados");

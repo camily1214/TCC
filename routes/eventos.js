@@ -262,15 +262,15 @@ router.delete('/:id', autenticar, async (req, res) => {
 // Confirmar evento (profissional)
 router.put('/:id/confirmar', autenticar, apenasProfissionais, async (req, res) => {
   try {
-    await Evento.findByIdAndUpdate(
+    const evento = await Evento.findByIdAndUpdate(
       req.params.id,
-      { status: 'confirmado' },
-      { runValidators: false } // ✅ ignora os campos obrigatórios
+      { confirmado: true },
+      { runValidators: false }
     );
-    res.json({ sucesso: true });
+    if (!evento) return res.status(404).send('Evento não encontrado');
+    res.json(evento);
   } catch (err) {
-    console.error("Erro ao atualizar status:", err);
-    res.status(500).json({ erro: "Erro ao atualizar status" });
+    res.status(500).send('Erro ao confirmar evento');
   }
 });
 
