@@ -5,213 +5,329 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Lista de Usuários</title>
 
-  <!--Navbar-->
   <link rel="stylesheet" href="/css/navbar.css" />
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #727277;
-      color: #fff;
+      background: linear-gradient(135deg, #b8b9bb, #d0d1d3);
+      font-family: "Segoe UI", Arial, sans-serif;
       margin: 0;
+      padding-top: 80px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
       padding: 20px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.8s ease forwards;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: #333;
-      margin-top: 20px;
-      color: #fff;
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    th, td {
-      padding: 12px;
-      border: 1px solid #555;
-      text-align: left;
-    }
-
-    th {
-      background-color: #444;
-    }
-
-    button {
-      padding: 6px 12px;
-      background-color: #e74c3c;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #c0392b;
-    }
-
-    #pagination {
-      margin-top: 20px;
+    h2 {
       text-align: center;
-    }
-
-    #pagination button {
-      margin: 5px;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      background-color: #555;
       color: #fff;
+      margin-bottom: 25px;
+      background-color: #727277;
+      padding: 12px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      letter-spacing: 1px;
+      font-size: 18px;
     }
 
-    #pagination button:disabled {
-      background-color: #999;
-      cursor: default;
+    #pesquisaUsuarios {
+      padding: 6px 10px;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 13px;
+      display: block;
+      margin: 0 auto 15px auto;
     }
 
-    .navbar-nav .nav-link {
-      font-family: Arial, sans-serif;
-      font-weight: bold;
+    .usuario-card {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .usuario-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .btn-vermais {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #fff;
+      background-color: #3498db;
+      transition: all 0.25s ease;
+      font-size: 12px;
+    }
+
+    .btn-vermais:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px);
+    }
+
+    .paginacao {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      animation: fadeInUp 0.8s ease;
+    }
+
+    .paginacao button {
+      background-color: #727277;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 13px;
+    }
+
+    .paginacao button:hover {
+      background-color: #555;
+      transform: scale(1.08);
+    }
+
+    .paginacao button:disabled {
+      background-color: #ccc;
+      color: #666;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .pagina-atual { background-color: #000000 !important; }
+
+    #mensagem-vazia {
+      animation: fadeInUp 1s ease;
+      text-align: center;
+      color: #444;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 10px;
+      right: 12px;
       font-size: 20px;
-      color: #000 !important;
-    }
-
-    .custom-navbar {
-      background-color: #727277 !important;
-    }
-
-    .custom-navbar .nav-link {
-      color: #fff !important;
       font-weight: bold;
+      cursor: pointer;
+      color: #333;
     }
 
-    .custom-navbar .nav-link:hover {
-      text-decoration: underline;
+    .btn-excluir {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #fff;
+      background-color: #e74c3c;
+      transition: all 0.25s ease;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    .btn-excluir:hover {
+      background-color: #c0392b;
+      transform: translateY(-2px);
     }
   </style>
 </head>
 <body>
 
-  <!-- Navbar -->
-  <div id="navbar-placeholder"></div>
+<div id="navbar-placeholder"></div>
 
-  <h1>Usuários Cadastrados</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>Nome</th>
-        <th>Telefone</th>
-        <th>Email</th>
-        <th>Cidade</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody id="ListaUsu"></tbody>
-  </table>
+<div class="container">
+  <h2>Usuários Cadastrados</h2>
 
-  <div id="pagination"></div>
-  <div id="footer-placeholder"></div>
+  <input type="text" id="pesquisaUsuarios" placeholder="Pesquisar usuários...">
+
+  <div id="lista-usuarios"></div>
+
+  <div id="paginacao" class="paginacao" style="display:none;"></div>
+
+  <div id="mensagem-vazia" style="display:none;">Nenhum usuário cadastrado no momento.</div>
+</div>
+
+<!-- Modal -->
+<div id="modalUsuario" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="fecharModal()">&times;</span>
+    <div id="modal-detalhes"></div>
+    <button class="btn-excluir" id="btnExcluirModal">Excluir</button>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
 
 <script>
-  // paginação
-  let usuarios = [];
+  let todosUsuarios = [];
   let paginaAtual = 1;
-  const limitePorPagina = 15;
+  const usuariosPorPagina = 10;
+  let usuarioAtualId = null;
 
   async function carregarUsuarios() {
     try {
       const resposta = await fetch('/api/usuarios/dados', { credentials: 'include' });
-      usuarios = await resposta.json().catch(() => []);
-      paginaAtual = 1; // sempre começa na página 1
-      renderizarTabela();
-      renderizarPaginacao();
+      todosUsuarios = await resposta.json().catch(() => []);
+      if (!todosUsuarios.length) {
+        document.getElementById('lista-usuarios').style.display = 'none';
+        document.getElementById('mensagem-vazia').style.display = 'block';
+      } else {
+        document.getElementById('lista-usuarios').style.display = 'block';
+        document.getElementById('mensagem-vazia').style.display = 'none';
+        exibirUsuarios(todosUsuarios);
+      }
     } catch (erro) {
       console.error('Erro ao carregar usuários:', erro);
+      alert('Erro ao carregar usuários.');
     }
   }
 
-  function renderizarTabela() {
-    const tabela = document.getElementById('ListaUsu');
-    tabela.innerHTML = '';
+  document.getElementById('pesquisaUsuarios').addEventListener('input', function() {
+    const termo = this.value.toLowerCase();
+    const filtrados = todosUsuarios.filter(u =>
+      (u.nome && u.nome.toLowerCase().includes(termo)) ||
+      (u.sobrenome && u.sobrenome.toLowerCase().includes(termo))
+    );
+    paginaAtual = 1;
+    exibirUsuarios(filtrados);
+  });
 
-    const inicio = (paginaAtual - 1) * limitePorPagina;
-    const fim = inicio + limitePorPagina;
-    const usuariosPagina = usuarios.slice(inicio, fim);
-
-    usuariosPagina.forEach(usuario => {
-      const linha = document.createElement('tr');
-      linha.innerHTML = `
-        <td>${usuario.nome} ${usuario.sobrenome || '-'}</td>
-        <td>${usuario.telefone || '-'}</td>
-        <td>${usuario.email || '-'}</td>
-        <td>${usuario.cidade || '-'}</td>
-        <td><button onclick="deletarUsuario('${usuario._id}')">Excluir</button></td>
-      `;
-      tabela.appendChild(linha);
-    });
-  }
-
-  function renderizarPaginacao() {
-    const totalPaginas = Math.ceil(usuarios.length / limitePorPagina);
-    const container = document.getElementById('pagination');
+  function exibirUsuarios(lista) {
+    const container = document.getElementById('lista-usuarios');
     container.innerHTML = '';
 
-    for (let i = 1; i <= totalPaginas; i++) {
-      const botao = document.createElement('button');
-      botao.textContent = i;
-      botao.disabled = i === paginaAtual;
-      botao.onclick = () => {
-        paginaAtual = i;
-        renderizarTabela();
-        renderizarPaginacao();
-      };
-      container.appendChild(botao);
+    const totalPaginas = Math.ceil(lista.length / usuariosPorPagina);
+    const inicio = (paginaAtual - 1) * usuariosPorPagina;
+    const fim = inicio + usuariosPorPagina;
+    const usuariosPagina = lista.slice(inicio, fim);
+
+    usuariosPagina.forEach(u => {
+      const div = document.createElement('div');
+      div.className = 'usuario-card';
+      div.innerHTML = `
+        <span><strong>Nome:</strong> ${u.nome} ${u.sobrenome || ''}</span>
+        <button class="btn-vermais" onclick="abrirModal('${u._id}')">Ver Mais</button>
+      `;
+      container.appendChild(div);
+    });
+
+    const paginacao = document.getElementById('paginacao');
+    paginacao.style.display = totalPaginas > 1 ? 'flex' : 'none';
+    if (totalPaginas > 1) {
+      paginacao.innerHTML = `
+        <button onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual===1?'disabled':''}>Anterior</button>
+        ${Array.from({length: totalPaginas}, (_,i)=>`<button class="${paginaAtual===i+1?'pagina-atual':''}" onclick="mudarPagina(${i+1})">${i+1}</button>`).join('')}
+        <button onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual===totalPaginas?'disabled':''}>Próxima</button>
+      `;
     }
   }
 
-  async function deletarUsuario(id) {
-    if (!id) {
-      alert('ID inválido. Não é possível excluir.');
-      return;
+  function mudarPagina(novaPagina) {
+    const totalPaginas = Math.ceil(todosUsuarios.length / usuariosPorPagina);
+    if (novaPagina >= 1 && novaPagina <= totalPaginas) {
+      paginaAtual = novaPagina;
+      exibirUsuarios(todosUsuarios);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  }
 
-    if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
+  function abrirModal(id) {
+    usuarioAtualId = id;
+    const usuario = todosUsuarios.find(u => u._id === id);
+    if (!usuario) return;
 
+    const detalhes = `
+      <p><strong>Nome:</strong> ${usuario.nome} ${usuario.sobrenome || ''}</p>
+      <p><strong>Telefone:</strong> ${usuario.telefone || '-'}</p>
+      <p><strong>Email:</strong> ${usuario.email || '-'}</p>
+      <p><strong>Cidade:</strong> ${usuario.cidade || '-'}</p>
+    `;
+
+    document.getElementById('modal-detalhes').innerHTML = detalhes;
+    document.getElementById('modalUsuario').style.display = 'flex';
+  }
+
+  function fecharModal() {
+    document.getElementById('modalUsuario').style.display = 'none';
+  }
+
+  document.getElementById('btnExcluirModal').addEventListener('click', async () => {
+    if (!usuarioAtualId || !confirm('Tem certeza que deseja excluir este usuário?')) return;
     try {
-      const resposta = await fetch(`/api/usuarios/${id}`, {
+      const res = await fetch(`/api/usuarios/${usuarioAtualId}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: { 'Accept': 'application/json' }
       });
-
-      const data = await resposta.json().catch(() => ({}));
-      if (resposta.ok) {
+      const data = await res.json().catch(()=>({}));
+      if (res.ok) {
         alert(data.mensagem || 'Usuário excluído com sucesso.');
+        fecharModal();
         carregarUsuarios();
       } else {
-        alert('Erro ao excluir: ' + (data.mensagem || data.erro || `Status ${resposta.status}`));
+        alert('Erro ao excluir: ' + (data.mensagem || data.erro || res.status));
       }
-    } catch (erro) {
-      console.error('Erro no fetch (DELETE):', erro);
+    } catch (err) {
+      console.error(err);
       alert('Erro ao excluir o usuário.');
     }
-  }
+  });
 
-  carregarUsuarios();
+  document.addEventListener('DOMContentLoaded', carregarUsuarios);
 
-  // carregar navbar
-  fetch('/components/navbarprof.html')
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById('navbar-placeholder').innerHTML = data;
-    });
-
-  // carregar footer
-  fetch('/components/footer.html')
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById('footer-placeholder').innerHTML = data;
-    });
+  // Navbar e Footer
+  fetch('/components/navbarprof.html').then(r=>r.text()).then(data=>document.getElementById('navbar-placeholder').innerHTML=data);
+  fetch('/components/footer.html').then(r=>r.text()).then(data=>document.getElementById('footer-placeholder').innerHTML=data);
 </script>
-
 </body>
 </html>

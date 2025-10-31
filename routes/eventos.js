@@ -77,21 +77,43 @@ router.post('/novo-evento', autenticar, async (req, res) => {
       rua, numero, complemento, bairro, cidade, estado, cep,
     } = req.body;
 
+    // Converter data para objeto Date
     const [ano, mes, dia] = data_evento.split('-').map(Number);
     const dataFinal = new Date(ano, mes - 1, dia);
 
+    // Criar novo evento
     const novoEvento = new Evento({
-      acesso, tipo_evento, tipo_comida, tipo_bebida,
-      num_convidados, data_evento: dataFinal, hora_evento, hora_fim_evento, descricao_evento,
-      rua, numero, complemento, bairro, cidade, estado, cep,
+      acesso,
+      tipo_evento,
+      tipo_comida,
+      tipo_bebida,
+      num_convidados,
+      data_evento: dataFinal,
+      hora_evento,
+      hora_fim_evento,
+      descricao_evento,
+      rua,
+      numero,
+      complemento,
+      bairro,
+      cidade,
+      estado,
+      cep,
       usuarioId: req.session.usuario.id
     });
 
     await novoEvento.save();
-    res.redirect('/sucesso');
+
+    // Retorna JSON de sucesso com tipo de usuário
+    res.json({ 
+      sucesso: true, 
+      mensagem: 'Evento cadastrado com sucesso!',
+      tipoUsuario: req.session.usuario.tipo
+    });
+
   } catch (err) {
     console.error('Erro ao cadastrar evento:', err);
-    res.status(500).send('Erro ao cadastrar evento.');
+    res.status(500).json({ erro: 'Erro ao cadastrar evento' });
   }
 });
 

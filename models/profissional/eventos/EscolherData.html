@@ -147,6 +147,20 @@
       text-decoration: underline;
       background-color: #666;
     }
+
+      /* Navbar e Footer escondidos/mostrados com transição */
+#navbar-placeholder, #footer-placeholder {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  position: fixed;
+  width: 100%;
+  left: 0;
+  z-index: 999;
+}
+
+#navbar-placeholder { top: 0; }
+#footer-placeholder { bottom: 0; }
+
+.hidden-footer { transform: translateY(20%); opacity: 0; }
   </style>
 </head>
 <body>
@@ -370,13 +384,29 @@ function selecionarData(data) {
 
   document.addEventListener("DOMContentLoaded", carregarNavbar);
 
-  // carregar footer
-        fetch('/components/footer.html')
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById('footer-placeholder').innerHTML = data;
-    })
-    .catch(err => console.error('Erro ao carregar rodapé:', err));
+let ultimaPosicaoScroll = 0;
+
+window.addEventListener('scroll', () => {
+  const footer = document.getElementById('footer-placeholder');
+  const posicaoAtual = window.pageYOffset || document.documentElement.scrollTop;
+
+  if (posicaoAtual > ultimaPosicaoScroll) {
+    // rolando para baixo → esconder
+    footer.classList.remove('hidden-footer');
+  } else {
+    // rolando para cima → mostrar
+    footer.classList.add('hidden-footer');
+  }
+
+  ultimaPosicaoScroll = posicaoAtual <= 0 ? 0 : posicaoAtual; // evitar negativos
+})
+
+    fetch('/components/footer.html')
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+      })
+      .catch(err => console.error('Erro ao carregar rodapé:', err));
 </script>
 </body>
 </html>
