@@ -188,7 +188,7 @@
     transform: none;
   }
 
-  .pagina-atual { background-color: #3498db !important; }
+  .pagina-atual { background-color: #000000 !important; }
 
   #mensagem-vazia {
     animation: fadeInUp 1s ease;
@@ -209,6 +209,10 @@
 
 <div class="container">
   <h2>Meus Eventos</h2>
+  <div style="text-align:center; margin-bottom:20px;">
+  <input type="text" id="pesquisaMeusEventos" placeholder="Pesquisar eventos..." 
+  style="padding:8px 12px; width:90%; max-width:400px; border-radius:6px; border:1px solid #ccc; font-size:14px;">
+  </div>
   <div id="listaEventos"></div>
   <div id="paginacao" class="paginacao" style="display:none;"></div>
   <div id="mensagem-vazia" style="display:none;">
@@ -232,6 +236,28 @@
 let meusEventos = [];
 let paginaAtual = 1;
 const eventosPorPagina = 5;
+
+document.getElementById('pesquisaMeusEventos').addEventListener('input', function() {
+  const termo = this.value.toLowerCase();
+  const eventosFiltrados = meusEventos.filter(e => {
+    const dataFormatada = e.data_evento ? new Date(e.data_evento).toLocaleDateString('pt-BR') : '';
+    return (
+      (e.tipo_evento && e.tipo_evento.toLowerCase().includes(termo)) ||
+      (e.descricao_evento && e.descricao_evento.toLowerCase().includes(termo)) ||
+      (e.acesso && e.acesso.toLowerCase().includes(termo)) ||
+      (e.tipo_comida && e.tipo_comida.toLowerCase().includes(termo)) ||
+      (e.tipo_bebida && e.tipo_bebida.toLowerCase().includes(termo)) ||
+      (e.rua && e.rua.toLowerCase().includes(termo)) ||
+      (e.bairro && e.bairro.toLowerCase().includes(termo)) ||
+      (e.cidade && e.cidade.toLowerCase().includes(termo)) ||
+      (e.estado && e.estado.toLowerCase().includes(termo)) ||
+      (e.cep && e.cep.toLowerCase().includes(termo)) ||
+      (dataFormatada && dataFormatada.toLowerCase().includes(termo)) // pesquisa na data
+    );
+  });
+  paginaAtual = 1; // voltar para a primeira página
+  exibirEventos(eventosFiltrados);
+});
 
 async function carregarEventos() {
   try {
@@ -353,6 +379,7 @@ function verDetalhes(id) {
   conteudo.innerHTML = `
     <p><strong>Status:</strong> ${statusFormatado}</p>
     ${status === 'cancelado' ? `<p><strong>Motivo do Cancelamento:</strong> ${motivoCancelamento}</p>` : ''}
+    <hr>
     <p><strong>Data do Evento:</strong> ${data}</p>
     <p><strong>Hora de Início:</strong> ${horaInicio}</p>
     <p><strong>Hora de Término:</strong> ${horaFim}</p>
@@ -394,6 +421,14 @@ fetch('/components/navbarClient.html')
   .then(res => res.text())
   .then(data => document.getElementById('navbar-placeholder').innerHTML = data)
   .catch(err => console.error('Erro ao carregar navbar do cliente:', err));
+
+    // carregar footer
+        fetch('/components/footer.html')
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById('footer-placeholder').innerHTML = data;
+    })
+    .catch(err => console.error('Erro ao carregar rodapé:', err));
 </script>
 </body>
 </html>

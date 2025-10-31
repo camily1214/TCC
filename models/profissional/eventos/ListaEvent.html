@@ -1,3 +1,4 @@
+<!-- 🔹 ATUALIZADO: ListaEvent.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -7,153 +8,204 @@
   <link rel="stylesheet" href="/css/navbar.css" />
 
   <style>
-    body {
-      background-color: #c5c6c8;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding-top: 80px;
-    }
+  body {
+    background: linear-gradient(135deg, #b8b9bb, #d0d1d3);
+    font-family: "Segoe UI", Arial, sans-serif;
+    margin: 0;
+    padding-top: 80px;
+    overflow-x: hidden;
+  }
 
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 20px;
-    }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s ease forwards;
+  }
 
-    h2 {
-      text-align: center;
-      color: #fff;
-      margin-bottom: 20px;
-      background-color: #727277;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 0 8px #00000055;
-    }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-    .evento {
-      background-color: #fff;
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 15px;
-      box-shadow: 0 0 5px #00000055;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+  h2 {
+    text-align: center;
+    color: #fff;
+    margin-bottom: 25px;
+    background-color: #727277;
+    padding: 14px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    letter-spacing: 1px;
+    animation: fadeDown 1s ease;
+  }
 
-    .evento:hover {
-      transform: scale(1.02);
-      box-shadow: 0 0 12px #00000088;
-    }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-    .status-aguardando { border-left: 5px solid #f1c40f; }
-    .status-confirmado { border-left: 5px solid #27ae60; }
-    .status-cancelado { border-left: 5px solid #c0392b; }
+  .evento {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    transform: scale(1);
+    animation: fadeCard 0.5s ease;
+  }
 
-    .evento p { margin: 5px 0; }
+  @keyframes fadeCard {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-    .btn-acao {
-      margin-top: 15px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-    }
+  .evento:hover {
+    transform: scale(1.03);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
 
-    .btn-acao button {
-      padding: 8px 14px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      color: #fff;
-      font-size: 13px;
-      flex: 0 1 auto;
-      transition: background-color 0.2s ease;
-      min-width: 120px;
-    }
+  .status-aguardando { border-left: 6px solid #f1c40f; }
+  .status-confirmado { border-left: 6px solid #27ae60; }
+  .status-cancelado { border-left: 6px solid #c0392b; }
 
-    .btn-confirmar { background-color: #27ae60; }
-    .btn-confirmar:hover { background-color: #1e874b; }
+  .evento p { margin: 6px 0; color: #333; }
+  .evento .data { font-size: 14px; color: #555; }
 
-    .btn-cancelar { background-color: #c0392b; }
-    .btn-cancelar:hover { background-color: #992d22; }
+  .btn-acao {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
 
-    .btn-ver-mais { background-color: #3498db; }
-    .btn-ver-mais:hover { background-color: #2980b9; }
+  .btn-acao button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 14px;
+    transition: all 0.25s ease;
+    min-width: 130px;
+  }
 
-    .btn-excluir { background-color: #555; }
-    .btn-excluir:hover { background-color: #000; }
+  .btn-ver-mais { background-color: #3498db; }
+  .btn-ver-mais:hover { background-color: #2980b9; transform: translateY(-2px); }
 
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 10;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.6);
-      justify-content: center;
-      align-items: center;
-    }
+  .btn-confirmar { background-color: #27ae60; }
+  .btn-confirmar:hover { background-color: #1e874b; transform: translateY(-2px); }
 
-    .modal-content {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 500px;
-      width: 90%;
-      box-shadow: 0 0 10px #000;
-      text-align: left;
-    }
+  .btn-cancelar { background-color: #c0392b; }
+  .btn-cancelar:hover { background-color: #992d22; transform: translateY(-2px); }
 
-    .btn-fechar, .btn-editar {
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      padding: 8px 14px;
-      color: #fff;
-      margin-top: 15px;
-      transition: background-color 0.2s ease;
-    }
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+  }
 
-    .btn-fechar { background-color: #727277; }
-    .btn-fechar:hover { background-color: #555; }
+  .modal.show {
+    display: flex;
+    animation: fadeBg 0.3s ease;
+  }
 
-    .btn-editar { background-color: #f39c12; }
-    .btn-editar:hover { background-color: #e67e22; }
+  @keyframes fadeBg {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 
-    .paginacao {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      margin-top: 20px;
-    }
+  .modal-content {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    max-width: 520px;
+    width: 90%;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    transform: translateY(50px);
+    opacity: 0;
+    animation: slideUp 0.35s ease forwards;
+  }
 
-    .paginacao button {
-      background-color: #727277;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.2s ease, transform 0.2s ease;
-    }
+  @keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
 
-    .paginacao button:hover {
-      background-color: #555;
-      transform: scale(1.05);
-    }
+  .btn-fechar, .btn-editar {
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 8px 14px;
+    color: #fff;
+    margin-top: 15px;
+    transition: background-color 0.2s ease;
+  }
 
-    .paginacao button:disabled {
-      background-color: #ccc;
-      color: #666;
-      cursor: not-allowed;
-    }
+  .btn-fechar { background-color: #727277; }
+  .btn-fechar:hover { background-color: #555; }
 
-    .pagina-atual {
-      background-color: #3498db;
-    }
+  .btn-editar { background-color: #f39c12; }
+  .btn-editar:hover { background-color: #e67e22; }
+
+  .paginacao {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 25px;
+    animation: fadeInUp 0.8s ease;
+  }
+
+  .paginacao button {
+    background-color: #727277;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .paginacao button:hover {
+    background-color: #555;
+    transform: scale(1.08);
+  }
+
+  .paginacao button:disabled {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .pagina-atual { background-color: #000000 !important; }
+
+  #mensagem-vazia {
+    animation: fadeInUp 1s ease;
+    text-align: center;
+    color: #444;
+    margin-top: 20px;
+  }
+
+  a {
+    color: #3498db;
+    text-decoration: none;
+  }
+  a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -161,14 +213,20 @@
 
   <div class="container">
     <h2>Eventos Cadastrados</h2>
+    <div style="text-align:center; margin-bottom:20px;">
+    <input type="text" id="pesquisaEventos" placeholder=" Pesquisar eventos..." 
+    style="padding:8px 12px; width:90%; max-width:400px; border-radius:6px; border:1px solid #ccc; font-size:14px;">
+    </div>
     <div id="lista-eventos"></div>
+
     <div id="paginacao" class="paginacao" style="display:none;"></div>
+
     <div id="mensagem-vazia" style="display:none; text-align:center; color:#555; margin-top:20px;">
       Nenhum evento cadastrado no momento.
     </div>
   </div>
 
-  <!-- Modal -->
+  <!-- Modal Detalhes -->
   <div id="modalDetalhes" class="modal">
     <div class="modal-content">
       <h3>Detalhes do Evento</h3>
@@ -180,122 +238,255 @@
     </div>
   </div>
 
+  <!-- Modal Cancelamento -->
+  <div id="modalCancelar" class="modal">
+    <div class="modal-content">
+      <h3>Cancelar Evento</h3>
+      <p>Informe o motivo do cancelamento:</p>
+      <textarea id="motivoCancelamento" rows="4" style="width:100%; padding:8px; border-radius:5px;"></textarea>
+      <div style="text-align:center; margin-top:10px;">
+        <button id="btnConfirmarCancelamento" class="btn-cancelar">Cancelar Evento</button>
+        <button onclick="fecharModalCancelar()" class="btn-fechar">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-  let todosEventos = [];
-  let paginaAtual = 1;
-  const eventosPorPagina = 5;
+    let todosEventos = [];
+    let paginaAtual = 1;
+    const eventosPorPagina = 5;
+    let eventoParaCancelar = null;
 
-  async function carregarEventos() {
-    try {
-      const resposta = await fetch('/api/eventos/lista-evento', { credentials: 'include' });
-      if (!resposta.ok) throw new Error('Erro ao buscar eventos');
-      todosEventos = await resposta.json();
+    async function carregarEventos() {
+      try {
+        const resposta = await fetch('/api/eventos/lista-evento', { credentials: 'include' });
+        if (!resposta.ok) throw new Error('Erro ao buscar eventos');
+        todosEventos = await resposta.json();
 
-      // Ordenar por data crescente (eventos futuros primeiro)
-      todosEventos.sort((a, b) => {
-        const dataA = a.data_evento ? new Date(a.data_evento) : new Date(8640000000000000);
-        const dataB = b.data_evento ? new Date(b.data_evento) : new Date(8640000000000000);
-        return dataA - dataB;
+        if (!todosEventos.length) {
+          document.getElementById('lista-eventos').style.display = 'none';
+          document.getElementById('mensagem-vazia').style.display = 'block';
+        } else {
+          document.getElementById('lista-eventos').style.display = 'block';
+          document.getElementById('mensagem-vazia').style.display = 'none';
+          exibirEventos(todosEventos);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao carregar eventos.');
+      }
+    }
+
+document.getElementById('pesquisaEventos').addEventListener('input', function() {
+  const termo = this.value.toLowerCase();
+  const eventosFiltrados = todosEventos.filter(e => {
+    const dataFormatada = e.data_evento ? new Date(e.data_evento).toLocaleDateString('pt-BR') : '';
+    return (
+      (e.usuarioNome && e.usuarioNome.toLowerCase().includes(termo)) ||
+      (e.usuarioTelefone && e.usuarioTelefone.toLowerCase().includes(termo)) ||
+      (e.tipo_evento && e.tipo_evento.toLowerCase().includes(termo)) ||
+      (e.descricao_evento && e.descricao_evento.toLowerCase().includes(termo)) ||
+      (e.complemento && e.complemento.toLowerCase().includes(termo)) ||
+      (e.acesso && e.acesso.toLowerCase().includes(termo)) ||
+      (e.tipo_comida && e.tipo_comida.toLowerCase().includes(termo)) ||
+      (e.tipo_bebida && e.tipo_bebida.toLowerCase().includes(termo)) ||
+      (e.rua && e.rua.toLowerCase().includes(termo)) ||
+      (e.bairro && e.bairro.toLowerCase().includes(termo)) ||
+      (e.cidade && e.cidade.toLowerCase().includes(termo)) ||
+      (e.estado && e.estado.toLowerCase().includes(termo)) ||
+      (e.cep && e.cep.toLowerCase().includes(termo)) ||
+      (dataFormatada && dataFormatada.toLowerCase().includes(termo)) // pesquisa na data
+    );
+  });
+  paginaAtual = 1; // voltar para a primeira página
+  exibirEventos(eventosFiltrados);
+});
+
+    function exibirEventos(lista) {
+      const container = document.getElementById('lista-eventos');
+      const paginacao = document.getElementById('paginacao');
+      container.innerHTML = '';
+
+      const totalPaginas = Math.ceil(lista.length / eventosPorPagina);
+      const inicio = (paginaAtual - 1) * eventosPorPagina;
+      const fim = inicio + eventosPorPagina;
+      const eventosPagina = lista.slice(inicio, fim);
+
+      eventosPagina.forEach(evento => {
+        const status = evento.status || 'aguardando';
+        const data = evento.data_evento ? new Date(evento.data_evento).toLocaleDateString('pt-BR') : '-';
+
+        const div = document.createElement('div');
+        div.className = `evento status-${status}`;
+        div.innerHTML = `
+          <p><strong>Cliente:</strong> ${evento.usuarioNome || '-'}</p>
+          <p><strong>Telefone:</strong> ${evento.usuarioTelefone || '-'}</p>
+          <p><strong>Data:</strong> ${data}</p>
+          <p><strong>Tipo de Evento:</strong> ${evento.tipo_evento || '-'}</p>
+          <p><strong>Status:</strong> ${
+            status === 'confirmado' ? 'Confirmado' :
+            status === 'cancelado' ? 'Cancelado' : 'Aguardando confirmação'
+          }</p>
+          <div class="btn-acao">
+            ${
+              status === 'aguardando'
+                ? `<button class="btn-confirmar" onclick="alterarStatus('${evento._id}', 'confirmado')">Confirmar</button>
+                   <button class="btn-cancelar" onclick="abrirModalCancelar('${evento._id}')">Cancelar</button>`
+                : ''
+            }
+            <button class="btn-ver-mais" onclick="verDetalhes('${evento._id}')">Ver Mais</button>
+          </div>
+        `;
+        container.appendChild(div);
       });
 
-      if (!todosEventos.length) {
-        document.getElementById('lista-eventos').style.display = 'none';
-        document.getElementById('mensagem-vazia').style.display = 'block';
-      } else {
-        document.getElementById('lista-eventos').style.display = 'block';
-        document.getElementById('mensagem-vazia').style.display = 'none';
-        exibirEventos(todosEventos);
+      paginacao.style.display = totalPaginas > 1 ? 'flex' : 'none';
+      if (totalPaginas > 1) {
+        paginacao.innerHTML = `
+          <button onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''}>Anterior</button>
+          ${Array.from({ length: totalPaginas }, (_, i) =>
+            `<button class="${paginaAtual === i + 1 ? 'pagina-atual' : ''}" onclick="mudarPagina(${i + 1})">${i + 1}</button>`
+          ).join('')}
+          <button onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled' : ''}>Próxima</button>
+        `;
       }
-    } catch (err) {
-      console.error(err);
-      alert('Erro ao carregar eventos.');
     }
-  }
 
-  function exibirEventos(lista) {
-    const container = document.getElementById('lista-eventos');
-    const paginacao = document.getElementById('paginacao');
-    container.innerHTML = '';
+    function verDetalhes(id) {
+      const evento = todosEventos.find(e => e._id === id);
+      if (!evento) return;
 
-    const totalPaginas = Math.ceil(lista.length / eventosPorPagina);
-    const inicio = (paginaAtual - 1) * eventosPorPagina;
-    const fim = inicio + eventosPorPagina;
-    const eventosPagina = lista.slice(inicio, fim);
-
-    eventosPagina.forEach(evento => {
-      const status = evento.status || 'aguardando';
       const data = evento.data_evento ? new Date(evento.data_evento).toLocaleDateString('pt-BR') : '-';
-      const hora = evento.hora_evento || '-';
+      const horaInicio = evento.hora_evento || '-';
+      const horaFim = evento.hora_fim_evento || '-';
+      const tipoEvento = evento.tipo_evento || '-';
+      const acesso = evento.acesso || '-';
+      const tipoComida = evento.tipo_comida || '-';
+      const tipoBebida = evento.tipo_bebida || '-';
       const convidados = evento.num_convidados || '-';
-      const cliente = evento.usuarioNome || '-';
-      const telefone = evento.usuarioTelefone || '-';
+      const descricao = evento.descricao_evento || '-';
+      const complemento = evento.complemento || '-';
+      const status = evento.status || 'aguardando';
+      const motivo = evento.motivo_cancelamento || '-';
 
-      const div = document.createElement('div');
-      div.className = `evento status-${status}`;
-      div.innerHTML = `
-        <p><strong>Tipo de Evento:</strong> ${evento.tipo_evento || '-'}</p>
-        <p><strong>Data:</strong> ${data}</p>
-        <p><strong>Hora:</strong> ${hora}</p>
-        <p><strong>Nº de Convidados:</strong> ${convidados}</p>
-        <p><strong>Status:</strong> ${status === 'confirmado' ? 'Confirmado' :
-          status === 'cancelado' ? 'Cancelado' : 'Aguardando confirmação'}</p>
-        <div class="btn-acao">
-          <button class="btn-ver-mais" onclick="verDetalhes('${evento._id}')">Ver Mais</button>
-        </div>
+      const statusFormatado =
+        status === 'confirmado'
+          ? '<span style="color:#27ae60;font-weight:bold;">Confirmado</span>'
+          : status === 'cancelado'
+          ? `<span style="color:#c0392b;font-weight:bold;">Cancelado</span><br><strong>Motivo:</strong> ${motivo}`
+          : '<span style="color:#f1c40f;font-weight:bold;">Aguardando Confirmação</span>';
+
+      const conteudo = document.getElementById('modalConteudo');
+      conteudo.innerHTML = `
+        <p><strong>Status:</strong> ${statusFormatado}</p>
+        <p><strong>Data do Evento:</strong> ${data}</p>
+        <p><strong>Hora de Início:</strong> ${horaInicio}</p>
+        <p><strong>Hora de Término:</strong> ${horaFim}</p>
+        <p><strong>Tipo de Evento:</strong> ${tipoEvento}</p>
+        <p><strong>Acesso:</strong> ${acesso}</p>
+        <p><strong>Comida:</strong> ${tipoComida}</p>
+        <p><strong>Bebida:</strong> ${tipoBebida}</p>
+        <p><strong>Número de Convidados:</strong> ${convidados}</p>
+        <p><strong>Descrição:</strong> ${descricao}</p>
+        <hr>
+        <p><strong>Endereço:</strong> ${evento.rua || '-'}, ${evento.numero || ''} - ${evento.bairro || '-'}, ${evento.cidade || '-'} - ${evento.estado || '-'}</p>
+        <p><strong>Complemento:</strong> ${complemento}</p>
+        <p><strong>CEP:</strong> ${evento.cep || '-'}</p>
+        <hr>
+        <p><strong>Responsável:</strong> ${evento.usuarioNome || '-'}</p>
+        <p><strong>Telefone:</strong> ${evento.usuarioTelefone || '-'}</p>
       `;
-      container.appendChild(div);
+
+      document.getElementById('btnEditar').onclick = () => editarEvento(id);
+      document.getElementById('modalDetalhes').style.display = 'flex';
+    }
+
+    function fecharModal() {
+      document.getElementById('modalDetalhes').style.display = 'none';
+    }
+
+    function abrirModalCancelar(id) {
+      eventoParaCancelar = id;
+      document.getElementById('motivoCancelamento').value = '';
+      document.getElementById('modalCancelar').style.display = 'flex';
+    }
+
+    function fecharModalCancelar() {
+      eventoParaCancelar = null;
+      document.getElementById('modalCancelar').style.display = 'none';
+    }
+
+    document.getElementById('btnConfirmarCancelamento').addEventListener('click', async () => {
+      const motivo = document.getElementById('motivoCancelamento').value.trim();
+      if (!motivo) {
+        alert('O motivo do cancelamento é obrigatório.');
+        return;
+      }
+
+      if (!confirm('Deseja realmente cancelar este evento?')) return;
+
+      try {
+        const resposta = await fetch(`/api/eventos/${eventoParaCancelar}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'cancelado', motivo_cancelamento: motivo }),
+          credentials: 'include'
+        });
+        if (!resposta.ok) throw new Error('Erro ao atualizar status');
+
+        alert('Evento cancelado com sucesso.');
+        fecharModalCancelar();
+        carregarEventos();
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao atualizar status.');
+      }
     });
 
-    // Paginação
-    paginacao.style.display = totalPaginas > 1 ? 'flex' : 'none';
-    if (totalPaginas > 1) {
-      paginacao.innerHTML = `
-        <button onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''}>Anterior</button>
-        ${Array.from({ length: totalPaginas }, (_, i) =>
-          `<button class="${paginaAtual === i + 1 ? 'pagina-atual' : ''}" onclick="mudarPagina(${i + 1})">${i + 1}</button>`
-        ).join('')}
-        <button onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled' : ''}>Próxima</button>
-      `;
+    async function alterarStatus(id, status) {
+      if (!confirm(`Deseja realmente marcar este evento como "${status}"?`)) return;
+      try {
+        const resposta = await fetch(`/api/eventos/${id}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status }),
+          credentials: 'include'
+        });
+        if (!resposta.ok) throw new Error('Erro ao atualizar status');
+        alert(`Evento marcado como "${status}".`);
+        carregarEventos();
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao atualizar status.');
+      }
     }
-  }
 
-  function verDetalhes(id) {
-    const evento = todosEventos.find(e => e._id === id);
-    if (!evento) return;
-
-    const data = evento.data_evento ? new Date(evento.data_evento).toLocaleDateString('pt-BR') : '-';
-    const conteudo = document.getElementById('modalConteudo');
-    conteudo.innerHTML = `
-      <p><strong>Status:</strong> ${evento.status || '-'}</p>
-      <p><strong>Data:</strong> ${data}</p>
-      <p><strong>Hora:</strong> ${evento.hora_evento || '-'}</p>
-      <p><strong>Cliente:</strong> ${evento.usuarioNome || '-'}</p>
-      <p><strong>Telefone:</strong> ${evento.usuarioTelefone || '-'}</p>
-      <p><strong>Descrição:</strong> ${evento.descricao_evento || '-'}</p>
-      <p><strong>Tipo de Evento:</strong> ${evento.tipo_evento || '-'}</p>
-      <p><strong>Número de Convidados:</strong> ${evento.num_convidados || '-'}</p>
-      ${evento.motivo_cancelamento ? `<p><strong>Motivo do Cancelamento:</strong> ${evento.motivo_cancelamento}</p>` : ''}
-    `;
-    document.getElementById('btnEditar').onclick = () => editarEvento(id);
-    document.getElementById('modalDetalhes').style.display = 'flex';
-  }
-
-  function fecharModal() { document.getElementById('modalDetalhes').style.display = 'none'; }
-  function editarEvento(id) { window.location.href = `/api/eventos/editar?id=${id}`; }
-
-  function mudarPagina(novaPagina) {
-    const totalPaginas = Math.ceil(todosEventos.length / eventosPorPagina);
-    if (novaPagina >= 1 && novaPagina <= totalPaginas) {
-      paginaAtual = novaPagina;
-      exibirEventos(todosEventos);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    function editarEvento(id) {
+      window.location.href = `/api/eventos/editar?id=${id}`;
     }
-  }
 
-  document.addEventListener('DOMContentLoaded', carregarEventos);
-  fetch('/components/navbarprof.html')
-    .then(r => r.text())
-    .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; });
-</script>
+    function mudarPagina(novaPagina) {
+      const totalPaginas = Math.ceil(todosEventos.length / eventosPorPagina);
+      if (novaPagina >= 1 && novaPagina <= totalPaginas) {
+        paginaAtual = novaPagina;
+        exibirEventos(todosEventos);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', carregarEventos);
+
+    fetch('/components/navbarprof.html')
+      .then(r => r.text())
+      .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; });
+
+        // carregar footer
+        fetch('/components/footer.html')
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById('footer-placeholder').innerHTML = data;
+    })
+    .catch(err => console.error('Erro ao carregar rodapé:', err));
+  </script>
 </body>
 </html>
