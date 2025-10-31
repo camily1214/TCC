@@ -8,86 +8,177 @@
   <link rel="stylesheet" href="/css/navbar.css" />
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color:#c5c6c8;
+    /* Reset e fonte */
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", Arial, sans-serif;
     }
 
-    .container-form {
+    /* Fundo com gradiente animado */
+    body {
+      background: linear-gradient(-45deg, #000, #5e5e5e, #8c8c8c, #bdbdbd);
+      background-size: 400% 400%;
+      animation: gradientMove 10s ease infinite;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 20px;
-      margin-top: 20px;
-      flex-direction: column;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Animação de entrada */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeIn 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Container do formulário */
+    .container-form {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 40px 30px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      animation: fadeIn 1s ease forwards;
     }
 
     form {
-      font-family: Arial, sans-serif;
-      background-color: #737372;
       width: 100%;
-      max-width: 500px;
-      padding: 25px;
+    }
+
+    img.logo {
+      display: block;
+      margin: 0 auto 20px;
+      width: 90px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgb(0, 0, 0);
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
     }
 
     h2 {
-      font-family: Arial, sans-serif;
       text-align: center;
-      color: #000;
-      margin-bottom: 20px;
+      color: #fff;
+      margin-bottom: 25px;
+      font-weight: 600;
     }
 
     .form-group {
-      margin-bottom: 15px;
+      margin-bottom: 18px;
     }
 
     label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
+      color: #e0e0e0;
+      font-size: 14px;
       font-weight: bold;
-      color: #111;
     }
 
     input, select {
       width: 100%;
-      font-family: Arial, sans-serif;
-      padding: 8px; /* mesmo padding para todas */
+      padding: 10px;
+      border-radius: 6px;
       border: 1px solid #ccc;
-      border-radius: 5px;
-      box-sizing: border-box;
+      background-color: rgba(255, 255, 255, 0.85);
+      font-size: 15px;
+      transition: 0.3s;
     }
 
+    input:focus, select:focus {
+      border-color: #fff;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+      outline: none;
+    }
+
+    /* Select customizado */
     select {
-      appearance: none; /* remove seta nativa */
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      background-image: url('/imagens/seta.png'); /* seta personalizada */
+      appearance: none;
+      background-image: url('/imagens/seta.png');
       background-repeat: no-repeat;
       background-position: right 10px center;
       background-size: 16px 16px;
       cursor: pointer;
     }
 
-    button {
-      font-family: Arial, sans-serif;
-      background-color: rgb(43, 47, 47);
-      color: white;
-      padding: 12px;
-      border: none;
-      width: 100%;
-      font-size: 16px;
+    /* Senha com ícone */
+    .senha-wrapper {
+      position: relative;
+    }
+
+    .senha-wrapper input {
+      padding-right: 40px;
+    }
+
+    .toggle-senha {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
       cursor: pointer;
-      border-radius: 5px;
+      width: 22px;
+      height: 22px;
+      opacity: 0.7;
+      transition: 0.3s;
+    }
+
+    .toggle-senha:hover {
+      opacity: 1;
+    }
+
+    /* Botão */
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #222;
+      color: #fff;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.4s ease;
     }
 
     button:hover {
-      background-color: rgb(0, 0, 0);
+      background-color: #fff;
+      color: #000;
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
     }
 
+    .alert {
+      background-color: rgba(255, 80, 80, 0.2);
+      color: #ffbbbb;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      display: none;
+      text-align: center;
+    }
+
+    /* Navbar personalizada */
     .custom-navbar {
       background-color: #727277 !important;
     }
@@ -101,44 +192,21 @@
       text-decoration: underline;
     }
 
-    .senha-wrapper {
-      position: relative;
-    }
-
-    .senha-wrapper input {
-      width: 100%;
-      padding-right: 40px; /* espaço para os ícones */
-    }
-
-    .toggle-senha {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      width: 24px;
-      height: 24px;
-    }
-
-    .alert {
-      background-color: #ffcccc;
-      color: #900;
-      padding: 10px;
-      border-radius: 5px;
-      margin-bottom: 15px;
-      display: none;
+    /* Transição entre páginas */
+    body.fade-out {
+      opacity: 0;
+      transition: opacity 0.4s ease;
     }
   </style>
 </head>
 <body>
-
-  <!--Navbar-->
+  <!-- Navbar -->
   <div id="navbar-placeholder"></div>
 
   <!-- Formulário de Login -->
-  <div class="container-form">
+  <div class="container-form fade-in">
     <form id="formLogin" method="POST">
-      <img src="/imagens/logo.png" alt="Logo" style="width: 100px; display: block; margin: 0 auto 15px; border-radius: 10px" />
+      <img src="/imagens/logofundo.png" alt="Logo" class="logo" />
       <h2>Login do Usuário</h2>
 
       <div id="erros" class="alert" aria-live="polite"></div>
@@ -160,96 +228,98 @@
       <div class="form-group senha-group">
         <label for="senha">Senha</label>
         <div class="senha-wrapper">
-        <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required />
-        <img id="olhoFechado" src="/imagens/escondido.png" alt="Mostrar senha" class="toggle-senha" onclick="mostrarSenha()" />
-        <img id="olhoAberto" src="/imagens/olho.png" alt="Ocultar senha" class="toggle-senha" onclick="mostrarSenha()" style="display:none;" />
+          <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required />
+          <img id="olhoFechado" src="/imagens/escondido.png" alt="Mostrar senha" class="toggle-senha" onclick="mostrarSenha()" />
+          <img id="olhoAberto" src="/imagens/olho.png" alt="Ocultar senha" class="toggle-senha" onclick="mostrarSenha()" style="display:none;" />
+        </div>
       </div>
-    </div>
 
       <button type="submit">Entrar</button>
-        </form>
-      </div>
+    </form>
+  </div>
 
   <div id="footer-placeholder"></div>
 
-<script>
-const form = document.getElementById('formLogin');
-const errosDiv = document.getElementById('erros');
+  <script>
+    const form = document.getElementById('formLogin');
+    const errosDiv = document.getElementById('erros');
 
-form.addEventListener('submit', async function (event) {
-  event.preventDefault();
-  errosDiv.style.display = 'none';
-  errosDiv.innerHTML = '';
+    form.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      errosDiv.style.display = 'none';
+      errosDiv.innerHTML = '';
 
-  const email = document.getElementById('email').value.trim();
-  const senha = document.getElementById('senha').value;
-  const tipo  = document.getElementById('tipo').value;
+      const email = document.getElementById('email').value.trim();
+      const senha = document.getElementById('senha').value;
+      const tipo  = document.getElementById('tipo').value;
 
-  if (!email || !senha || !tipo) {
-    errosDiv.innerHTML = 'Por favor, preencha todos os campos.';
-    errosDiv.style.display = 'block';
-    return;
-  }
-
-  try {
-    const resposta = await fetch('/api/usuarios/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email, senha, tipo }) // envia tipo junto
-    });
-
-    const data = await resposta.json();
-
-    if (resposta.ok) {
-      if (data.tipo === 'cliente') {
-        window.location.href = '/api/eventos/pos-login';
-      } else if (data.tipo === 'profissional') {
-        window.location.href = '/api/eventos/prof-pos-login'; 
-      } else {
-        window.location.href = '/api/eventos/pos-login';
+      if (!email || !senha || !tipo) {
+        errosDiv.innerHTML = 'Por favor, preencha todos os campos.';
+        errosDiv.style.display = 'block';
+        return;
       }
-    } else {
-      errosDiv.innerHTML = data.mensagem || 'Erro ao fazer login.';
-      errosDiv.style.display = 'block';
-    }
-  } catch (err) {
-    console.error('Erro ao tentar login:', err);
-    errosDiv.innerHTML = 'Erro ao conectar ao servidor.';
-    errosDiv.style.display = 'block';
-  }
-});
+
+      try {
+        const resposta = await fetch('/api/usuarios/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email, senha, tipo })
+        });
+
+        const data = await resposta.json();
+
+        if (resposta.ok) {
+          document.body.classList.add('fade-out');
+          setTimeout(() => {
+            if (data.tipo === 'cliente') {
+              window.location.href = '/api/eventos/pos-login';
+            } else if (data.tipo === 'profissional') {
+              window.location.href = '/api/eventos/prof-pos-login';
+            } else {
+              window.location.href = '/api/eventos/pos-login';
+            }
+          }, 400);
+        } else {
+          errosDiv.innerHTML = data.mensagem || 'Erro ao fazer login.';
+          errosDiv.style.display = 'block';
+        }
+      } catch (err) {
+        console.error('Erro ao tentar login:', err);
+        errosDiv.innerHTML = 'Erro ao conectar ao servidor.';
+        errosDiv.style.display = 'block';
+      }
+    });
 
     function mostrarSenha() {
-  const senhaInput = document.getElementById('senha');
-  const olhoFechado = document.getElementById('olhoFechado');
-  const olhoAberto = document.getElementById('olhoAberto');
+      const senhaInput = document.getElementById('senha');
+      const olhoFechado = document.getElementById('olhoFechado');
+      const olhoAberto = document.getElementById('olhoAberto');
 
-  if (senhaInput.type === 'password') {
-    senhaInput.type = 'text';
-    olhoFechado.style.display = 'none';
-    olhoAberto.style.display = 'block';
-  } else {
-    senhaInput.type = 'password';
-    olhoFechado.style.display = 'block';
-    olhoAberto.style.display = 'none';
-  }
+      if (senhaInput.type === 'password') {
+        senhaInput.type = 'text';
+        olhoFechado.style.display = 'none';
+        olhoAberto.style.display = 'block';
+      } else {
+        senhaInput.type = 'password';
+        olhoFechado.style.display = 'block';
+        olhoAberto.style.display = 'none';
+      }
     }
 
-  // Carrega a navbar
-  fetch('/components/navbarinicial.html')
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById('navbar-placeholder').innerHTML = data;
-    });
+    // Carrega navbar e footer
+    fetch('/components/navbarinicial.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('navbar-placeholder').innerHTML = data;
+      });
 
-// carregar footer
-        fetch('/components/footer.html')
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById('footer-placeholder').innerHTML = data;
-    })
-    .catch(err => console.error('Erro ao carregar rodapé:', err));
-</script>
+    fetch('/components/footer.html')
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+      })
+      .catch(err => console.error('Erro ao carregar rodapé:', err));
+  </script>
 </body>
 </html>

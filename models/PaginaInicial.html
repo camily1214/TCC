@@ -5,36 +5,89 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Página Inicial</title>
 
-    <!-- Navbar -->
+  <!-- Navbar -->
   <link rel="stylesheet" href="/css/navbar.css" />
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #000;
-      color: #000000;
+    /* Fonte e reset */
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", Arial, sans-serif;
     }
 
+    /* Fundo com gradiente animado */
+    body {
+      height: 100vh;
+      background: linear-gradient(-45deg, #000, #5e5e5e, #8c8c8c, #bdbdbd);
+      background-size: 400% 400%;
+      animation: gradientMove 10s ease infinite;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Fade-in da página */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeIn 1.2s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Área principal */
     .hero {
-      background:  #737372;
-      padding: 60px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 60px 40px;
       text-align: center;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      width: 90%;
+      max-width: 700px;
     }
 
     .hero h1 {
       font-size: 36px;
       margin-bottom: 10px;
-      color: #000000;
+      color: #fff;
+      letter-spacing: 1px;
     }
 
     .hero p {
       font-size: 18px;
-      color: #000000;
-      margin-bottom: 30px;
+      color: #f0f0f0;
+      margin-bottom: 40px;
     }
 
+    .logo {
+      width: 120px;
+      margin-bottom: 20px;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* Botões */
     .buttons {
       display: flex;
       flex-wrap: wrap;
@@ -44,34 +97,35 @@
 
     .btn {
       background-color: #8c8c8c;
-      color: #000000;
-      padding: 15px 25px;
+      color: #000;
+      padding: 15px 35px;
       font-size: 16px;
       border: none;
-      border-radius: 8px;
+      border-radius: 30px;
       cursor: pointer;
       text-decoration: none;
-      transition: 0.3s;
+      transition: all 0.4s ease;
+      font-weight: bold;
     }
 
     .btn:hover {
-      background-color: #555;
+      background-color: #fff;
+      color: #000;
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
     }
 
-    .logo {
-      width: 120px;
-      margin-bottom: 20px;
-    }
-
+    /* Rodapé */
     .footer {
-      background-color: #111;
-      color: #888;
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
       text-align: center;
-      padding: 20px;
-      margin-top: 60px;
+      color: #ccc;
       font-size: 14px;
     }
-        /* Navbar personalizada */
+
+    /* Navbar personalizada */
     .custom-navbar {
       background-color: #727277 !important;
     }
@@ -84,28 +138,45 @@
     .custom-navbar .nav-link:hover {
       text-decoration: underline;
     }
+
+    /* Transição entre telas */
+    a {
+      transition: opacity 0.4s ease;
+    }
+
+    a.fade {
+      opacity: 0;
+    }
   </style>
 </head>
 <body>
-
-  <!-- Conteúdo principal -->
-  <div class="hero">
-    <img src="/imagens/logo.png" alt="Logo" class="logo" />
+  <div class="hero fade-in">
+    <img src="/imagens/logofundo.png" alt="Logo" class="logo" />
     <h1>Bem-vindo ao AHS Eventos</h1>
-    <p>Aqui o sistema é voltado para que o cliente contrate e acompanhe os detalhes do seu serviço com eficiencia e facilidade.</p>
+    <p>Aqui o sistema é voltado para que o cliente contrate e acompanhe os detalhes do seu serviço com eficiência e facilidade.</p>
 
     <div class="buttons">
-      <a href="/login" class="btn">Ja tenho cadastro</a>
-      <a href="/api/usuarios/cadastro" class="btn">Quero me cadastrar</a>
+      <a href="/login" class="btn transition-link">Já tenho cadastro</a>
+      <a href="/api/usuarios/cadastro" class="btn transition-link">Quero me cadastrar</a>
     </div>
   </div>
 
   <div class="footer">
-    &copy; 2025 Sistema de Gerenciamento de Serviços para Eventos — Camily de Sant'ana Lummertz e Isadora Sofia Pereira Marcelino
+    &copy; 2025 Sistema de Gerenciamento de Serviços para Eventos — Camily de Sant'ana Lummertz e Isadora Sofia Marcelino Pereira
   </div>
 
   <script>
-
+    // Transição suave entre páginas
+    const links = document.querySelectorAll('.transition-link');
+    links.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        document.body.classList.add('fade');
+        setTimeout(() => {
+          window.location.href = link.href;
+        }, 400);
+      });
+    });
   </script>
 </body>
 </html>

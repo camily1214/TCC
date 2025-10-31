@@ -1,4 +1,3 @@
-<!-- 🔹 ATUALIZADO: ListaEvent.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -37,7 +36,6 @@
       padding: 15px;
       margin-bottom: 15px;
       box-shadow: 0 0 5px #00000055;
-      cursor: pointer;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
@@ -51,7 +49,6 @@
     .status-cancelado { border-left: 5px solid #c0392b; }
 
     .evento p { margin: 5px 0; }
-    .evento .data { font-size: 14px; color: #555; }
 
     .btn-acao {
       margin-top: 15px;
@@ -81,6 +78,9 @@
 
     .btn-ver-mais { background-color: #3498db; }
     .btn-ver-mais:hover { background-color: #2980b9; }
+
+    .btn-excluir { background-color: #555; }
+    .btn-excluir:hover { background-color: #000; }
 
     .modal {
       display: none;
@@ -121,11 +121,6 @@
     .btn-editar { background-color: #f39c12; }
     .btn-editar:hover { background-color: #e67e22; }
 
-    .modal-content button {
-      display: inline-block;
-      margin-right: 10px;
-    }
-
     .paginacao {
       display: flex;
       justify-content: center;
@@ -154,7 +149,6 @@
       background-color: #ccc;
       color: #666;
       cursor: not-allowed;
-      transform: none;
     }
 
     .pagina-atual {
@@ -168,9 +162,7 @@
   <div class="container">
     <h2>Eventos Cadastrados</h2>
     <div id="lista-eventos"></div>
-
     <div id="paginacao" class="paginacao" style="display:none;"></div>
-
     <div id="mensagem-vazia" style="display:none; text-align:center; color:#555; margin-top:20px;">
       Nenhum evento cadastrado no momento.
     </div>
@@ -189,134 +181,121 @@
   </div>
 
   <script>
-    let todosEventos = [];
-    let paginaAtual = 1;
-    const eventosPorPagina = 5;
+  let todosEventos = [];
+  let paginaAtual = 1;
+  const eventosPorPagina = 5;
 
-    async function carregarEventos() {
-      try {
-        const resposta = await fetch('/api/eventos/lista-evento', { credentials: 'include' });
-        if (!resposta.ok) throw new Error('Erro ao buscar eventos');
-        todosEventos = await resposta.json();
+  async function carregarEventos() {
+    try {
+      const resposta = await fetch('/api/eventos/lista-evento', { credentials: 'include' });
+      if (!resposta.ok) throw new Error('Erro ao buscar eventos');
+      todosEventos = await resposta.json();
 
-        if (!todosEventos.length) {
-          document.getElementById('lista-eventos').style.display = 'none';
-          document.getElementById('mensagem-vazia').style.display = 'block';
-        } else {
-          document.getElementById('lista-eventos').style.display = 'block';
-          document.getElementById('mensagem-vazia').style.display = 'none';
-          exibirEventos(todosEventos);
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Erro ao carregar eventos.');
-      }
-    }
-
-    function exibirEventos(lista) {
-      const container = document.getElementById('lista-eventos');
-      const paginacao = document.getElementById('paginacao');
-      container.innerHTML = '';
-
-      const totalPaginas = Math.ceil(lista.length / eventosPorPagina);
-      const inicio = (paginaAtual - 1) * eventosPorPagina;
-      const fim = inicio + eventosPorPagina;
-      const eventosPagina = lista.slice(inicio, fim);
-
-      eventosPagina.forEach(evento => {
-        const status = evento.status || 'aguardando';
-        const div = document.createElement('div');
-        div.className = `evento status-${status}`;
-        div.innerHTML = `
-          <p><strong>Cliente:</strong> ${evento.usuarioNome || '-'}</p>
-          <p><strong>Telefone:</strong> ${evento.usuarioTelefone || '-'}</p>
-          <p><strong>Data:</strong> ${evento.data_evento || '-'}</p>
-          <p><strong>Tipo de Evento:</strong> ${evento.tipo_evento || '-'}</p>
-          <p><strong>Status:</strong> ${
-            status === 'confirmado'
-              ? 'Confirmado'
-              : status === 'cancelado'
-              ? 'Cancelado'
-              : 'Aguardando confirmação'
-          }</p>
-          
-          <div class="btn-acao">
-            <button class="btn-confirmar" onclick="alterarStatus('${evento._id}', 'confirmado')">Confirmar</button>
-            <button class="btn-cancelar" onclick="alterarStatus('${evento._id}', 'cancelado')">Cancelar</button>
-            <button class="btn-ver-mais" onclick="verDetalhes('${evento._id}')">Ver Mais</button>
-          </div>
-        `;
-        container.appendChild(div);
+      // Ordenar por data crescente (eventos futuros primeiro)
+      todosEventos.sort((a, b) => {
+        const dataA = a.data_evento ? new Date(a.data_evento) : new Date(8640000000000000);
+        const dataB = b.data_evento ? new Date(b.data_evento) : new Date(8640000000000000);
+        return dataA - dataB;
       });
 
-      if (totalPaginas > 1) {
-        paginacao.style.display = 'flex';
-        paginacao.innerHTML = `
-          <button onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''}>Anterior</button>
-          ${Array.from({ length: totalPaginas }, (_, i) => `
-            <button class="${paginaAtual === i + 1 ? 'pagina-atual' : ''}" onclick="mudarPagina(${i + 1})">${i + 1}</button>
-          `).join('')}
-          <button onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled' : ''}>Próxima</button>
-        `;
+      if (!todosEventos.length) {
+        document.getElementById('lista-eventos').style.display = 'none';
+        document.getElementById('mensagem-vazia').style.display = 'block';
       } else {
-        paginacao.style.display = 'none';
+        document.getElementById('lista-eventos').style.display = 'block';
+        document.getElementById('mensagem-vazia').style.display = 'none';
+        exibirEventos(todosEventos);
       }
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao carregar eventos.');
     }
+  }
 
-    function verDetalhes(id) {
-      const evento = todosEventos.find(e => e._id === id);
-      if (!evento) return;
-      const conteudo = document.getElementById('modalConteudo');
-      conteudo.innerHTML = `
-        <p><strong>Cliente:</strong> ${evento.usuarioNome}</p>
-        <p><strong>Telefone:</strong> ${evento.usuarioTelefone}</p>
-        <p><strong>Data:</strong> ${evento.data_evento}</p>
-        <p><strong>Hora Início:</strong> ${evento.hora_evento || '-'}</p>
-        <p><strong>Hora Fim:</strong> ${evento.hora_fim_evento || '-'}</p>
-        <p><strong>Acesso:</strong> ${evento.acesso || '-'}</p>
-        <p><strong>Comida:</strong> ${evento.tipo_comida || '-'}</p>
-        <p><strong>Bebida:</strong> ${evento.tipo_bebida || '-'}</p>
-        <p><strong>Convidados:</strong> ${evento.num_convidados || '-'}</p>
-        <p><strong>Observações:</strong> ${evento.descricao_evento || '-'}</p>
-        <p><strong>Endereço:</strong> ${evento.rua}, ${evento.numero || ''} ${evento.bairro}, ${evento.cidade} - ${evento.estado}</p>
-        <p><strong>Complemento:</strong> ${evento.complemento || '-'}</p>
+  function exibirEventos(lista) {
+    const container = document.getElementById('lista-eventos');
+    const paginacao = document.getElementById('paginacao');
+    container.innerHTML = '';
+
+    const totalPaginas = Math.ceil(lista.length / eventosPorPagina);
+    const inicio = (paginaAtual - 1) * eventosPorPagina;
+    const fim = inicio + eventosPorPagina;
+    const eventosPagina = lista.slice(inicio, fim);
+
+    eventosPagina.forEach(evento => {
+      const status = evento.status || 'aguardando';
+      const data = evento.data_evento ? new Date(evento.data_evento).toLocaleDateString('pt-BR') : '-';
+      const hora = evento.hora_evento || '-';
+      const convidados = evento.num_convidados || '-';
+      const cliente = evento.usuarioNome || '-';
+      const telefone = evento.usuarioTelefone || '-';
+
+      const div = document.createElement('div');
+      div.className = `evento status-${status}`;
+      div.innerHTML = `
+        <p><strong>Tipo de Evento:</strong> ${evento.tipo_evento || '-'}</p>
+        <p><strong>Data:</strong> ${data}</p>
+        <p><strong>Hora:</strong> ${hora}</p>
+        <p><strong>Nº de Convidados:</strong> ${convidados}</p>
+        <p><strong>Status:</strong> ${status === 'confirmado' ? 'Confirmado' :
+          status === 'cancelado' ? 'Cancelado' : 'Aguardando confirmação'}</p>
+        <div class="btn-acao">
+          <button class="btn-ver-mais" onclick="verDetalhes('${evento._id}')">Ver Mais</button>
+        </div>
       `;
-      document.getElementById('btnEditar').onclick = () => editarEvento(id);
-      document.getElementById('modalDetalhes').style.display = 'flex';
+      container.appendChild(div);
+    });
+
+    // Paginação
+    paginacao.style.display = totalPaginas > 1 ? 'flex' : 'none';
+    if (totalPaginas > 1) {
+      paginacao.innerHTML = `
+        <button onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''}>Anterior</button>
+        ${Array.from({ length: totalPaginas }, (_, i) =>
+          `<button class="${paginaAtual === i + 1 ? 'pagina-atual' : ''}" onclick="mudarPagina(${i + 1})">${i + 1}</button>`
+        ).join('')}
+        <button onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled' : ''}>Próxima</button>
+      `;
     }
+  }
 
-    function fecharModal() {
-      document.getElementById('modalDetalhes').style.display = 'none';
+  function verDetalhes(id) {
+    const evento = todosEventos.find(e => e._id === id);
+    if (!evento) return;
+
+    const data = evento.data_evento ? new Date(evento.data_evento).toLocaleDateString('pt-BR') : '-';
+    const conteudo = document.getElementById('modalConteudo');
+    conteudo.innerHTML = `
+      <p><strong>Status:</strong> ${evento.status || '-'}</p>
+      <p><strong>Data:</strong> ${data}</p>
+      <p><strong>Hora:</strong> ${evento.hora_evento || '-'}</p>
+      <p><strong>Cliente:</strong> ${evento.usuarioNome || '-'}</p>
+      <p><strong>Telefone:</strong> ${evento.usuarioTelefone || '-'}</p>
+      <p><strong>Descrição:</strong> ${evento.descricao_evento || '-'}</p>
+      <p><strong>Tipo de Evento:</strong> ${evento.tipo_evento || '-'}</p>
+      <p><strong>Número de Convidados:</strong> ${evento.num_convidados || '-'}</p>
+      ${evento.motivo_cancelamento ? `<p><strong>Motivo do Cancelamento:</strong> ${evento.motivo_cancelamento}</p>` : ''}
+    `;
+    document.getElementById('btnEditar').onclick = () => editarEvento(id);
+    document.getElementById('modalDetalhes').style.display = 'flex';
+  }
+
+  function fecharModal() { document.getElementById('modalDetalhes').style.display = 'none'; }
+  function editarEvento(id) { window.location.href = `/api/eventos/editar?id=${id}`; }
+
+  function mudarPagina(novaPagina) {
+    const totalPaginas = Math.ceil(todosEventos.length / eventosPorPagina);
+    if (novaPagina >= 1 && novaPagina <= totalPaginas) {
+      paginaAtual = novaPagina;
+      exibirEventos(todosEventos);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  }
 
-    async function alterarStatus(id, status) {
-      if (!confirm(`Deseja realmente marcar este evento como "${status}"?`)) return;
-      try {
-        const resposta = await fetch(`/api/eventos/${id}/status`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status }),
-          credentials: 'include'
-        });
-
-        if (!resposta.ok) throw new Error('Erro ao atualizar status');
-        alert(`Evento marcado como "${status}".`);
-        carregarEventos();
-      } catch (err) {
-        console.error(err);
-        alert('Erro ao atualizar status.');
-      }
-    }
-
-    function editarEvento(id) {
-      window.location.href = `/api/eventos/editar?id=${id}`;
-    }
-
-    document.addEventListener('DOMContentLoaded', carregarEventos);
-
-    fetch('/components/navbarprof.html')
-      .then(r => r.text())
-      .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; });
-  </script>
+  document.addEventListener('DOMContentLoaded', carregarEventos);
+  fetch('/components/navbarprof.html')
+    .then(r => r.text())
+    .then(data => { document.getElementById('navbar-placeholder').innerHTML = data; });
+</script>
 </body>
 </html>

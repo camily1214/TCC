@@ -3,62 +3,105 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Página Inicial - profissional</title>
+  <title>Página Inicial - Profissional</title>
 
   <!-- Navbar -->
   <link rel="stylesheet" href="/css/navbar.css" />
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #c5c6c8;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #c5c6c8, #a6a7ab);
       margin: 0;
       padding: 0;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .container-opcoes {
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      min-height: calc(100vh - 100px);
-      padding: 40px 20px 20px;
+      align-items: center;
       flex: 1;
+      padding: 40px 20px;
     }
 
     .card-opcoes {
-      background-color: #737372;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      background-color: rgba(115, 115, 114, 0.95);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
       text-align: center;
-      color: #000000;
-      max-width: 600px;
+      color: #fff;
+      max-width: 500px;
+      width: 100%;
+      transform: translateY(30px);
+      animation: slideUp 0.8s ease forwards;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-opcoes img {
+      width: 120px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .card-opcoes img:hover {
+      transform: scale(1.05);
     }
 
     .card-opcoes h2 {
       color: #000;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+    }
+
+    .card-opcoes p {
+      margin-bottom: 25px;
+      color: #000;
+      font-size: 1rem;
     }
 
     .btn-opcao {
-      background-color: rgb(43, 47, 47);
+      background-color: #2b2f2f;
       border: none;
       color: #fff;
       padding: 14px 28px;
-      border-radius: 5px;
+      border-radius: 8px;
       font-size: 16px;
       margin: 10px;
-      text-decoration: none;
-      display: inline-block;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
 
     .btn-opcao:hover {
       background-color: #000;
+      transform: scale(1.05);
+    }
+
+    /* Transição suave entre páginas */
+    .fade-out {
+      animation: fadeOut 0.5s ease forwards;
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
     }
 
     /* Navbar personalizada */
@@ -81,29 +124,30 @@
   <!-- Navbar -->
   <div id="navbar-placeholder"></div>
 
-  <!-- Opções Pós Login -->
+  <!-- Conteúdo principal -->
   <div class="container-opcoes">
     <div class="card-opcoes">
-      <img src="/imagens/logo.png" alt="Logo" style="width: 110px; border-radius: 10px; margin-bottom: 15px;" />
-      <h2>Bem-vindo a área profissional!</h2>
+      <img src="/imagens/logofundo.png" alt="Logo" />
+      <h2>Bem-vindo à área profissional!</h2>
       <p>Escolha uma das opções abaixo:</p>
       
       <!-- Botão Criar Evento -->
-      <button class="btn-opcao" onclick="window.location.href = '/api/eventos/escolher-data'">
+      <button class="btn-opcao" onclick="transitionTo('/api/eventos/escolher-data')">
         Criar Novo Evento
       </button>
 
       <!-- Botão Ver Meus Eventos -->
-      <button class="btn-opcao" onclick="window.location.href='/api/eventos/lista-eventos-html'">
+      <button class="btn-opcao" onclick="transitionTo('/api/eventos/lista-eventos-html')">
         Ver Todos os Eventos
       </button>
     </div>
   </div>
 
-    <div id="footer-placeholder"></div>
+  <div id="footer-placeholder"></div>
 
-  <!-- Script para carregar navbar -->
+  <!-- Script de carregamento e transição -->
   <script>
+    // Carregar navbar
     fetch('/components/navbarprof.html')
       .then(response => {
         if (!response.ok) throw new Error('Erro ao carregar a navbar');
@@ -112,17 +156,23 @@
       .then(data => {
         document.getElementById('navbar-placeholder').innerHTML = data;
       })
-      .catch(error => {
-        console.error('Erro ao carregar navbar:', error);
-      });
+      .catch(error => console.error('Erro ao carregar navbar:', error));
 
-      // carregar footer
-        fetch('/components/footer.html')
-    .then(res => res.text())
-    .then(data => {
-      document.getElementById('footer-placeholder').innerHTML = data;
-    })
-    .catch(err => console.error('Erro ao carregar rodapé:', err));
+    // Carregar footer
+    fetch('/components/footer.html')
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('footer-placeholder').innerHTML = data;
+      })
+      .catch(err => console.error('Erro ao carregar rodapé:', err));
+
+    // Função de transição suave entre páginas
+    function transitionTo(url) {
+      document.body.classList.add('fade-out');
+      setTimeout(() => {
+        window.location.href = url;
+      }, 400);
+    }
   </script>
 </body>
 </html>

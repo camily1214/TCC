@@ -6,22 +6,22 @@ const EventSchema = new mongoose.Schema({
   tipo_bebida: String,
   tipo_comida: String,
   num_convidados: {
-    type: Number, 
+    type: Number,
     required: true
   },
   data_evento: {
-    type: Date, 
+    type: Date,
     required: true
   },
   hora_evento: {
     type: String,
     required: true
   },
-  hora_fim_evento: { 
+  hora_fim_evento: {
     type: String,
     required: true
   },
-  descricao_evento: { 
+  descricao_evento: {
     type: String,
     default: ''
   },
@@ -33,25 +33,26 @@ const EventSchema = new mongoose.Schema({
   estado: String,
   cep: String,
 
-  usuarioId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Usuario',
-    required: true
-  },
-
+  // 🔹 Campos de controle
   status: {
     type: String,
     enum: ['aguardando', 'confirmado', 'cancelado'],
     default: 'aguardando'
   },
-
-  // Campos adicionados para registrar quem e quando alterou o status
-  alteradoPor: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Usuario'
+  motivo_cancelamento: {
+    type: String,
+    default: null // armazena o motivo informado pelo profissional
   },
   dataAlteracaoStatus: {
-    type: Date
+    type: Date,
+    default: null
+  },
+
+  // 🔹 Relação com o usuário (cliente)
+  usuarioId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Usuario',
+    required: true
   }
 });
 

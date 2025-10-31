@@ -128,27 +128,36 @@ router.get('/datas-agendadas', async (req, res) => {
   }
 });
 
-
-// Listar todos os eventos (profissionais)
+// 🔹 Listar apenas eventos recentes (últimos 15 dias e futuros)
 router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) => {
   try {
-    const eventos = await Evento.find().populate('usuarioId', 'nome telefone').lean();
+    const hoje = new Date();
+    const limite = new Date(hoje);
+    limite.setDate(limite.getDate() - 15); // 15 dias atrás
+
+    const eventos = await Evento.find({ data_evento: { $gte: limite } })
+      .populate('usuarioId', 'nome telefone')
+      .sort({ data_evento: 1 })
+      .lean();
 
     const eventosFormatados = eventos.map(e => {
       let dataFormatada = '-';
       if (e.data_evento) {
         try {
-          const dataObj = typeof e.data_evento === 'string'
-            ? new Date(e.data_evento + 'T00:00:00')
-            : new Date(e.data_evento);
+          let dataObj;
+          if (e.data_evento instanceof Date && !isNaN(e.data_evento)) {
+            dataObj = e.data_evento;
+          } else if (typeof e.data_evento === 'string') {
+            dataObj = new Date(e.data_evento);
+          }
 
-          if (!isNaN(dataObj.getTime())) {
+          if (dataObj && !isNaN(dataObj.getTime())) {
             dataFormatada = dataObj.toLocaleDateString('pt-BR', {
               timeZone: 'America/Sao_Paulo'
             });
           }
-        } catch {
-          dataFormatada = '-';
+        } catch (err) {
+          console.error('Erro ao formatar data:', e.data_evento, err);
         }
       }
 
@@ -162,7 +171,7 @@ router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) =>
         num_convidados: e.num_convidados || '-',
         tipo_bebida: e.tipo_bebida || '-',
         tipo_comida: e.tipo_comida || '-',
-        data_evento: dataFormatada,
+        data_evento: e.data_evento ? e.data_evento.toISOString() : null,
         hora_evento: e.hora_evento || '--:--',
         hora_fim_evento: e.hora_fim_evento || '--:--',
         descricao_evento: e.descricao_evento || '-',
@@ -178,10 +187,11 @@ router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) =>
 
     res.json(eventosFormatados);
   } catch (err) {
-    console.error('Erro ao buscar eventos:', err);
-    res.status(500).json({ error: 'Erro ao buscar eventos.' });
+    console.error('Erro ao buscar eventos recentes:', err);
+    res.status(500).json({ erro: 'Erro ao buscar eventos recentes.' });
   }
 });
+
 
 // Buscar evento por ID
 router.get('/:id', autenticar, async (req, res) => {
@@ -202,16 +212,33 @@ router.get('/:id', autenticar, async (req, res) => {
 // Atualizar status (profissional)
 router.put('/:id/status', autenticar, apenasProfissionais, async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, motivo_cancelamento } = req.body;
+
+    // Verificação de status válido
     if (!['confirmado', 'cancelado'].includes(status)) {
       return res.status(400).json({ erro: 'Status inválido' });
     }
 
+    // Busca o evento
     const evento = await Evento.findById(req.params.id);
-    if (!evento) return res.status(404).json({ erro: 'Evento não encontrado' });
+    if (!evento) {
+      return res.status(404).json({ erro: 'Evento não encontrado' });
+    }
 
+    // Atualiza os campos
     evento.status = status;
     evento.dataAlteracaoStatus = new Date();
+
+    // Se o status for cancelado, salva o motivo
+    if (status === 'cancelado') {
+      if (!motivo_cancelamento || motivo_cancelamento.trim() === '') {
+        return res.status(400).json({ erro: 'O motivo do cancelamento é obrigatório.' });
+      }
+      evento.motivo_cancelamento = motivo_cancelamento.trim();
+    } else {
+      evento.motivo_cancelamento = null;
+    }
+
     await evento.save();
 
     res.json({
@@ -226,21 +253,37 @@ router.put('/:id/status', autenticar, apenasProfissionais, async (req, res) => {
   }
 });
 
-// Atualizar evento
-router.put('/:id', autenticar, async (req, res) => {
+// Atualizar evento (cliente ou profissional autorizado)
+router.put("/:id", autenticar, async (req, res) => {
   try {
+    const usuario = req.session.usuario;
     const evento = await Evento.findById(req.params.id);
-    if (!evento) return res.status(404).json({ erro: 'Evento não encontrado' });
+    if (!evento) return res.status(404).json({ erro: "Evento não encontrado" });
 
-    Object.assign(evento, req.body);
-    await evento.save();
+    // Permissão
+    if (usuario.tipo === "cliente" && evento.usuarioId.toString() !== usuario.id) {
+      return res.status(403).json({ erro: "Você não tem permissão para editar este evento." });
+    }
 
-    res.json({ sucesso: true, mensagem: 'Evento atualizado com sucesso.' });
+    // Corrigir formato da data
+    if (req.body.data_evento) {
+      const [ano, mes, dia] = req.body.data_evento.split('-').map(Number);
+      req.body.data_evento = new Date(ano, mes - 1, dia);
+    }
+
+    const eventoAtualizado = await Evento.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    res.json({ sucesso: true, evento: eventoAtualizado });
   } catch (err) {
-    console.error('Erro ao atualizar evento:', err);
-    res.status(500).json({ erro: 'Erro ao atualizar evento.' });
+    console.error("Erro ao atualizar evento:", err);
+    res.status(500).json({ erro: "Erro ao atualizar evento." });
   }
 });
+
 
 // Deletar evento
 router.delete('/:id', autenticar, async (req, res) => {
