@@ -275,37 +275,57 @@ router.put('/:id/status', autenticar, apenasProfissionais, async (req, res) => {
   }
 });
 
-// Atualizar evento (cliente ou profissional autorizado)
-router.put("/:id", autenticar, async (req, res) => {
+// Atualizar evento completo (cliente ou profissional)
+router.put('/:id', autenticar, async (req, res) => {
   try {
-    const usuario = req.session.usuario;
     const evento = await Evento.findById(req.params.id);
-    if (!evento) return res.status(404).json({ erro: "Evento não encontrado" });
-
-    // Permissão
-    if (usuario.tipo === "cliente" && evento.usuarioId.toString() !== usuario.id) {
-      return res.status(403).json({ erro: "Você não tem permissão para editar este evento." });
+    if (!evento) {
+      return res.status(404).json({ erro: 'Evento não encontrado' });
     }
 
-    // Corrigir formato da data
-    if (req.body.data_evento) {
-      const [ano, mes, dia] = req.body.data_evento.split('-').map(Number);
-      req.body.data_evento = new Date(ano, mes - 1, dia);
+    // Impede que um cliente edite evento de outro
+    if (req.session.usuario.tipo === 'cliente' && evento.usuarioId.toString() !== req.session.usuario.id) {
+      return res.status(403).json({ erro: 'Acesso negado' });
     }
 
-    const eventoAtualizado = await Evento.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
+    const {
+      acesso, tipo_evento, tipo_comida, tipo_bebida,
+      num_convidados, data_evento, hora_evento, hora_fim_evento, descricao_evento,
+      rua, numero, complemento, bairro, cidade, estado, cep
+    } = req.body;
 
-    res.json({ sucesso: true, evento: eventoAtualizado });
+    // Atualiza os campos
+    if (data_evento) {
+      const [ano, mes, dia] = data_evento.split('-').map(Number);
+      evento.data_evento = new Date(ano, mes - 1, dia);
+    }
+
+    Object.assign(evento, {
+      acesso,
+      tipo_evento,
+      tipo_comida,
+      tipo_bebida,
+      num_convidados,
+      hora_evento,
+      hora_fim_evento,
+      descricao_evento,
+      rua,
+      numero,
+      complemento,
+      bairro,
+      cidade,
+      estado,
+      cep
+    });
+
+    await evento.save();
+
+    res.json({ sucesso: true, mensagem: 'Evento atualizado com sucesso!', evento });
   } catch (err) {
-    console.error("Erro ao atualizar evento:", err);
-    res.status(500).json({ erro: "Erro ao atualizar evento." });
+    console.error('Erro ao atualizar evento:', err);
+    res.status(500).json({ erro: 'Erro ao atualizar evento.' });
   }
 });
-
 
 // Deletar evento
 router.delete('/:id', autenticar, async (req, res) => {

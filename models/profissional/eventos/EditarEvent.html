@@ -6,145 +6,178 @@
   <title>Editar Evento</title>
   <link rel="stylesheet" href="/css/navbar.css" />
 
-  <style>
-    :root {
-      --bg: #c5c6c8;
-      --card: #727277;
-      --white: #fff;
-      --black: #000;
-      --gap: 10px;
-    }
+<style>
+:root {
+  --bg: #c5c6c8;
+  --card: #727277;
+  --white: #fff;
+  --black: #000;
+  --gap: 10px;
+}
 
-    * { box-sizing: border-box; }
+* { box-sizing: border-box; }
 
-    body {
-      font-family: Arial, sans-serif;
-      background-color: var(--bg);
-      color: var(--black);
-      margin: 0;
-      padding: 0;
-    }
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--bg);
+  color: var(--black);
+  margin: 0;
+  padding: 0;
+}
 
-    .form-wrapper {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 20px;
-      padding-top: 80px;
-      min-height: 100vh;
-    }
+.form-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  padding-top: 80px;
+  min-height: 100vh;
+}
 
-    form {
-      background-color: var(--card);
-      width: 100%;
-      max-width: 700px;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 8px 15px rgba(0,0,0,0.2);
-      overflow: hidden;
-      position: relative;
-      transition: all 0.4s ease;
-    }
+form {
+  background-color: var(--card);
+  width: 100%;
+  max-width: 680px; /* igual ao criar evento */
+  padding: 22px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+  overflow: hidden;
+  position: relative;
+}
 
-    .etapa { display: none; }
-    .etapa.ativa { display: block; }
+/* Etapas */
+.etapa { display: none; }
+.etapa.ativa { display: block; }
 
-    h2, h3 {
-      text-align: center;
-      color: var(--black);
-      margin: 10px 0 20px;
-    }
+h2, h3 {
+  text-align: center;
+  color: var(--black);
+  margin: 6px 0 14px;
+}
 
-    label {
-      display:block;
-      margin-bottom:6px;
-      font-weight:600;
-      color:#111;
-      font-size:14px;
-    }
+label {
+  display:block;
+  margin-bottom:6px;
+  font-weight:600;
+  color:#111;
+  font-size:14px;
+}
 
-    input[type="text"], input[type="date"], input[type="time"], select,
-    textarea {
-      width: 100%;
-      padding: 8px 12px;
-      border-radius: 6px;
-      border: none;
-      font-size:14px;
-    }
+input[type="text"], input[type="date"], input[type="time"], select,
+textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: none;
+  font-size:14px;
+}
 
-    input[readonly] {
-      background:#e9e9e9;
-      color:#333;
-    }
+input[readonly] {
+  background:#e9e9e9;
+  color:#333;
+}
 
-    button {
-      border: none;
-      border-radius: 6px;
-      font-size: 15px;
-      cursor: pointer;
-      transition: all .2s ease;
-      padding: 10px 12px;
-    }
+button {
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background .18s ease;
+  padding: 10px 12px;
+}
 
-    .btn-primary { background:#000; color:#fff; font-weight:600; }
-    .btn-primary:hover { background:#232424; }
-    .btn-secondary { background:#444; color:#fff; font-weight:600; }
-    .btn-secondary:hover { background:#333; }
+.btn-primary { background:#000; color:#fff; font-weight:600; }
+.btn-primary:hover { background:#232424; }
+.btn-secondary { background:#444; color:#fff; font-weight:600; }
+.btn-secondary:hover { background:#333; }
 
-    .section { margin-bottom: 14px; }
+.section { margin-bottom: 14px; }
 
-    .row {
-      display:flex;
-      gap: var(--gap);
-      align-items:flex-start;
-      margin-bottom:12px;
-    }
+.row {
+  display:flex;
+  gap: var(--gap);
+  align-items:flex-start;
+  margin-bottom:12px;
+}
 
-    .col { flex:1; min-width:0; }
-    .col.small { flex:0 0 160px; }
-    .col.mid { flex:0 0 180px; }
+.col { flex:1; min-width:0; }
+.col.small { flex:0 0 160px; }
+.col.mid { flex:0 0 180px; }
 
-    .bebida-container {
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
+/* Bebidas */
+.bebida-container {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.bebida-opcao {
+  padding:6px 10px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  background:#f0f0f0;
+  cursor:pointer;
+  font-size:14px;
+  user-select:none;
+}
+.bebida-opcao.selecionado {
+  background:#000;
+  color:#fff;
+  border-color:#000;
+}
 
-    .bebida-opcao {
-      padding:6px 10px;
-      border-radius:6px;
-      border:1px solid #ccc;
-      background:#f0f0f0;
-      cursor:pointer;
-      font-size:14px;
-      user-select:none;
-      transition: all .2s;
-    }
+@media (max-width:760px) {
+  .row { flex-direction:column; }
+  .col.small, .col.mid { flex:1; }
+}
 
-    .bebida-opcao.selecionado {
-      background:#000;
-      color:#fff;
-      border-color:#000;
-    }
+.placeholder { margin-top:12px; }
 
-    @media (max-width:760px) {
-      .row { flex-direction:column; }
-      .col.small, .col.mid { flex:1; }
-    }
+/* Fade */
+.fade-in { animation: fadeIn .6s ease forwards; }
+.fade-out { animation: fadeOut .5s ease forwards; }
 
-    /* Fade transições */
-    .fade-in { animation: fadeIn .6s ease forwards; }
-    .fade-out { animation: fadeOut .5s ease forwards; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-15px); }
+}
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeOut {
-      from { opacity: 1; transform: translateY(0); }
-      to { opacity: 0; transform: translateY(-15px); }
-    }
-  </style>
+/* Modal de sucesso do editar */
+.modal-sucesso {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.modal-content {
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+}
+.modal-content h2 { color:#000; margin-bottom: 15px; }
+.modal-content p { font-size:14px; color:#333; }
+.modal-content button {
+  margin: 10px 8px 0;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight:600;
+}
+.btn-close { background:#555; color:#fff; }
+.btn-close:hover { background:#333; }
+.btn-lista { background:#000; color:#fff; }
+.btn-lista:hover { background:#232424; }
+</style>
 </head>
 <body>
   <div id="navbar-placeholder"></div>
@@ -165,16 +198,16 @@
             <input type="date" id="data_evento" name="data_evento" required>
           </div>
           <div class="col small">
-            <label for="hora_evento">Início</label>
+            <label for="hora_evento">Horário de Início</label>
             <input type="time" id="hora_evento" name="hora_evento" required>
           </div>
           <div class="col small">
-            <label for="hora_fim_evento">Término</label>
+            <label for="hora_fim_evento">Horário de Termino</label>
             <input type="time" id="hora_fim_evento" name="hora_fim_evento" required>
           </div>
-          <div class="col small">
+          <div class="col small" style="flex: 0 0 100px;">
             <label for="num_convidados">Convidados</label>
-            <select id="num_convidados" name="num_convidados" required style="width: 95%; font-size: 14px; padding: 8px 10px; border-radius: 6px;">
+            <select id="num_convidados" name="num_convidados" required style="width: 110%; font-size: 14px; padding: 8px 10px; border-radius: 6px;">
               <option value="">Selecione...</option>
               <option value="50">50</option>
               <option value="100">100</option>
@@ -302,6 +335,18 @@
 
   <div id="footer-placeholder"></div>
 
+<!-- 🔹 Modal de sucesso -->
+<div class="modal-sucesso" id="modalSucesso">
+  <div class="modal-content">
+    <h2>✅ Evento atualizado com sucesso!</h2>
+    <p id="mensagem-modal"></p>
+    <div style="margin-top:15px;">
+      <button class="btn-lista" id="btnIrLista">Ir para meus eventos</button>
+      <button class="btn-close" id="btnFecharModal">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
   const etapaDados = document.getElementById("etapa-dados");
@@ -312,6 +357,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const opcoesBebida = document.querySelectorAll('.bebida-opcao');
   const campoHidden = document.getElementById('tipo_bebida');
   let selecionados = [];
+  let tipoUsuario = null;
 
   function limparAnimacoes(el){ el.classList.remove("fade-in","fade-out"); void el.offsetWidth; }
 
@@ -351,12 +397,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
+  // --- Carregar navbar e identificar tipo de usuário ---
   async function carregarNavbar(){
     try{
       const resposta = await fetch('/api/usuarios/tipo',{ credentials:'include' });
       if(!resposta.ok) return;
       const dados = await resposta.json();
-      const urlNavbar = dados.tipo==="cliente"?"/components/navbarclient.html":"/components/navbarprof.html";
+      tipoUsuario = dados.tipo; // salva tipo para decidir redirecionamento
+      const urlNavbar = tipoUsuario==="cliente"?"/components/navbarclient.html":"/components/navbarprof.html";
       const htmlNavbar = await fetch(urlNavbar).then(res=>res.text());
       document.getElementById("navbar-placeholder").innerHTML = htmlNavbar;
     }catch(e){ console.error(e); }
@@ -369,7 +417,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if(!eventoId) return alert("ID do evento não informado.");
 
   try{
-    const resposta = await fetch(`/api/eventos/${eventoId}`);
+    const resposta = await fetch(`/api/eventos/${eventoId}`, { credentials: 'include' });
     if(!resposta.ok) throw new Error("Erro ao buscar dados do evento.");
     const evento = await resposta.json();
 
@@ -390,13 +438,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     campoHidden.value = selecionados.join(',');
 
     // Etapa endereço
-    // Campos etapa endereço
     ['cep','estado','cidade','rua','bairro','numero','complemento'].forEach(campo => {
       if(evento[campo]) document.getElementById(campo).value = evento[campo];
     });
 
-  }catch(e){ console.error(e); alert("Falha ao carregar dados do evento."); }
+  }catch(e){
+    console.error(e);
+    alert("Falha ao carregar dados do evento.");
+  }
 
+
+// --- Atualizar evento ---
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const dados = Object.fromEntries(new FormData(form));
@@ -409,19 +461,48 @@ form.addEventListener("submit", async (e) => {
       credentials: "include"
     });
 
-    if (!res.ok) throw new Error("Erro ao atualizar evento");
+    if (!res.ok) throw new Error("Erro ao atualizar evento.");
 
-    // Exibe mensagem de sucesso
-    alert("Evento atualizado com sucesso!");
-
-    // Volta automaticamente para a página anterior
-    window.history.back();
+    // 🔹 Exibe o modal de sucesso
+    mostrarModalSucesso();
 
   } catch (err) {
     console.error(err);
-    alert("Erro ao atualizar evento.");
+    alert("❌ Erro ao atualizar evento. Tente novamente.");
   }
+});
+
+
+// 🔹 Modal de sucesso
+const modal = document.getElementById("modalSucesso");
+const btnIrLista = document.getElementById("btnIrLista");
+const btnFecharModal = document.getElementById("btnFecharModal");
+
+// Função para exibir o modal após sucesso
+function mostrarModalSucesso(mensagem="") {
+  document.getElementById("mensagem-modal").textContent = mensagem;
+  modal.style.display = "flex";
+}
+
+// Botão "Fechar" → apenas oculta o modal
+btnFecharModal.addEventListener("click", () => {
+  modal.style.display = "none";
+});
+
+// Botão "Ir para lista" → redireciona conforme tipo
+btnIrLista.addEventListener("click", () => {
+  if (tipoUsuario === "profissional") {
+    window.location.href = "/profissional/eventos/ListaEvent.html";
+  } else {
+    window.location.href = "/api/eventos/meus-eventos";
+  }
+});
+
+// Fecha modal clicando fora do conteúdo
+window.addEventListener("click", (e) => {
+  if (e.target === modal) modal.style.display = "none";
 })});
+
 
   // carregar footer
         fetch('/components/footer.html')

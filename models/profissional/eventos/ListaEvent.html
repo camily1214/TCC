@@ -140,6 +140,25 @@
     animation: slideUp 0.35s ease forwards;
   }
 
+  .btn_cancelar {
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 8px 14px;
+  color: #fff;
+  margin-top: 15px;
+  transition: background-color 0.2s ease;
+  background-color: #c0392b; /* vermelho principal */
+}
+
+.btn_cancelar:hover {
+  background-color: #992d22; /* vermelho escuro no hover */
+}
+
+  .btn-cancelar { background-color: #c0392b; }
+  .btn-cancelar:hover { background-color: #992d22; transform: translateY(-2px); }
+
+
   @keyframes slideUp {
     from { transform: translateY(50px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
@@ -258,10 +277,11 @@
       <h3>Cancelar Evento</h3>
       <p>Informe o motivo do cancelamento:</p>
       <textarea id="motivoCancelamento" rows="4" style="width:100%; padding:8px; border-radius:5px;"></textarea>
-      <div style="text-align:center; margin-top:10px;">
-        <button id="btnConfirmarCancelamento" class="btn-cancelar">Cancelar Evento</button>
-        <button onclick="fecharModalCancelar()" class="btn-fechar">Fechar</button>
-      </div>
+    <div style="text-align:center; margin-top:10px;">
+      <button id="btnConfirmarCancelamento" class="btn_cancelar">Cancelar Evento</button>
+      <button onclick="fecharModalCancelar()" class="btn-fechar">Fechar</button>
+    </div>
+
     </div>
   </div>
 
@@ -382,13 +402,18 @@ document.getElementById('pesquisaEventos').addEventListener('input', function() 
       const descricao = evento.descricao_evento || '-';
       const complemento = evento.complemento || '-';
       const status = evento.status || 'aguardando';
-      const motivo = evento.motivo_cancelamento || '-';
 
+      // Motivo do cancelamento
+      const motivoCancelamento = evento.motivo_cancelamento && evento.motivo_cancelamento.trim() !== ''
+        ? evento.motivo_cancelamento
+        : 'Motivo não informado';
+
+      // Status formatado com motivo
       const statusFormatado =
         status === 'confirmado'
           ? '<span style="color:#27ae60;font-weight:bold;">Confirmado</span>'
           : status === 'cancelado'
-          ? `<span style="color:#c0392b;font-weight:bold;">Cancelado</span><br><strong>Motivo:</strong> ${motivo}`
+          ? `<span style="color:#c0392b;font-weight:bold;">Cancelado</span><br><strong>Motivo:</strong> ${motivoCancelamento}`
           : '<span style="color:#f1c40f;font-weight:bold;">Aguardando Confirmação</span>';
 
       const conteudo = document.getElementById('modalConteudo');
@@ -415,7 +440,6 @@ document.getElementById('pesquisaEventos').addEventListener('input', function() 
       document.getElementById('btnEditar').onclick = () => editarEvento(id);
       document.getElementById('modalDetalhes').style.display = 'flex';
     }
-
     function fecharModal() {
       document.getElementById('modalDetalhes').style.display = 'none';
     }

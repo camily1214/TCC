@@ -382,8 +382,11 @@ function verDetalhes(id) {
   const convidados = evento.num_convidados || '-';
   const descricao = evento.descricao_evento || '-';
   const complemento = evento.complemento || '-';
-  const status = evento.status || 'aguardando';
-  const motivoCancelamento = evento.motivo_cancelamento || '-';
+  const status = (evento.status || 'aguardando').toLowerCase();
+  const motivoCancelamento = evento.motivo_cancelamento && evento.motivo_cancelamento.trim() !== ''
+    ? evento.motivo_cancelamento
+    : 'Motivo não informado';
+
 
   const statusFormatado =
     status === 'confirmado'
@@ -416,6 +419,7 @@ function verDetalhes(id) {
   modal.classList.add('show');
   document.getElementById('btnEditar').onclick = () => editarEvento(id);
 }
+
 
 function deletarEvento(id) {
   if (!confirm('Deseja realmente excluir este evento?')) return;

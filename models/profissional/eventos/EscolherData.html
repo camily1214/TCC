@@ -5,52 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Escolher Data</title>
 
-    <!--Navbar-->
+  <!--Navbar-->
   <link rel="stylesheet" href="/css/navbar.css" />
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #c5c6c8;
-      color: #000;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f0f0f0, #dcdcdc);
+      color: #222;
       margin: 0;
       padding: 0;
-    }
-
-    header {
-      background-color: #555;
-      padding: 15px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    header h1 {
-      font-size: 28px;
-      margin: 0;
-    }
-
-    header nav a {
-      color: white;
-      margin-left: 20px;
-      text-decoration: none;
-      font-weight: bold;
+      transition: background 0.5s ease;
     }
 
     .calendario {
-      padding: 30px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 30px 20px;
+      margin: 50px auto;
+      background-color: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      max-width: 700px;
+      transition: all 0.4s ease;
     }
 
     .mes-navegacao {
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 24px;
-      margin-bottom: 20px;
+      font-size: 22px;
+      margin-bottom: 25px;
       gap: 20px;
+      transition: transform 0.3s ease;
     }
 
     .mes-navegacao span,
@@ -59,24 +47,29 @@
       font-weight: bold;
       background: none;
       border: none;
-      color: inherit;
-      font-size: 24px;
-      padding: 4px 8px;
+      color: #444;
+      font-size: 22px;
+      padding: 6px 12px;
       border-radius: 12px;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
     }
+
     .mes-navegacao span:hover,
     .mes-navegacao button:hover {
-      background-color: #333;
+      background-color: #727277;
+      color: #fff;
+      transform: scale(1.1);
     }
 
     table.tabela-calendario {
       border-collapse: separate;
       border-spacing: 10px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      opacity: 1;
     }
 
-    .tabela-calendario th,
-    .tabela-calendario td {
+    table.tabela-calendario td,
+    table.tabela-calendario th {
       width: 60px;
       height: 60px;
       text-align: center;
@@ -84,83 +77,57 @@
       border-radius: 15px;
       font-size: 18px;
       cursor: pointer;
-      color: #000;
+      transition: all 0.25s ease;
+      color: #fff;
     }
 
-    .tabela-calendario td:hover {
-      opacity: 0.8;
+    table.tabela-calendario th {
+      font-weight: bold;
+      font-size: 18px;
+      color: #555;
     }
 
-    .disponivel {
-      background-color: #727277;
+    table.tabela-calendario td:hover {
+      transform: scale(1.05);
     }
 
-    .feriado {
-      background-color: #f1c40f;
-      color: #000;
-    }
-
-    .agendado {
-      background-color: #e74c3c;
-    }
-
-    .vazio {
-      background-color: transparent;
-      cursor: default;
-    }
+    .disponivel { background-color: #888988; }
+    .agendado { background-color: #e74c3c; }
+    .feriado { background-color: #f1c40f; color: #000; }
+    .vazio { background-color: transparent; cursor: default; }
 
     .legenda {
       display: flex;
-      gap: 30px;
+      gap: 25px;
       margin-top: 25px;
-      font-size: 16px;
+      font-size: 15px;
+      justify-content: center;
     }
 
     .legenda span {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .legenda .cor {
       width: 20px;
       height: 20px;
       border-radius: 5px;
+      border: 1px solid #ccc;
     }
 
-        /* Botões da navbar e logo com a mesma cor */
-    .custom-navbar, .logo-area {
-      background-color: #727277 !important;
+    #navbar-placeholder, #footer-placeholder {
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      position: fixed;
+      width: 100%;
+      left: 0;
+      z-index: 999;
     }
 
-    .custom-navbar .nav-link {
-      background-color: #727277;
-      color: #fff !important;
-      font-weight: bold;
-      border-radius: 5px;
-      margin: 0 5px;
-      padding: 6px 12px;
-      display: inline-block;
-    }
-
-    .custom-navbar .nav-link:hover {
-      text-decoration: underline;
-      background-color: #666;
-    }
-
-      /* Navbar e Footer escondidos/mostrados com transição */
-#navbar-placeholder, #footer-placeholder {
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  position: fixed;
-  width: 100%;
-  left: 0;
-  z-index: 999;
-}
-
-#navbar-placeholder { top: 0; }
-#footer-placeholder { bottom: 0; }
-
-.hidden-footer { transform: translateY(20%); opacity: 0; }
+    #navbar-placeholder { top: 0; }
+    #footer-placeholder { bottom: 0; }
+    .hidden-footer { transform: translateY(20%); opacity: 0; }
   </style>
 </head>
 <body>
@@ -180,9 +147,7 @@
           <th>D</th><th>S</th><th>T</th><th>Q</th><th>Q</th><th>S</th><th>S</th>
         </tr>
       </thead>
-      <tbody id="corpo-calendario">
-        <!-- Dias serão gerados dinamicamente aqui -->
-      </tbody>
+      <tbody id="corpo-calendario"></tbody>
     </table>
 
     <div class="legenda">
@@ -195,218 +160,174 @@
   <div id="footer-placeholder"></div>
 
   <script>
-  const corpoCalendario = document.getElementById("corpo-calendario");
-  const mesAno          = document.getElementById("mesAno");
+    const corpoCalendario = document.getElementById("corpo-calendario");
+    const mesAno = document.getElementById("mesAno");
 
-  let dataAtual         = new Date();
-  let eventosAgendados  = [];                // será preenchido via fetch
-  const feriados        = [];                // mantenha aqui se precisar
+    let dataAtual = new Date();
+    let eventosAgendados = [];
+    const feriados = [];
 
-
-  /* 1. Busca no backend as datas de eventos já confirmados ------------ */
-  async function carregarDatasAgendadas() {
-    try {
-      const resp = await fetch('/api/eventos/datas-agendadas');
-      if (!resp.ok) throw new Error('Erro ao buscar datas');
-      eventosAgendados = await resp.json();
-    } catch (err) {
-      console.error('Falha ao carregar datas agendadas:', err);
-    }
-  }
-
-
-  /* 2. Funções auxiliares e geração do calendário --------------------- */
-  function formatarDataLocal(date) {
-    const ano = date.getFullYear();
-    const mes = String(date.getMonth() + 1).padStart(2, '0');
-    const dia = String(date.getDate()).padStart(2, '0');
-    return `${ano}-${mes}-${dia}`;
-  }
-
-  function gerarCalendario(ano, mes) {
-    corpoCalendario.innerHTML = "";
-    const primeiroDia = new Date(ano, mes, 1);
-    const ultimoDia   = new Date(ano, mes + 1, 0);
-    const nomeMes     = primeiroDia.toLocaleString("pt-BR", { month: "long" });
-
-    mesAno.textContent = `${nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)} ${ano}`;
-    mesAno.onclick     = habilitarEdicaoMesAno;
-
-    let linha = document.createElement("tr");
-
-    // células vazias antes do 1º dia do mês
-    for (let i = 0; i < primeiroDia.getDay(); i++) {
-      const vazio = document.createElement("td");
-      vazio.className = "vazio";
-      linha.appendChild(vazio);
-    }
-
-    for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
-      const dataCompleta = new Date(ano, mes, dia);
-      const dataStr      = formatarDataLocal(dataCompleta);
-
-      const celula = document.createElement("td");
-      celula.textContent = dia;
-
-      if (eventosAgendados.includes(dataStr)) {
-        celula.className = "agendado";           // vermelho
-      } else if (feriados.includes(dataStr)) {
-        celula.className = "feriado";
-      } else {
-        celula.className = "disponivel";
-        celula.onclick   = () => selecionarData(dataStr);
-      }
-
-      linha.appendChild(celula);
-
-      if (dataCompleta.getDay() === 6) {         // sábado → quebra de linha
-        corpoCalendario.appendChild(linha);
-        linha = document.createElement("tr");
+    async function carregarDatasAgendadas() {
+      try {
+        const resp = await fetch('/api/eventos/datas-agendadas');
+        if (!resp.ok) throw new Error('Erro ao buscar datas');
+        eventosAgendados = await resp.json();
+      } catch (err) {
+        console.error('Falha ao carregar datas agendadas:', err);
       }
     }
 
-    if (linha.children.length > 0) corpoCalendario.appendChild(linha);
-  }
-
-  function mudarMes(delta) {
-    dataAtual.setMonth(dataAtual.getMonth() + delta);
-    gerarCalendario(dataAtual.getFullYear(), dataAtual.getMonth());
-  }
-
-function selecionarData(data) {
-  // Redireciona para a página de criação de evento passando a data como parâmetro
-  window.location.href = `/api/eventos/criar?data=${data}`;
-}
-
-  /* ------------------------------------------------------------------ */
-  /* 3. Permite editar mês/ano clicando no cabeçalho ------------------- */
-  function habilitarEdicaoMesAno() {
-    mesAno.onclick = null;
-
-    const anoAtual = dataAtual.getFullYear();
-    const mesAtual = dataAtual.getMonth();
-
-    const selectMes = document.createElement("select");
-    const meses = [
-      "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
-      "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
-    ];
-    meses.forEach((nome, idx) => {
-      const opt = document.createElement("option");
-      opt.value = idx;
-      opt.textContent = nome;
-      if (idx === mesAtual) opt.selected = true;
-      selectMes.appendChild(opt);
-    });
-
-    selectMes.style.fontSize = "18px";
-    selectMes.style.padding  = "6px 12px";
-    selectMes.style.borderRadius = "12px";
-    selectMes.style.border   = "1px solid #ccc";
-    selectMes.style.outline  = "none";
-
-    const inputAno = document.createElement("input");
-    inputAno.type  = "number";
-    inputAno.value = anoAtual;
-    inputAno.style.width = "90px";
-    inputAno.style.fontSize = "18px";
-    inputAno.style.padding  = "6px 12px";
-    inputAno.style.borderRadius = "12px";
-    inputAno.style.border  = "1px solid #ccc";
-    inputAno.style.outline = "none";
-    inputAno.min = 1970;
-    inputAno.max = 2100;
-
-    mesAno.textContent = "";
-    mesAno.appendChild(selectMes);
-    mesAno.appendChild(document.createTextNode(" "));
-    mesAno.appendChild(inputAno);
-
-    function atualizar() {
-      const novoMes = parseInt(selectMes.value, 10);
-      let   novoAno = parseInt(inputAno.value, 10);
-
-      if (isNaN(novoAno) || novoAno < 1970) novoAno = 1970;
-      if (novoAno > 2100) novoAno = 2100;
-
-      dataAtual = new Date(novoAno, novoMes, 1);
-      gerarCalendario(novoAno, novoMes);
+    function formatarDataLocal(date) {
+      const ano = date.getFullYear();
+      const mes = String(date.getMonth() + 1).padStart(2, '0');
+      const dia = String(date.getDate()).padStart(2, '0');
+      return `${ano}-${mes}-${dia}`;
     }
 
-    selectMes.onchange = atualizar;
-    inputAno.onchange  = atualizar;
+    function gerarCalendario(ano, mes) {
+      corpoCalendario.style.opacity = 0; // fade out
+      setTimeout(() => {
+        corpoCalendario.innerHTML = "";
+        const primeiroDia = new Date(ano, mes, 1);
+        const ultimoDia = new Date(ano, mes + 1, 0);
+        const nomeMes = primeiroDia.toLocaleString("pt-BR", { month: "long" });
 
-    inputAno.onblur = () => {
-      if (inputAno.value === "") inputAno.value = dataAtual.getFullYear();
-      atualizar();
-    };
+        mesAno.textContent = `${nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1)} ${ano}`;
+        mesAno.onclick = habilitarEdicaoMesAno;
 
-    inputAno.onkeydown = (e) => {
-      if (e.key === "Enter") inputAno.blur();
-    };
-  }
+        let linha = document.createElement("tr");
 
+        for (let i = 0; i < primeiroDia.getDay(); i++) {
+          const vazio = document.createElement("td");
+          vazio.className = "vazio";
+          linha.appendChild(vazio);
+        }
 
-  // 4. Inicializa: busca datas confirmadas, depois gera o calendário
-  (async function initCalendario() {
-    await carregarDatasAgendadas();                        // ← carrega backend
-    gerarCalendario(dataAtual.getFullYear(), dataAtual.getMonth());
-  })();
+        for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
+          const dataCompleta = new Date(ano, mes, dia);
+          const dataStr = formatarDataLocal(dataCompleta);
 
-// Carregar navbar
-  async function carregarNavbar() {
-    try {
-      // 1. Pergunta ao backend o tipo do usuário
-      const resposta = await fetch('/api/usuarios/tipo', { credentials: 'include' });
-      if (!resposta.ok) throw new Error("Falha ao validar usuário");
+          const celula = document.createElement("td");
+          celula.textContent = dia;
 
-      const dados = await resposta.json();
-      let urlNavbar = "";
+          if (eventosAgendados.includes(dataStr)) {
+            celula.className = "agendado";
+          } else if (feriados.includes(dataStr)) {
+            celula.className = "feriado";
+          } else {
+            celula.className = "disponivel";
+            celula.onclick = () => {
+              celula.style.transform = 'scale(1.2)';
+              celula.style.transition = 'transform 0.2s ease';
+              setTimeout(() => selecionarData(dataStr), 150);
+            };
+          }
 
-      // 2. Decide qual navbar carregar
-      if (dados.tipo === "cliente") {
-        urlNavbar = "/components/navbarclient.html";
-      } else if (dados.tipo === "profissional") {
-        urlNavbar = "/components/navbarprof.html";
-      } else {
-        console.warn("Usuário não autenticado ou tipo indefinido");
-        return;
+          linha.appendChild(celula);
+
+          if (dataCompleta.getDay() === 6) {
+            corpoCalendario.appendChild(linha);
+            linha = document.createElement("tr");
+          }
+        }
+
+        if (linha.children.length > 0) corpoCalendario.appendChild(linha);
+        corpoCalendario.style.opacity = 1; // fade in
+      }, 200);
+    }
+
+    function mudarMes(delta) {
+      dataAtual.setMonth(dataAtual.getMonth() + delta);
+      gerarCalendario(dataAtual.getFullYear(), dataAtual.getMonth());
+    }
+
+    function selecionarData(data) {
+      window.location.href = `/api/eventos/criar?data=${data}`;
+    }
+
+    function habilitarEdicaoMesAno() {
+      mesAno.onclick = null;
+      const anoAtual = dataAtual.getFullYear();
+      const mesAtual = dataAtual.getMonth();
+      const selectMes = document.createElement("select");
+      const meses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+      meses.forEach((nome, idx) => {
+        const opt = document.createElement("option");
+        opt.value = idx;
+        opt.textContent = nome;
+        if(idx===mesAtual) opt.selected=true;
+        selectMes.appendChild(opt);
+      });
+      selectMes.style.fontSize="18px";
+      selectMes.style.padding="6px 12px";
+      selectMes.style.borderRadius="12px";
+      selectMes.style.border="1px solid #ccc";
+      selectMes.style.outline="none";
+
+      const inputAno = document.createElement("input");
+      inputAno.type="number";
+      inputAno.value=anoAtual;
+      inputAno.style.width="90px";
+      inputAno.style.fontSize="18px";
+      inputAno.style.padding="6px 12px";
+      inputAno.style.borderRadius="12px";
+      inputAno.style.border="1px solid #ccc";
+      inputAno.style.outline="none";
+      inputAno.min=1970; inputAno.max=2100;
+
+      mesAno.textContent="";
+      mesAno.appendChild(selectMes);
+      mesAno.appendChild(document.createTextNode(" "));
+      mesAno.appendChild(inputAno);
+
+      function atualizar() {
+        const novoMes = parseInt(selectMes.value,10);
+        let novoAno = parseInt(inputAno.value,10);
+        if(isNaN(novoAno)||novoAno<1970) novoAno=1970;
+        if(novoAno>2100) novoAno=2100;
+        dataAtual=new Date(novoAno,novoMes,1);
+        gerarCalendario(novoAno,novoMes);
       }
-
-      // 3. Carrega a navbar correta
-      const htmlNavbar = await fetch(urlNavbar).then(res => res.text());
-      document.getElementById("navbar-placeholder").innerHTML = htmlNavbar;
-
-    } catch (err) {
-      console.error("Erro ao carregar navbar:", err);
+      selectMes.onchange=atualizar;
+      inputAno.onchange=atualizar;
+      inputAno.onblur=()=>{if(inputAno.value==="") inputAno.value=dataAtual.getFullYear(); atualizar();}
+      inputAno.onkeydown=(e)=>{if(e.key==="Enter") inputAno.blur();}
     }
-  }
 
-  document.addEventListener("DOMContentLoaded", carregarNavbar);
+    (async function initCalendario() {
+      await carregarDatasAgendadas();
+      gerarCalendario(dataAtual.getFullYear(), dataAtual.getMonth());
+    })();
 
-let ultimaPosicaoScroll = 0;
+    async function carregarNavbar() {
+      try {
+        const resposta = await fetch('/api/usuarios/tipo', { credentials: 'include' });
+        if (!resposta.ok) throw new Error("Falha ao validar usuário");
+        const dados = await resposta.json();
+        let urlNavbar = "";
+        if(dados.tipo==="cliente") urlNavbar="/components/navbarclient.html";
+        else if(dados.tipo==="profissional") urlNavbar="/components/navbarprof.html";
+        else return;
+        const htmlNavbar = await fetch(urlNavbar).then(res=>res.text());
+        document.getElementById("navbar-placeholder").innerHTML=htmlNavbar;
+      } catch(err){ console.error("Erro ao carregar navbar:", err); }
+    }
 
-window.addEventListener('scroll', () => {
-  const footer = document.getElementById('footer-placeholder');
-  const posicaoAtual = window.pageYOffset || document.documentElement.scrollTop;
+    document.addEventListener("DOMContentLoaded", carregarNavbar);
 
-  if (posicaoAtual > ultimaPosicaoScroll) {
-    // rolando para baixo → esconder
-    footer.classList.remove('hidden-footer');
-  } else {
-    // rolando para cima → mostrar
-    footer.classList.add('hidden-footer');
-  }
-
-  ultimaPosicaoScroll = posicaoAtual <= 0 ? 0 : posicaoAtual; // evitar negativos
-})
+    let ultimaPosicaoScroll = 0;
+    window.addEventListener('scroll', () => {
+      const footer = document.getElementById('footer-placeholder');
+      const posicaoAtual = window.pageYOffset || document.documentElement.scrollTop;
+      if(posicaoAtual>ultimaPosicaoScroll) footer.classList.remove('hidden-footer');
+      else footer.classList.add('hidden-footer');
+      ultimaPosicaoScroll=posicaoAtual<=0?0:posicaoAtual;
+    })
 
     fetch('/components/footer.html')
-      .then(res => res.text())
-      .then(data => {
-        document.getElementById('footer-placeholder').innerHTML = data;
-      })
-      .catch(err => console.error('Erro ao carregar rodapé:', err));
-</script>
+      .then(res=>res.text())
+      .then(data=>document.getElementById('footer-placeholder').innerHTML=data)
+      .catch(err=>console.error('Erro ao carregar rodapé:', err));
+  </script>
 </body>
 </html>

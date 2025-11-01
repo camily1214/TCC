@@ -70,6 +70,39 @@ router.get('/me', autenticar, apenasClientes, async (req, res) => {
   }
 });
 
+// Atualizar perfil do usuário logado
+router.put('/me', autenticar, apenasClientes, async (req, res) => {
+  try {
+    const usuarioId = req.session.usuario.id;
+    const dados = req.body;
+
+    // Protege campos que não podem ser alterados
+    delete dados.cpf;
+    delete dados.tipo;
+    delete dados.senha; // senha antiga não pode ser alterada diretamente
+
+    // Atualiza senha se enviado
+    if (dados.senhaNova) {
+      if (dados.senhaNova !== dados.confirmaSenha) {
+        return res.status(400).json({ mensagem: 'As senhas não coincidem.' });
+      }
+      dados.senha = await bcrypt.hash(dados.senhaNova, 10);
+    }
+
+    // Remove campos temporários
+    delete dados.senhaNova;
+    delete dados.confirmaSenha;
+
+    const usuarioAtualizado = await Usuario.findByIdAndUpdate(usuarioId, dados, { new: true, runValidators: true }).select('-senha');
+
+    res.json({ mensagem: 'Perfil atualizado com sucesso', usuario: usuarioAtualizado });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensagem: 'Erro ao atualizar perfil.' });
+  }
+});
+
+
 /* ---ROTAS DE AUTENTICAÇÃO---*/
 
 // Rota de login
@@ -202,27 +235,6 @@ router.get('/dados', async (req, res) => {
   }
 });
 
-// Deletar usuário + eventos vinculados (somente profissionais)
-router.delete('/:id', autenticar, apenasProfissionais, async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Apagar usuário
-    const usuario = await Usuario.findByIdAndDelete(id);
-    if (!usuario) {
-      return res.status(404).json({ mensagem: 'Usuário não encontrado.' });
-    }
-
-    // Apagar eventos relacionados a esse usuário
-    await Evento.deleteMany({ usuarioId: id });
-
-    res.status(200).json({ mensagem: 'Usuário e eventos excluídos com sucesso.' });
-  } catch (err) {
-    console.error("Erro ao deletar usuário e eventos:", err);
-    res.status(500).json({ erro: 'Erro ao excluir usuário: ' + err.message });
-  }
-});
-
 
 // Rota GET para listar todos os usuários com log de debug (somente profissionais)
 router.get('/api/usuarios/debug', autenticar, apenasProfissionais, async (req, res) => {
@@ -236,29 +248,35 @@ router.get('/api/usuarios/debug', autenticar, apenasProfissionais, async (req, r
   }
 });
 
-// Deletar a própria conta (cliente)
+
+// Deletar própria conta (cliente)
 router.delete('/me', autenticar, apenasClientes, async (req, res) => {
   try {
     const usuarioId = req.session.usuario.id;
-
-    // Deleta eventos vinculados
-    await Evento.deleteMany({ usuarioId });
-
-    // Deleta usuário
+    await Evento.deleteMany({ clienteId: usuarioId });
     await Usuario.findByIdAndDelete(usuarioId);
-
-    // Finaliza sessão
-    req.session.destroy(err => {
-      if (err) console.error(err);
-    });
-
-    res.status(200).json({ mensagem: 'Conta excluída com sucesso.' });
+    req.session.destroy(err => { if (err) console.error(err); });
+    res.status(200).json({ mensagem: 'Conta e todos os eventos excluídos com sucesso.' });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ mensagem: 'Erro ao excluir conta.' });
+    res.status(500).json({ mensagem: 'Erro ao excluir conta e eventos.' });
   }
 });
 
+// Deletar outro usuário (profissional)
+router.delete('/:id', autenticar, apenasProfissionais, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const usuario = await Usuario.findByIdAndDelete(id);
+    if (!usuario) return res.status(404).json({ mensagem: 'Usuário não encontrado.' });
+
+    await Evento.deleteMany({ clienteId: id });
+    res.status(200).json({ mensagem: 'Usuário e eventos excluídos com sucesso.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensagem: 'Erro ao excluir usuário.' });
+  }
+});
 
 router.get('/tipo', (req, res) => {
   if (req.session.usuario) {
