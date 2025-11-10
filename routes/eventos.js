@@ -186,6 +186,7 @@ router.get('/lista-evento', autenticar, apenasProfissionais, async (req, res) =>
       return {
         _id: e._id,
         status: e.status || 'aguardando',
+        motivo_cancelamento: e.motivo_cancelamento || null,
         usuarioNome: e.usuarioId?.nome || '-',
         usuarioTelefone: e.usuarioId?.telefone || '-',
         tipo_evento: e.tipo_evento || '-',

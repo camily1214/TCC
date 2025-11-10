@@ -1,4 +1,3 @@
-<!-- 🔹 ATUALIZADO: ListaEvent.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -401,24 +400,24 @@ document.getElementById('pesquisaEventos').addEventListener('input', function() 
       const convidados = evento.num_convidados || '-';
       const descricao = evento.descricao_evento || '-';
       const complemento = evento.complemento || '-';
-      const status = evento.status || 'aguardando';
-
-      // Motivo do cancelamento
+      const status = (evento.status || 'aguardando').toLowerCase();
       const motivoCancelamento = evento.motivo_cancelamento && evento.motivo_cancelamento.trim() !== ''
-        ? evento.motivo_cancelamento
-        : 'Motivo não informado';
+      ? evento.motivo_cancelamento
+      : 'Motivo não informado';
+
 
       // Status formatado com motivo
       const statusFormatado =
         status === 'confirmado'
           ? '<span style="color:#27ae60;font-weight:bold;">Confirmado</span>'
           : status === 'cancelado'
-          ? `<span style="color:#c0392b;font-weight:bold;">Cancelado</span><br><strong>Motivo:</strong> ${motivoCancelamento}`
+          ? '<span style="color:#c0392b;font-weight:bold;">Cancelado</span>'
           : '<span style="color:#f1c40f;font-weight:bold;">Aguardando Confirmação</span>';
 
       const conteudo = document.getElementById('modalConteudo');
       conteudo.innerHTML = `
         <p><strong>Status:</strong> ${statusFormatado}</p>
+        ${status === 'cancelado' ? `<p><strong>Motivo do Cancelamento:</strong> ${motivoCancelamento}</p>` : ''}
         <p><strong>Data do Evento:</strong> ${data}</p>
         <p><strong>Hora de Início:</strong> ${horaInicio}</p>
         <p><strong>Hora de Término:</strong> ${horaFim}</p>

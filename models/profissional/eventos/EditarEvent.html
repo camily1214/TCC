@@ -177,6 +177,23 @@ button {
 .btn-close:hover { background:#333; }
 .btn-lista { background:#000; color:#fff; }
 .btn-lista:hover { background:#232424; }
+
+    /* Transições suaves */
+    .fade-in {
+      animation: fadeIn .6s ease forwards;
+    }
+    .fade-out {
+      animation: fadeOut .5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-15px); }
+    }
 </style>
 </head>
 <body>
@@ -335,10 +352,10 @@ button {
 
   <div id="footer-placeholder"></div>
 
-<!-- 🔹 Modal de sucesso -->
+<!-- Modal de sucesso -->
 <div class="modal-sucesso" id="modalSucesso">
   <div class="modal-content">
-    <h2>✅ Evento atualizado com sucesso!</h2>
+    <h2>Evento atualizado com sucesso!</h2>
     <p id="mensagem-modal"></p>
     <div style="margin-top:15px;">
       <button class="btn-lista" id="btnIrLista">Ir para meus eventos</button>
@@ -431,6 +448,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('num_convidados').value = evento.num_convidados||'';
     document.getElementById('descricao_evento').value = evento.descricao_evento||'';
 
+    // Corrige seleção do tipo de evento (garante exibição correta)
+const tipoSelect = document.getElementById('tipo_evento');
+if (evento.tipo_evento) {
+  tipoSelect.value = evento.tipo_evento;
+  // Caso o valor não exista na lista (ex: diferença de maiúsculas/minúsculas)
+  if (tipoSelect.value !== evento.tipo_evento) {
+    [...tipoSelect.options].forEach(opt => {
+      if (opt.value.toLowerCase() === evento.tipo_evento.toLowerCase()) {
+        tipoSelect.value = opt.value;
+      }
+    });
+  }
+}
+
     selecionados = evento.tipo_bebida?evento.tipo_bebida.split(','):[];
     opcoesBebida.forEach(op => {
       if(selecionados.includes(op.dataset.value)) op.classList.add('selecionado');
@@ -468,12 +499,12 @@ form.addEventListener("submit", async (e) => {
 
   } catch (err) {
     console.error(err);
-    alert("❌ Erro ao atualizar evento. Tente novamente.");
+    alert("Erro ao atualizar evento. Tente novamente.");
   }
 });
 
 
-// 🔹 Modal de sucesso
+// Modal de sucesso
 const modal = document.getElementById("modalSucesso");
 const btnIrLista = document.getElementById("btnIrLista");
 const btnFecharModal = document.getElementById("btnFecharModal");

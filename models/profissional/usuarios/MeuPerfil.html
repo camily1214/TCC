@@ -115,6 +115,20 @@
     .form-row { flex-direction: column; }
     form { padding: 22px; }
   }
+
+    /* Navbar e Footer escondidos/mostrados com transição */
+#navbar-placeholder, #footer-placeholder {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  position: fixed;
+  width: 100%;
+  left: 0;
+  z-index: 999;
+}
+
+#navbar-placeholder { top: 0; }
+#footer-placeholder { bottom: 0; }
+
+.hidden-footer { transform: translateY(20%); opacity: 0; }
 </style>
 </head>
 <body>

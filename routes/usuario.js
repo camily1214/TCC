@@ -227,7 +227,7 @@ router.get('/usuarios/listaUsu', autenticar, apenasProfissionais, async (req, re
 // Rota para buscar todos os usuários em JSON
 router.get('/dados', async (req, res) => {
   try {
-    const usuarios = await Usuario.find();
+    const usuarios = await Usuario.find().sort({ nome: 1 });
     res.json(usuarios);
   } catch (err) {
     console.error('Erro ao buscar usuários:', err);
